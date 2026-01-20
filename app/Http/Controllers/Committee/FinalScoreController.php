@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Committee;
 
-use App\Models\SelectionResult;
+use App\Models\FinalScore;
 use Illuminate\Http\Request;
 
-class SelectionResultController extends Controller
+class FinalScoreController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class SelectionResultController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SelectionResult $selectionResult)
+    public function show(FinalScore $finalScore)
     {
         //
     }
@@ -42,7 +42,7 @@ class SelectionResultController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(SelectionResult $selectionResult)
+    public function edit(FinalScore $finalScore)
     {
         //
     }
@@ -50,7 +50,7 @@ class SelectionResultController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SelectionResult $selectionResult)
+    public function update(Request $request, FinalScore $finalScore)
     {
         //
     }
@@ -58,7 +58,7 @@ class SelectionResultController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SelectionResult $selectionResult)
+    public function destroy(FinalScore $finalScore)
     {
         //
     }

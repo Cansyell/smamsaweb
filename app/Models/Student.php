@@ -13,6 +13,7 @@ class Student extends Model
 
     protected $fillable = [
         'user_id',
+        'academic_year_id',
         'student_id',
         'nisn',
         'full_name',
@@ -41,6 +42,21 @@ class Student extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
+    public function testScore()
+    {
+        return $this->hasOne(TestScore::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 
     /* =======================
@@ -76,6 +92,11 @@ class Student extends Model
         return $query->where('graduation_year', $year);
     }
 
+    public function scopeByAcademicYear($query, $academicYearId)
+    {
+        return $query->where('academic_year_id', $academicYearId);
+    }
+
     /* =======================
      | BUSINESS LOGIC
      ======================= */
@@ -83,6 +104,7 @@ class Student extends Model
     {
         return self::create([
             'user_id'          => $data['user_id'],
+            'academic_year_id' => $data['academic_year_id'] ?? null,
             'student_id'       => self::generateStudentId(),
             'nisn'             => $data['nisn'],
             'full_name'        => $data['full_name'],

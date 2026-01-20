@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Committee;
 
-use App\Models\FinalScore;
+use App\Models\TestScore;
 use Illuminate\Http\Request;
 
-class FinalScoreController extends Controller
+class TestScoreController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class FinalScoreController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(FinalScore $finalScore)
+    public function show(TestScore $testScore)
     {
         //
     }
@@ -42,7 +42,7 @@ class FinalScoreController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(FinalScore $finalScore)
+    public function edit(TestScore $testScore)
     {
         //
     }
@@ -50,7 +50,7 @@ class FinalScoreController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, FinalScore $finalScore)
+    public function update(Request $request, TestScore $testScore)
     {
         //
     }
@@ -58,7 +58,7 @@ class FinalScoreController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(FinalScore $finalScore)
+    public function destroy(TestScore $testScore)
     {
         //
     }

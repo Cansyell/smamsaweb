@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Student;
 
-use App\Models\ReportGrade;
+use App\Models\Document;
 use Illuminate\Http\Request;
 
-class ReportGradeController extends Controller
+class DocumentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class ReportGradeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ReportGrade $reportGrade)
+    public function show(Document $document)
     {
         //
     }
@@ -42,7 +42,7 @@ class ReportGradeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ReportGrade $reportGrade)
+    public function edit(Document $document)
     {
         //
     }
@@ -50,7 +50,7 @@ class ReportGradeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ReportGrade $reportGrade)
+    public function update(Request $request, Document $document)
     {
         //
     }
@@ -58,7 +58,7 @@ class ReportGradeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ReportGrade $reportGrade)
+    public function destroy(Document $document)
     {
         //
     }
