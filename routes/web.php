@@ -6,7 +6,7 @@ use App\Http\Controllers\ProfileController;
 // Admin Controllers
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
-// use App\Http\Controllers\Admin\CriteriaController;
+use App\Http\Controllers\Admin\CriteriaController;
 // use App\Http\Controllers\Admin\CalculationController;
 // use App\Http\Controllers\Admin\ResultController;
 // use App\Http\Controllers\Admin\RankingController;
@@ -69,68 +69,74 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Data Siswa
-    Route::prefix('students')->name('students.')->group(function () {
-        Route::get('/', [StudentController::class, 'index'])->name('index');
-        Route::get('/create', [StudentController::class, 'create'])->name('create');
-        Route::post('/', [StudentController::class, 'store'])->name('store');
-        Route::get('/{student}', [StudentController::class, 'show'])->name('show');
-        Route::get('/{student}/edit', [StudentController::class, 'edit'])->name('edit');
-        Route::put('/{student}', [StudentController::class, 'update'])->name('update');
-        Route::delete('/{student}', [StudentController::class, 'destroy'])->name('destroy');
-        Route::get('/export', [StudentController::class, 'export'])->name('export');
+    // Group Admin dengan prefix dan name
+    Route::prefix('admin')->name('admin.')->group(function () {
+        
+        // Data Siswa
+        Route::prefix('students')->name('students.')->group(function () {
+            Route::get('/', [StudentController::class, 'index'])->name('index');
+            Route::get('/create', [StudentController::class, 'create'])->name('create');
+            Route::post('/', [StudentController::class, 'store'])->name('store');
+            Route::get('/{student}', [StudentController::class, 'show'])->name('show');
+            Route::get('/{student}/edit', [StudentController::class, 'edit'])->name('edit');
+            Route::put('/{student}', [StudentController::class, 'update'])->name('update');
+            Route::delete('/{student}', [StudentController::class, 'destroy'])->name('destroy');
+            Route::get('/export', [StudentController::class, 'export'])->name('export');
+        });
+        
+        // Kriteria Penilaian - Resource route dengan custom routes
+        Route::resource('criterias', CriteriaController::class);
+        
+        // Route tambahan untuk Criteria
+        Route::patch('criterias/{criteria}/toggle-status', [CriteriaController::class, 'toggleStatus'])
+            ->name('criterias.toggle-status');
+        
+        Route::post('criterias/{specialization}/reorder', [CriteriaController::class, 'reorder'])
+            ->name('criterias.reorder')
+            ->whereIn('specialization', ['tahfiz', 'language']);
+        
+        // Perhitungan Kriteria
+        // Route::prefix('calculation')->name('calculation.')->group(function () {
+        //     Route::get('/', [CalculationController::class, 'index'])->name('index');
+        //     Route::post('/process', [CalculationController::class, 'process'])->name('process');
+        //     Route::post('/recalculate', [CalculationController::class, 'recalculate'])->name('recalculate');
+        //     Route::get('/preview', [CalculationController::class, 'preview'])->name('preview');
+        // });
+        
+        // Hasil Perhitungan
+        // Route::prefix('results')->name('results.')->group(function () {
+        //     Route::get('/', [ResultController::class, 'index'])->name('index');
+        //     Route::get('/{student}', [ResultController::class, 'show'])->name('show');
+        //     Route::get('/export/all', [ResultController::class, 'export'])->name('export');
+        //     Route::get('/export/pdf', [ResultController::class, 'exportPdf'])->name('export.pdf');
+        // });
+        
+        // Ranking
+        // Route::prefix('rankings')->name('rankings.')->group(function () {
+        //     Route::get('/tahfiz', [RankingController::class, 'tahfiz'])->name('tahfiz');
+        //     Route::get('/bahasa', [RankingController::class, 'bahasa'])->name('bahasa');
+        //     Route::get('/reguler', [RankingController::class, 'reguler'])->name('reguler');
+        //     Route::post('/finalize', [RankingController::class, 'finalize'])->name('finalize');
+        // });
+        
+        // Kuota Peminatan
+        // Route::prefix('quota')->name('quota.')->group(function () {
+        //     Route::get('/settings', [QuotaController::class, 'index'])->name('settings');
+        //     Route::post('/update', [QuotaController::class, 'update'])->name('update');
+        // });
+        
+        // Kelola Pengguna
+        // Route::resource('users', UserController::class);
+        // Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+        
+        // Pengaturan Sistem
+        // Route::prefix('settings')->name('settings.')->group(function () {
+        //     Route::get('/', [SettingsController::class, 'index'])->name('index');
+        //     Route::post('/update', [SettingsController::class, 'update'])->name('update');
+        //     Route::get('/academic-year', [SettingsController::class, 'academicYear'])->name('academic-year');
+        //     Route::post('/academic-year/activate', [SettingsController::class, 'activateYear'])->name('academic-year.activate');
+        // });
     });
-    
-    // Kriteria Penilaian
-    // Route::prefix('criteria')->name('criteria.')->group(function () {
-    //     Route::get('/', [CriteriaController::class, 'index'])->name('index');
-    //     Route::post('/', [CriteriaController::class, 'store'])->name('store');
-    //     Route::get('/{criteria}/edit', [CriteriaController::class, 'edit'])->name('edit');
-    //     Route::put('/{criteria}', [CriteriaController::class, 'update'])->name('update');
-    //     Route::delete('/{criteria}', [CriteriaController::class, 'destroy'])->name('destroy');
-    // });
-    
-    // Perhitungan Kriteria
-    // Route::prefix('calculation')->name('calculation.')->group(function () {
-    //     Route::get('/', [CalculationController::class, 'index'])->name('index');
-    //     Route::post('/process', [CalculationController::class, 'process'])->name('process');
-    //     Route::post('/recalculate', [CalculationController::class, 'recalculate'])->name('recalculate');
-    //     Route::get('/preview', [CalculationController::class, 'preview'])->name('preview');
-    // });
-    
-    // Hasil Perhitungan
-    // Route::prefix('results')->name('results.')->group(function () {
-    //     Route::get('/', [ResultController::class, 'index'])->name('index');
-    //     Route::get('/{student}', [ResultController::class, 'show'])->name('show');
-    //     Route::get('/export/all', [ResultController::class, 'export'])->name('export');
-    //     Route::get('/export/pdf', [ResultController::class, 'exportPdf'])->name('export.pdf');
-    // });
-    
-    // Ranking
-    // Route::prefix('rankings')->name('rankings.')->group(function () {
-    //     Route::get('/tahfiz', [RankingController::class, 'tahfiz'])->name('tahfiz');
-    //     Route::get('/bahasa', [RankingController::class, 'bahasa'])->name('bahasa');
-    //     Route::get('/reguler', [RankingController::class, 'reguler'])->name('reguler');
-    //     Route::post('/finalize', [RankingController::class, 'finalize'])->name('finalize');
-    // });
-    
-    // Kuota Peminatan
-    // Route::prefix('quota')->name('quota.')->group(function () {
-    //     Route::get('/settings', [QuotaController::class, 'index'])->name('settings');
-    //     Route::post('/update', [QuotaController::class, 'update'])->name('update');
-    // });
-    
-    // Kelola Pengguna
-    // Route::resource('users', UserController::class);
-    // Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
-    
-    // // Pengaturan Sistem
-    // Route::prefix('settings')->name('settings.')->group(function () {
-    //     Route::get('/', [SettingsController::class, 'index'])->name('index');
-    //     Route::post('/update', [SettingsController::class, 'update'])->name('update');
-    //     Route::get('/academic-year', [SettingsController::class, 'academicYear'])->name('academic-year');
-    //     Route::post('/academic-year/activate', [SettingsController::class, 'activateYear'])->name('academic-year.activate');
-    // });
 });
 
 // ============================================================

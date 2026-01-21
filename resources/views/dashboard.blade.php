@@ -58,7 +58,7 @@
 <div class="bg-white rounded-lg shadow-md">
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-gray-800">Siswa Terbaru</h3>
-        <a href="{{ route('students.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">
+        <a href="{{ route('admin.students.index') }}" class="text-sm text-indigo-600 hover:text-indigo-800">
             Lihat Semua →
         </a>
     </div>
@@ -91,7 +91,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $student->created_at->format('d M Y') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="{{ route('students.show', $student->id) }}" class="text-blue-600 hover:text-blue-800">Detail</a>
+                        <a href="{{ route('admin.students.show', $student->id) }}" class="text-blue-600 hover:text-blue-800">Detail</a>
                     </td>
                 </tr>
                 @empty

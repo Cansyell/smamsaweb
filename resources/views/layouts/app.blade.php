@@ -20,6 +20,7 @@
             </main>
         </div>
     </div>
+@stack('scripts')
 
     <script>
         // Toggle sidebar

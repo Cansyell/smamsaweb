@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Committee;
 
+use App\Http\Controllers\Controller;
 use App\Models\FinalScore;
 use Illuminate\Http\Request;
 
