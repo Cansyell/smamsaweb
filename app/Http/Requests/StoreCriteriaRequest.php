@@ -12,8 +12,7 @@ class StoreCriteriaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Pastikan hanya admin yang bisa akses
-        return $this->user()->hasRole('admin');
+        return auth()->check() && $this->user()->role === 'admin';
     }
 
     /**

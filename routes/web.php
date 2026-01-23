@@ -7,10 +7,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\CriteriaController;
+use App\Http\Controllers\Admin\AhpMatrixController;
 // use App\Http\Controllers\Admin\CalculationController;
 // use App\Http\Controllers\Admin\ResultController;
 // use App\Http\Controllers\Admin\RankingController;
-// use App\Http\Controllers\Admin\QuotaController;
+use App\Http\Controllers\Admin\AcademicYearController;
 // use App\Http\Controllers\Admin\UserController;
 // use App\Http\Controllers\Admin\SettingsController;
 
@@ -94,6 +95,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('criterias/{specialization}/reorder', [CriteriaController::class, 'reorder'])
             ->name('criterias.reorder')
             ->whereIn('specialization', ['tahfiz', 'language']);
+
+        //ahp matrix
+        Route::resource('ahp-matrices', AhpMatrixController::class)->only(['index', 'store', 'show']);
+        Route::post('ahp-matrices/calculate-weights', [AhpMatrixController::class, 'calculateWeights'])->name('ahp-matrices.calculate-weights');
+        Route::delete('ahp-matrices/reset', [AhpMatrixController::class, 'reset'])->name('ahp-matrices.reset');
+
+
+        Route::resource('academic-years', AcademicYearController::class);
+        Route::patch('academic-years/{academicYear}/toggle-active', [AcademicYearController::class, 'toggleActive'])
+        ->name('academic-years.toggle-active');
         
         // Perhitungan Kriteria
         // Route::prefix('calculation')->name('calculation.')->group(function () {
