@@ -6,17 +6,23 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StudentRequest extends FormRequest
 {
-
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         $studentId = $this->route('student'); // Untuk update
 
         return [
+            'academic_year_id' => 'required|exists:academic_years,id',
             'nisn'             => [
                 'required',
                 'string',
@@ -38,9 +44,15 @@ class StudentRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom messages for validator errors.
+     */
     public function messages(): array
     {
         return [
+            'academic_year_id.required' => 'Tahun akademik wajib dipilih.',
+            'academic_year_id.exists'   => 'Tahun akademik tidak valid.',
+            
             'nisn.required'           => 'NISN wajib diisi.',
             'nisn.digits'             => 'NISN harus terdiri dari 10 digit.',
             'nisn.unique'             => 'NISN sudah terdaftar.',
@@ -75,9 +87,13 @@ class StudentRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom attributes for validator errors.
+     */
     public function attributes(): array
     {
         return [
+            'academic_year_id' => 'tahun akademik',
             'nisn'            => 'NISN',
             'full_name'       => 'nama lengkap',
             'father_name'     => 'nama ayah',

@@ -46,7 +46,7 @@ class AcademicYearController extends Controller
 
         // Jika diset aktif, nonaktifkan yang lain
         if ($validated['is_active']) {
-            $academicYear->setAsActive();
+            $academicYear->activate();
         }
 
         return redirect()
@@ -92,7 +92,7 @@ class AcademicYearController extends Controller
 
         // Jika diset aktif, nonaktifkan yang lain
         if ($validated['is_active']) {
-            $academicYear->setAsActive();
+            $academicYear->activate();
         }
 
         return redirect()
@@ -119,6 +119,13 @@ class AcademicYearController extends Controller
                 ->with('error', 'Tidak dapat menghapus tahun ajaran yang memiliki data quota');
         }
 
+        // Cek apakah ada siswa yang terkait
+        if ($academicYear->students()->count() > 0) {
+            return redirect()
+                ->route('admin.academic-years.index')
+                ->with('error', 'Tidak dapat menghapus tahun ajaran yang memiliki data siswa');
+        }
+
         $academicYear->delete();
 
         return redirect()
@@ -132,11 +139,11 @@ class AcademicYearController extends Controller
     public function toggleActive(AcademicYear $academicYear)
     {
         if ($academicYear->is_active) {
-            $academicYear->update(['is_active' => false]);
-            $message = 'Tahun ajaran dinonaktifkan';
+            $academicYear->deactivate();
+            $message = 'Tahun ajaran berhasil dinonaktifkan';
         } else {
-            $academicYear->setAsActive();
-            $message = 'Tahun ajaran diaktifkan';
+            $academicYear->activate();
+            $message = 'Tahun ajaran berhasil diaktifkan';
         }
 
         return redirect()

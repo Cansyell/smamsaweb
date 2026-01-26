@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\CriteriaController;
 use App\Http\Controllers\Admin\AhpMatrixController;
+use App\Http\Controllers\Admin\SpecializationQuotaController;
 // use App\Http\Controllers\Admin\CalculationController;
 // use App\Http\Controllers\Admin\ResultController;
 // use App\Http\Controllers\Admin\RankingController;
@@ -22,12 +23,10 @@ use App\Http\Controllers\Committee\TestScoreController;
 // use App\Http\Controllers\Panitia\PanitiaStudentController;
 
 // Student Controllers
-use App\Http\Controllers\Student\StudentDashboardController;
-// use App\Http\Controllers\Student\ProfileController as StudentProfileController;
+use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\ReportGradeController;
 use App\Http\Controllers\Student\DocumentController;
-// use App\Http\Controllers\Student\SpecializationController;
-// use App\Http\Controllers\Student\ResultController as StudentResultController;
+use App\Http\Controllers\Student\StudentDashboardController;
 
 // ============================================================
 // PUBLIC ROUTES
@@ -101,11 +100,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('ahp-matrices/calculate-weights', [AhpMatrixController::class, 'calculateWeights'])->name('ahp-matrices.calculate-weights');
         Route::delete('ahp-matrices/reset', [AhpMatrixController::class, 'reset'])->name('ahp-matrices.reset');
 
-
+        //academic-years
         Route::resource('academic-years', AcademicYearController::class);
         Route::patch('academic-years/{academicYear}/toggle-active', [AcademicYearController::class, 'toggleActive'])
         ->name('academic-years.toggle-active');
         
+        // Specialization Quotas Routes
+        Route::resource('specialization-quotas', SpecializationQuotaController::class);
+        Route::patch('specialization-quotas/{specializationQuota}/toggle-active', 
+            [SpecializationQuotaController::class, 'toggleActive'])
+            ->name('specialization-quotas.toggle-active');
         // Perhitungan Kriteria
         // Route::prefix('calculation')->name('calculation.')->group(function () {
         //     Route::get('/', [CalculationController::class, 'index'])->name('index');
@@ -189,15 +193,27 @@ Route::middleware(['auth', 'role:committee'])->prefix('committee')->name('commit
 // ============================================================
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     
-    // Dashboard Siswa
+   // Dashboard
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
     
-    // Data Pribadi
-    // Route::prefix('profile')->name('profile.')->group(function () {
-    //     Route::get('/', [StudentProfileController::class, 'index'])->name('index');
-    //     Route::post('/store', [StudentProfileController::class, 'store'])->name('store');
-    //     Route::put('/update', [StudentProfileController::class, 'update'])->name('update');
-    // });
+    // Profile
+    Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile.index');
+    Route::post('/profile', [StudentProfileController::class, 'store'])->name('profile.store');
+    Route::put('/profile/{student}', [StudentProfileController::class, 'update'])->name('profile.update');
+    
+    // Report Grades
+    Route::get('/grades', [ReportGradeController::class, 'index'])->name('grades.index');
+    Route::post('/grades', [ReportGradeController::class, 'store'])->name('grades.store');
+    Route::put('/grades/{reportGrade}', [ReportGradeController::class, 'update'])->name('grades.update');
+    
+    // Documents
+    Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
+    Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
+    Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    
+    // Specialization
+    Route::get('/specialization', [SpecializationController::class, 'index'])->name('specialization.index');
+    Route::post('/specialization', [SpecializationController::class, 'store'])->name('specialization.store');
     
     // Input Nilai Rapor
     // Route::prefix('grades')->name('grades.')->group(function () {

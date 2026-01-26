@@ -34,6 +34,16 @@ class AcademicYear extends Model
     {
         return $this->hasMany(Student::class);
     }
+    // Tambahkan di bagian RELATIONSHIP
+    public function specializationQuotas()
+    {
+        return $this->hasMany(SpecializationQuota::class);
+    }
+
+    public function activeSpecializationQuota()
+    {
+        return $this->hasOne(SpecializationQuota::class)->where('is_active', true);
+    }
 
     /* =======================
      | QUERY SCOPE

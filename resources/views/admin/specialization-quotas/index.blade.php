@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Kelola Tahun Ajaran')
+@section('title', 'Kelola Kuota Spesialisasi')
 
 @section('content')
 <div class="max-w-7xl mx-auto">
@@ -8,15 +8,15 @@
     <div class="mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">Kelola Tahun Ajaran</h2>
-                <p class="text-sm text-gray-600 mt-1">Kelola data tahun ajaran akademik sekolah</p>
+                <h2 class="text-2xl font-bold text-gray-800">Kelola Kuota Spesialisasi</h2>
+                <p class="text-sm text-gray-600 mt-1">Kelola kuota penerimaan siswa per peminatan</p>
             </div>
-            <a href="{{ route('admin.academic-years.create') }}" 
+            <a href="{{ route('admin.specialization-quotas.create') }}" 
                 class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg transition shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                <span class="font-medium">Tambah Tahun Ajaran</span>
+                <span class="font-medium">Tambah Kuota</span>
             </a>
         </div>
     </div>
@@ -53,12 +53,12 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Total Tahun Ajaran</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $academicYears->total() }}</p>
+                    <p class="text-sm font-medium text-gray-600">Total Kuota</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-1">{{ $quotas->total() }}</p>
                 </div>
                 <div class="p-3 bg-indigo-100 rounded-lg">
                     <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
                 </div>
             </div>
@@ -67,9 +67,9 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Tahun Ajaran Aktif</p>
+                    <p class="text-sm font-medium text-gray-600">Kuota Aktif</p>
                     <p class="text-2xl font-bold text-green-600 mt-1">
-                        {{ $academicYears->where('is_active', true)->count() }}
+                        {{ $quotas->where('is_active', true)->count() }}
                     </p>
                 </div>
                 <div class="p-3 bg-green-100 rounded-lg">
@@ -83,14 +83,14 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Sedang Berjalan</p>
+                    <p class="text-sm font-medium text-gray-600">Total Tahfiz</p>
                     <p class="text-2xl font-bold text-blue-600 mt-1">
-                        {{ $academicYears->filter(fn($y) => $y->isCurrent())->count() }}
+                        {{ $quotas->sum('tahfiz_quota') }}
                     </p>
                 </div>
                 <div class="p-3 bg-blue-100 rounded-lg">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                 </div>
             </div>
@@ -99,25 +99,66 @@
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Akan Datang</p>
+                    <p class="text-sm font-medium text-gray-600">Total Bahasa</p>
                     <p class="text-2xl font-bold text-purple-600 mt-1">
-                        {{ $academicYears->filter(fn($y) => $y->isUpcoming())->count() }}
+                        {{ $quotas->sum('language_quota') }}
                     </p>
                 </div>
                 <div class="p-3 bg-purple-100 rounded-lg">
                     <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
                     </svg>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Filter Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6">
+        <form method="GET" action="{{ route('admin.specialization-quotas.index') }}">
+            <div class="flex flex-col sm:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter Tahun Ajaran
+                    </label>
+                    <select name="academic_year_id" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Semua Tahun Ajaran</option>
+                        @foreach($academicYears as $year)
+                            <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                {{ $year->year }} @if($year->name) - {{ $year->name }} @endif
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" 
+                        class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition shadow-sm font-medium">
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filter
+                    </button>
+                    <a href="{{ route('admin.specialization-quotas.index') }}" 
+                        class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition border border-gray-300 font-medium">
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Table Card -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <!-- Table Header -->
         <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Daftar Tahun Ajaran</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Daftar Kuota Peminatan</h3>
         </div>
 
         <!-- Table -->
@@ -128,20 +169,17 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Tahun Ajaran
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Periode
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kuota Tahfiz
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Durasi
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Kuota Bahasa
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Total Kuota
                         </th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status
-                        </th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Siswa
-                        </th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Quota
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -149,7 +187,7 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($academicYears as $year)
+                    @forelse($quotas as $quota)
                         <tr class="hover:bg-gray-50 transition">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -159,81 +197,64 @@
                                         </svg>
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-semibold text-gray-900">{{ $year->year }}</div>
-                                        <div class="text-xs text-gray-500">{{ $year->name ?? 'Tidak ada nama' }}</div>
+                                        <div class="text-sm font-semibold text-gray-900">{{ $quota->academicYear->year }}</div>
+                                        <div class="text-xs text-gray-500">{{ $quota->academicYear->name ?? 'Tidak ada nama' }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $year->start_date->format('d M Y') }}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="inline-flex flex-col items-center">
+                                    <div class="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-100">
+                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="text-lg font-bold text-blue-600">{{ $quota->tahfiz_quota }}</div>
+                                            <div class="text-xs text-blue-500">{{ $quota->tahfiz_percentage }}%</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="text-xs text-gray-500">
-                                    s/d {{ $year->end_date->format('d M Y') }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ $year->duration_in_days }} hari</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <div class="flex flex-col items-center gap-1">
-                                    @if($year->is_active)
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
-                                            Tidak Aktif
-                                        </span>
-                                    @endif
-                                    
-                                    @if($year->isCurrent())
-                                        <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">
-                                            Berjalan
-                                        </span>
-                                    @elseif($year->isUpcoming())
-                                        <span class="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700">
-                                            Mendatang
-                                        </span>
-                                    @elseif($year->isPast())
-                                        <span class="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
-                                            Selesai
-                                        </span>
-                                    @endif
+                                <div class="inline-flex flex-col items-center">
+                                    <div class="flex items-center gap-2 bg-purple-50 px-3 py-2 rounded-lg border border-purple-100">
+                                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="text-lg font-bold text-purple-600">{{ $quota->language_quota }}</div>
+                                            <div class="text-xs text-purple-500">{{ $quota->language_percentage }}%</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex flex-col items-center">
-                                    <span class="text-lg font-bold text-gray-900">{{ $year->student_count }}</span>
+                                    <span class="text-2xl font-bold text-indigo-600">{{ $quota->total_quota }}</span>
                                     <span class="text-xs text-gray-500">siswa</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <div class="flex flex-col items-center">
-                                    @php
-                                        $quotaCount = $year->specializationQuotas->count();
-                                        $totalQuota = $year->specializationQuotas->sum('total_quota');
-                                    @endphp
-                                    <span class="text-lg font-bold text-indigo-600">{{ $quotaCount }}</span>
-                                    <span class="text-xs text-gray-500">
-                                        @if($totalQuota > 0)
-                                            ({{ $totalQuota }} siswa)
-                                        @else
-                                            quota
-                                        @endif
+                                @if($quota->is_active)
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        Aktif
                                     </span>
-                                </div>
+                                @else
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 border border-gray-200">
+                                        Tidak Aktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right">
                                 <div class="flex justify-end items-center gap-2">
                                     <!-- Toggle Active -->
-                                    <form action="{{ route('admin.academic-years.toggle-active', $year) }}" method="POST" class="inline">
+                                    <form action="{{ route('admin.specialization-quotas.toggle-active', $quota) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit" 
-                                            class="p-2 {{ $year->is_active ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-green-600 hover:text-green-900 hover:bg-green-50' }} rounded-lg transition"
-                                            title="{{ $year->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
-                                            @if($year->is_active)
+                                            class="p-2 {{ $quota->is_active ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100' : 'text-green-600 hover:text-green-900 hover:bg-green-50' }} rounded-lg transition"
+                                            title="{{ $quota->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
+                                            @if($quota->is_active)
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                                                 </svg>
@@ -246,7 +267,7 @@
                                     </form>
 
                                     <!-- View -->
-                                    <a href="{{ route('admin.academic-years.show', $year) }}" 
+                                    <a href="{{ route('admin.specialization-quotas.show', $quota) }}" 
                                         class="p-2 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-lg transition"
                                         title="Detail">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +277,7 @@
                                     </a>
 
                                     <!-- Edit -->
-                                    <a href="{{ route('admin.academic-years.edit', $year) }}" 
+                                    <a href="{{ route('admin.specialization-quotas.edit', $quota) }}" 
                                         class="p-2 text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50 rounded-lg transition"
                                         title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,11 +286,11 @@
                                     </a>
 
                                     <!-- Delete -->
-                                    @if(!$year->is_active && $year->specializationQuotas->count() == 0)
-                                        <form action="{{ route('admin.academic-years.destroy', $year) }}" 
+                                    @if(!$quota->is_active)
+                                        <form action="{{ route('admin.specialization-quotas.destroy', $quota) }}" 
                                             method="POST" 
                                             class="inline"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus tahun ajaran {{ $year->year }}?')">
+                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus kuota ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -295,12 +316,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                 </svg>
-                                <p class="text-gray-500 font-medium">Belum ada data tahun ajaran</p>
-                                <p class="text-sm text-gray-400 mt-1">Klik tombol "Tambah Tahun Ajaran" untuk membuat data baru</p>
+                                <p class="text-gray-500 font-medium">Belum ada data kuota spesialisasi</p>
+                                <p class="text-sm text-gray-400 mt-1">Klik tombol "Tambah Kuota" untuk membuat data baru</p>
                             </td>
                         </tr>
                     @endforelse
@@ -309,9 +330,9 @@
         </div>
 
         <!-- Pagination -->
-        @if($academicYears->hasPages())
+        @if($quotas->hasPages())
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                {{ $academicYears->links() }}
+                {{ $quotas->links() }}
             </div>
         @endif
     </div>
