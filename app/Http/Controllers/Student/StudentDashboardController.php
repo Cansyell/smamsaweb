@@ -37,7 +37,7 @@ class StudentDashboardController extends Controller
                 [
                     'name' => 'Nilai Rapor',
                     'completed' => $student->isReportGradeCompleted(),
-                    'route' => 'student.grades.index',
+                    'route' => 'student.report-grades.index',
                     'description' => 'Input nilai PAI, Bahasa Indonesia, dan Bahasa Inggris',
                     'details' => $student->getGradesDetails(),
                 ],

@@ -9,24 +9,21 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\CriteriaController;
 use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
-// use App\Http\Controllers\Admin\CalculationController;
-// use App\Http\Controllers\Admin\ResultController;
-// use App\Http\Controllers\Admin\RankingController;
 use App\Http\Controllers\Admin\AcademicYearController;
-// use App\Http\Controllers\Admin\UserController;
-// use App\Http\Controllers\Admin\SettingsController;
+
 
 // Panitia Controllers
 use App\Http\Controllers\Committee\CommitteeDashboardController;
-// use App\Http\Controllers\Panitia\ValidationController;
 use App\Http\Controllers\Committee\TestScoreController;
-// use App\Http\Controllers\Panitia\PanitiaStudentController;
+
 
 // Student Controllers
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\ReportGradeController;
 use App\Http\Controllers\Student\DocumentController;
 use App\Http\Controllers\Student\StudentDashboardController;
+use App\Http\Controllers\Student\SpecializationController;
+
 
 // ============================================================
 // PUBLIC ROUTES
@@ -110,47 +107,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::patch('specialization-quotas/{specializationQuota}/toggle-active', 
             [SpecializationQuotaController::class, 'toggleActive'])
             ->name('specialization-quotas.toggle-active');
-        // Perhitungan Kriteria
-        // Route::prefix('calculation')->name('calculation.')->group(function () {
-        //     Route::get('/', [CalculationController::class, 'index'])->name('index');
-        //     Route::post('/process', [CalculationController::class, 'process'])->name('process');
-        //     Route::post('/recalculate', [CalculationController::class, 'recalculate'])->name('recalculate');
-        //     Route::get('/preview', [CalculationController::class, 'preview'])->name('preview');
-        // });
         
-        // Hasil Perhitungan
-        // Route::prefix('results')->name('results.')->group(function () {
-        //     Route::get('/', [ResultController::class, 'index'])->name('index');
-        //     Route::get('/{student}', [ResultController::class, 'show'])->name('show');
-        //     Route::get('/export/all', [ResultController::class, 'export'])->name('export');
-        //     Route::get('/export/pdf', [ResultController::class, 'exportPdf'])->name('export.pdf');
-        // });
-        
-        // Ranking
-        // Route::prefix('rankings')->name('rankings.')->group(function () {
-        //     Route::get('/tahfiz', [RankingController::class, 'tahfiz'])->name('tahfiz');
-        //     Route::get('/bahasa', [RankingController::class, 'bahasa'])->name('bahasa');
-        //     Route::get('/reguler', [RankingController::class, 'reguler'])->name('reguler');
-        //     Route::post('/finalize', [RankingController::class, 'finalize'])->name('finalize');
-        // });
-        
-        // Kuota Peminatan
-        // Route::prefix('quota')->name('quota.')->group(function () {
-        //     Route::get('/settings', [QuotaController::class, 'index'])->name('settings');
-        //     Route::post('/update', [QuotaController::class, 'update'])->name('update');
-        // });
-        
-        // Kelola Pengguna
-        // Route::resource('users', UserController::class);
-        // Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
-        
-        // Pengaturan Sistem
-        // Route::prefix('settings')->name('settings.')->group(function () {
-        //     Route::get('/', [SettingsController::class, 'index'])->name('index');
-        //     Route::post('/update', [SettingsController::class, 'update'])->name('update');
-        //     Route::get('/academic-year', [SettingsController::class, 'academicYear'])->name('academic-year');
-        //     Route::post('/academic-year/activate', [SettingsController::class, 'activateYear'])->name('academic-year.activate');
-        // });
     });
 });
 
@@ -165,27 +122,7 @@ Route::middleware(['auth', 'role:committee'])->prefix('committee')->name('commit
     // Profile Panitia
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
-    // Validasi Berkas Siswa
-    // Route::prefix('validation')->name('students.')->group(function () {
-    //     Route::get('/pending', [ValidationController::class, 'index'])->name('pending');
-    //     Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
-    //     Route::post('/{student}/validate', [ValidationController::class, 'validate'])->name('validate');
-    //     Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
-    //     Route::post('/bulk-validate', [ValidationController::class, 'bulkValidate'])->name('bulk-validate');
-    // });
-    
-    // Input Nilai Tes (Semua tes dalam satu halaman)
-    // Route::prefix('tests')->name('tests.')->group(function () {
-    //     Route::get('/input', [TestController::class, 'index'])->name('input');
-    //     Route::get('/{student}/form', [TestController::class, 'form'])->name('form');
-    //     Route::post('/{student}/save', [TestController::class, 'save'])->name('save');
-    //     Route::put('/{student}/update', [TestController::class, 'update'])->name('update');
-    // });
-    
-    // Daftar Siswa (View Only)
-    // Route::get('/students', [PanitiaStudentController::class, 'index'])->name('students.list');
-    // Route::get('/students/{student}', [PanitiaStudentController::class, 'show'])->name('students.detail');
+
 });
 
 // ============================================================
@@ -202,42 +139,15 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::put('/profile/{student}', [StudentProfileController::class, 'update'])->name('profile.update');
     
     // Report Grades
-    Route::get('/grades', [ReportGradeController::class, 'index'])->name('grades.index');
-    Route::post('/grades', [ReportGradeController::class, 'store'])->name('grades.store');
-    Route::put('/grades/{reportGrade}', [ReportGradeController::class, 'update'])->name('grades.update');
+    Route::resource('report-grades', ReportGradeController::class);
     
     // Documents
-    Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
-    Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
-    Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    Route::resource('documents', DocumentController::class);
     
     // Specialization
     Route::get('/specialization', [SpecializationController::class, 'index'])->name('specialization.index');
     Route::post('/specialization', [SpecializationController::class, 'store'])->name('specialization.store');
     
-    // Input Nilai Rapor
-    // Route::prefix('grades')->name('grades.')->group(function () {
-    //     Route::get('/', [GradeController::class, 'index'])->name('index');
-    //     Route::post('/store', [GradeController::class, 'store'])->name('store');
-    //     Route::put('/update', [GradeController::class, 'update'])->name('update');
-    // });
-    
-    // Upload Berkas
-    // Route::prefix('documents')->name('documents.')->group(function () {
-    //     Route::get('/', [DocumentController::class, 'index'])->name('index');
-    //     Route::post('/upload', [DocumentController::class, 'upload'])->name('upload');
-    //     Route::delete('/{document}', [DocumentController::class, 'destroy'])->name('destroy');
-    // });
-    
-    // Pilih Peminatan
-    // Route::prefix('specialization')->name('specialization.')->group(function () {
-    //     Route::get('/', [SpecializationController::class, 'index'])->name('index');
-    //     Route::post('/choose', [SpecializationController::class, 'choose'])->name('choose');
-    //     Route::put('/update', [SpecializationController::class, 'update'])->name('update');
-    // });
-    
-    // Hasil Seleksi (View Only)
-    // Route::get('/result', [StudentResultController::class, 'index'])->name('result');
 });
 
 // ============================================================
