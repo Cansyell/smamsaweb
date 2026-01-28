@@ -23,6 +23,7 @@ use App\Http\Controllers\Student\ReportGradeController;
 use App\Http\Controllers\Student\DocumentController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\SpecializationController;
+use App\Http\Controllers\Student\ResultController;
 
 
 // ============================================================
@@ -145,9 +146,22 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::resource('documents', DocumentController::class);
     
     // Specialization
-    Route::get('/specialization', [SpecializationController::class, 'index'])->name('specialization.index');
-    Route::post('/specialization', [SpecializationController::class, 'store'])->name('specialization.store');
+    Route::prefix('specialization')->name('specialization.')->group(function () {
+        Route::get('/', [SpecializationController::class, 'index'])->name('index');
+        Route::get('/create', [SpecializationController::class, 'create'])->name('create');
+        Route::post('/', [SpecializationController::class, 'store'])->name('store');
+        Route::get('/show', [SpecializationController::class, 'show'])->name('show');
+        Route::get('/edit', [SpecializationController::class, 'edit'])->name('edit');
+        Route::put('/', [SpecializationController::class, 'update'])->name('update');
+    });
     
+    // Result Routes (Ranking)
+    Route::prefix('result')->name('result.')->group(function () {
+        Route::get('/', [ResultController::class, 'index'])->name('index');
+        Route::get('/detail', [ResultController::class, 'show'])->name('show');
+        Route::get('/comparison', [ResultController::class, 'comparison'])->name('comparison');
+        Route::get('/card', [ResultController::class, 'card'])->name('card');
+    });
 });
 
 // ============================================================

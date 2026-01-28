@@ -76,6 +76,16 @@ class Student extends Model
         return $this->hasOne(FinalScore::class);
     }
 
+    public function sawResult()
+    {
+        return $this->hasOne(SawResult::class);
+    }
+
+    public function criterionValues()
+    {
+        return $this->hasMany(StudentCriterionValue::class);
+    }
+
     /* =======================
      | SCOPES
      ======================= */
@@ -113,6 +123,16 @@ class Student extends Model
     public function scopeByAcademicYear($query, $academicYearId)
     {
         return $query->where('academic_year_id', $academicYearId);
+    }
+
+    public function scopeHasSpecialization($query)
+    {
+        return $query->whereNotNull('specialization');
+    }
+
+    public function scopeWithoutSpecialization($query)
+    {
+        return $query->whereNull('specialization');
     }
 
     /* =======================
@@ -160,6 +180,21 @@ class Student extends Model
         ]);
     }
 
+    public function setSpecialization(string $specialization): bool
+    {
+        if (!in_array($specialization, ['tahfiz', 'language', 'regular'])) {
+            return false;
+        }
+
+        return $this->update(['specialization' => $specialization]);
+    }
+
+    public function canChangeSpecialization(): bool
+    {
+        // Tidak bisa ubah jika sudah ada test score
+        return !$this->testScore()->exists();
+    }
+
     /* =======================
      | REGISTRATION PROGRESS & DETAILS
      ======================= */
@@ -187,6 +222,19 @@ class Student extends Model
     public function isSpecializationCompleted(): bool
     {
         return !empty($this->specialization);
+    }
+
+    public function isTestScoreCompleted(): bool
+    {
+        return $this->testScore()->exists();
+    }
+
+    public function isRegistrationCompleted(): bool
+    {
+        return $this->isPersonalDataCompleted()
+            && $this->isReportGradeCompleted()
+            && $this->isDocumentsCompleted()
+            && $this->isSpecializationCompleted();
     }
 
     public function getRegistrationProgress(): array
@@ -274,6 +322,7 @@ class Student extends Model
         return [
             'selected' => $this->specialization,
             'completed' => !empty($this->specialization),
+            'can_change' => $this->canChangeSpecialization(),
         ];
     }
 
@@ -341,6 +390,71 @@ class Student extends Model
     }
 
     /* =======================
+     | RANKING METHODS
+     ======================= */
+
+    public function hasRanking(): bool
+    {
+        return $this->sawResult()->exists();
+    }
+
+    public function getRankingInfo(): ?array
+    {
+        $sawResult = $this->sawResult;
+
+        if (!$sawResult) {
+            return null;
+        }
+
+        return [
+            'rank' => $sawResult->rank,
+            'final_score' => $sawResult->final_score,
+            'specialization' => $sawResult->specialization,
+            'calculated_at' => $sawResult->calculated_at,
+            'detail_calculation' => $sawResult->detail_calculation,
+        ];
+    }
+
+    public function isAccepted(): ?bool
+    {
+        $sawResult = $this->sawResult;
+
+        if (!$sawResult || !$this->specialization) {
+            return null;
+        }
+
+        // Ambil quota dari SpecializationQuota
+        $quota = SpecializationQuota::getActiveByAcademicYear($this->academic_year_id);
+
+        if (!$quota) {
+            return null;
+        }
+
+        $specializationQuota = match($this->specialization) {
+            'tahfiz' => $quota->tahfiz_quota,
+            'language' => $quota->language_quota,
+            default => null,
+        };
+
+        if (!$specializationQuota) {
+            return null;
+        }
+
+        return $sawResult->rank <= $specializationQuota;
+    }
+
+    public function getAcceptanceStatus(): string
+    {
+        $isAccepted = $this->isAccepted();
+
+        if ($isAccepted === null) {
+            return 'pending';
+        }
+
+        return $isAccepted ? 'accepted' : 'rejected';
+    }
+
+    /* =======================
      | ACCESSORS
      ======================= */
 
@@ -369,6 +483,7 @@ class Student extends Model
         return match($this->specialization) {
             'tahfiz' => 'Tahfiz',
             'language' => 'Bahasa',
+            'regular' => 'Reguler',
             default => null,
         };
     }
@@ -376,6 +491,17 @@ class Student extends Model
     public function getHasKipAttribute(): bool
     {
         return !empty($this->kip_number);
+    }
+
+    public function getAcceptanceStatusBadgeAttribute(): string
+    {
+        $status = $this->getAcceptanceStatus();
+
+        return match($status) {
+            'accepted' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diterima</span>',
+            'rejected' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Diterima</span>',
+            default => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>',
+        };
     }
 
     /* =======================
@@ -394,5 +520,26 @@ class Student extends Model
             : '0001';
 
         return "{$date}{$newNumber}";
+    }
+
+    /* =======================
+     | STATIC QUERIES
+     ======================= */
+
+    public static function getTotalBySpecialization(int $academicYearId, string $specialization): int
+    {
+        return self::where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
+            ->where('validation_status', 'valid')
+            ->count();
+    }
+
+    public static function getAcceptedCount(int $academicYearId, string $specialization, int $quota): int
+    {
+        return self::whereHas('sawResult', function($query) use ($academicYearId, $specialization, $quota) {
+            $query->where('academic_year_id', $academicYearId)
+                ->where('specialization', $specialization)
+                ->where('rank', '<=', $quota);
+        })->count();
     }
 }
