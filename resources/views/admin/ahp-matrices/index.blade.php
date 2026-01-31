@@ -236,18 +236,33 @@
                     </svg>
                     Matriks Perbandingan Berpasangan
                 </h3>
-                <form action="{{ route('admin.ahp-matrices.reset') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset semua nilai perbandingan?')">
-                    @csrf
-                    @method('DELETE')
-                    <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
-                    <input type="hidden" name="specialization" value="{{ $selectedSpecialization }}">
-                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm">
-                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                        Reset Matriks
-                    </button>
-                </form>
+                <div class="flex items-center space-x-3">
+                    @if($isComplete && $consistencyRatio !== null && $consistencyRatio <= 0.1)
+                        <form action="{{ route('admin.ahp-matrices.calculate-weights') }}" method="POST" class="inline-block">
+                            @csrf
+                            <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
+                            <input type="hidden" name="specialization" value="{{ $selectedSpecialization }}">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm">
+                                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                                Hitung Bobot
+                            </button>
+                        </form>
+                    @endif
+                    <form action="{{ route('admin.ahp-matrices.reset') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset semua nilai perbandingan?')" class="inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
+                        <input type="hidden" name="specialization" value="{{ $selectedSpecialization }}">
+                        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Reset Matriks
+                        </button>
+                    </form>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full">

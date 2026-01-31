@@ -45,7 +45,7 @@ class RoleMiddleware
                 return redirect()->route('dashboard')->with('error', $message);
             case 'committee':
                 return redirect()->route('committee.dashboard')->with('error', $message);
-            case 'siswa':
+            case 'student':
                 return redirect()->route('student.dashboard')->with('error', $message);
             default:
                 return redirect()->route('login')->with('error', 'Role tidak valid.');

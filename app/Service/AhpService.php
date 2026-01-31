@@ -57,7 +57,7 @@ class AhpService
 
             return true;
         } catch (\Throwable $e) {
-            Log::error($e->getMessage());
+            Log::error('AHP Save Comparison Error: ' . $e->getMessage());
             return false;
         }
     }
@@ -66,27 +66,52 @@ class AhpService
     {
         try {
             $weights = AhpMatrix::getPriorityWeights($academicYearId, $specialization);
+            $cr = AhpMatrix::calculateConsistencyRatio($academicYearId, $specialization);
 
             if (!$weights) {
                 throw new \Exception('Matrix belum lengkap');
             }
 
-            DB::transaction(function () use ($academicYearId, $specialization, $weights) {
-                CriterionWeight::where('academic_year_id', $academicYearId)->delete();
+            if ($cr === null || $cr > 0.1) {
+                throw new \Exception('Matrix tidak konsisten (CR: ' . ($cr ?? 'null') . ')');
+            }
 
+            DB::transaction(function () use ($academicYearId, $specialization, $weights, $cr) {
+                // Hapus weight lama untuk tahun ajaran dan specialization ini
+                CriterionWeight::where('academic_year_id', $academicYearId)
+                    ->where('specialization', $specialization)
+                    ->delete();
+
+                // Simpan weight baru
                 foreach ($weights as $criteriaId => $data) {
                     CriterionWeight::create([
                         'academic_year_id' => $academicYearId,
+                        'specialization' => $specialization,
                         'criteria_id' => $criteriaId,
-                        'weight_value' => $data['weight'],
-                        'calculation_method' => 'ahp',
+                        'weight' => $data['weight'],
+                        'priority_vector' => $data['weight'],
+                        'consistency_ratio' => $cr,
+                        'is_consistent' => true,
+                        'calculated_at' => now(),
+                        'calculated_by' => auth()->id(),
                     ]);
                 }
             });
 
+            Log::info('AHP weights saved successfully', [
+                'academic_year_id' => $academicYearId,
+                'specialization' => $specialization,
+                'cr' => $cr,
+                'weights_count' => count($weights)
+            ]);
+
             return true;
         } catch (\Throwable $e) {
-            Log::error($e->getMessage());
+            Log::error('Failed to save AHP weights: ' . $e->getMessage(), [
+                'academic_year_id' => $academicYearId,
+                'specialization' => $specialization,
+                'trace' => $e->getTraceAsString()
+            ]);
             return false;
         }
     }

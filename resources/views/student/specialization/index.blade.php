@@ -111,10 +111,24 @@
                         </div>
                     </div>
                     @if($ranking)
-                    <div class="text-right">
-                        <p class="text-sm text-gray-600">Peringkat</p>
-                        <p class="text-4xl font-bold text-indigo-600">#{{ $ranking->rank }}</p>
-                    </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Peringkat</p>
+                            <p class="text-4xl font-bold text-indigo-600">#{{ $ranking['rank'] }}</p>
+                        </div>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            dari {{ $ranking['total_students'] }} siswa
+                        </p>
+
+                        @if($ranking['is_accepted'])
+                            <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                                ✓ Diterima
+                            </span>
+                        @else
+                            <span class="inline-block mt-2 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                                ✗ Belum Diterima
+                            </span>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -126,7 +140,7 @@
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Peringkat</p>
-                            <p class="text-3xl font-bold text-gray-800">#{{ $ranking->rank }}</p>
+                            <p class="text-3xl font-bold text-gray-800">#{{ $ranking['rank'] }}</p>
                         </div>
                         <div class="p-3 bg-blue-100 rounded-full">
                             <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,15 +149,16 @@
                         </div>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: 100%"></div>
+                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ min(($ranking['rank'] / $ranking['total_students']) * 100, 100) }}%"></div>
                     </div>
+                    <p class="text-xs text-gray-500 mt-2">dari {{ $ranking['total_students'] }} siswa</p>
                 </div>
 
                 <div class="bg-white border border-gray-200 rounded-lg p-6">
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <p class="text-sm text-gray-600 mb-1">Nilai Akhir SAW</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($ranking->final_score, 2) }}</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ number_format($ranking['final_score'], 2) }}</p>
                         </div>
                         <div class="p-3 bg-green-100 rounded-full">
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +167,7 @@
                         </div>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ min($ranking->final_score * 10, 100) }}%"></div>
+                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ min($ranking['final_score'] * 100, 100) }}%"></div>
                     </div>
                 </div>
 
@@ -190,6 +205,34 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Status Diterima / Belum Diterima -->
+            @if($ranking['is_accepted'])
+            <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+                <div class="p-2 bg-green-100 rounded-full">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-green-800">Anda Diterima di {{ ucfirst($student->specialization) }}</p>
+                    <p class="text-xs text-green-600">Peringkat #{{ $ranking['rank'] }} dari kuota {{ $ranking['quota'] }} tempat</p>
+                </div>
+            </div>
+            @else
+            <div class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+                <div class="p-2 bg-red-100 rounded-full">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-red-800">Belum Diterima di {{ ucfirst($student->specialization) }}</p>
+                    <p class="text-xs text-red-600">Peringkat #{{ $ranking['rank'] }}, kuota hanya {{ $ranking['quota'] }} tempat</p>
+                </div>
+            </div>
+            @endif
+
             @else
             <!-- Waiting for Test -->
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">

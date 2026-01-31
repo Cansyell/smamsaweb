@@ -131,6 +131,8 @@ class AhpMatrix extends Model
 
     /**
      * Calculate consistency ratio for the matrix
+     * 
+     * FIXED: Corrected lambda max calculation
      */
     public static function calculateConsistencyRatio(int $academicYearId, string $specialization): ?float
     {
@@ -144,7 +146,7 @@ class AhpMatrix extends Model
 
         $n = $criterias->count();
         
-        // Consistency Index values
+        // Random Index (RI) values for n=1 to n=10
         $ri = [0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
 
         if ($n < 3 || $n > 10 || !isset($ri[$n - 1])) {
@@ -183,7 +185,7 @@ class AhpMatrix extends Model
             }
         }
 
-        // Calculate priority vector (average of each row)
+        // Calculate priority vector (average of each row in normalized matrix)
         $priorityVector = [];
         for ($i = 0; $i < $n; $i++) {
             $sum = 0;
@@ -193,18 +195,28 @@ class AhpMatrix extends Model
             $priorityVector[$i] = $sum / $n;
         }
 
-        // Calculate lambda max
-        $lambdaMax = 0;
-        for ($j = 0; $j < $n; $j++) {
-            $weightedSum = 0;
-            for ($i = 0; $i < $n; $i++) {
-                $weightedSum += $completeMatrix[$i][$j] * $priorityVector[$i];
+        // ✅ FIXED: Calculate lambda max correctly
+        // Step 1: Calculate weighted sum vector (original matrix × priority vector)
+        $weightedSum = [];
+        for ($i = 0; $i < $n; $i++) {
+            $sum = 0;
+            for ($j = 0; $j < $n; $j++) {
+                // Multiply each row of matrix by priority vector
+                $sum += $completeMatrix[$i][$j] * $priorityVector[$j];
             }
-            $lambdaMax += $weightedSum / $priorityVector[$j];
+            $weightedSum[$i] = $sum;
         }
-        $lambdaMax = $lambdaMax / $n;
 
-        // Calculate CI and CR
+        // Step 2: Calculate consistency vector (weighted sum ÷ priority vector)
+        $consistencyVector = [];
+        for ($i = 0; $i < $n; $i++) {
+            $consistencyVector[$i] = $weightedSum[$i] / $priorityVector[$i];
+        }
+
+        // Step 3: Lambda max is the average of consistency vector
+        $lambdaMax = array_sum($consistencyVector) / $n;
+
+        // Calculate Consistency Index (CI) and Consistency Ratio (CR)
         $ci = ($lambdaMax - $n) / ($n - 1);
         $cr = $ci / $ri[$n - 1];
 

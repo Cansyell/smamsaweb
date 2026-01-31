@@ -10,11 +10,15 @@ use App\Http\Controllers\Admin\CriteriaController;
 use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
 use App\Http\Controllers\Admin\AcademicYearController;
+use App\Http\Controllers\Admin\AhpResultController;
 
 
 // Panitia Controllers
 use App\Http\Controllers\Committee\CommitteeDashboardController;
 use App\Http\Controllers\Committee\TestScoreController;
+use App\Http\Controllers\Committee\ValidationController;
+use App\Http\Controllers\Committee\CriterionValueController;
+
 
 
 // Student Controllers
@@ -98,6 +102,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('ahp-matrices/calculate-weights', [AhpMatrixController::class, 'calculateWeights'])->name('ahp-matrices.calculate-weights');
         Route::delete('ahp-matrices/reset', [AhpMatrixController::class, 'reset'])->name('ahp-matrices.reset');
 
+        // AHP Results - Hasil Perhitungan
+        Route::get('ahp-results', [AhpResultController::class, 'index'])->name('ahp-results.index');
+
         //academic-years
         Route::resource('academic-years', AcademicYearController::class);
         Route::patch('academic-years/{academicYear}/toggle-active', [AcademicYearController::class, 'toggleActive'])
@@ -124,7 +131,38 @@ Route::middleware(['auth', 'role:committee'])->prefix('committee')->name('commit
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
+    // TAMBAHKAN VALIDATION ROUTES DI SINI
+    Route::prefix('validation')->name('validation.')->group(function () {
+        Route::get('/', [ValidationController::class, 'index'])->name('index');
+        Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
+        Route::post('/{student}/approve', [ValidationController::class, 'approve'])->name('approve');
+        Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
+        Route::post('/batch/approve', [ValidationController::class, 'batchApprove'])->name('batch.approve');
+        Route::get('/{student}/check-completeness', [ValidationController::class, 'checkCompleteness'])->name('check-completeness');
+        Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])->name('documents.validate');
+    });
+    
+    // Criterion Values Input Routes
+    Route::prefix('criterion-values')->name('criterion-values.')->group(function () {
+        Route::get('/', [CriterionValueController::class, 'index'])->name('index');
+        Route::get('/create/{student}', [CriterionValueController::class, 'create'])->name('create');
+        Route::post('/store/{student}', [CriterionValueController::class, 'store'])->name('store');
+        Route::get('/show/{student}', [CriterionValueController::class, 'show'])->name('show');
+        
+        // Bulk input
+        Route::get('/bulk-create', [CriterionValueController::class, 'bulkCreate'])->name('bulk-create');
+        Route::post('/bulk-store', [CriterionValueController::class, 'bulkStore'])->name('bulk-store');
+        
+        // Calculate SAW
+        Route::post('/calculate-saw', [CriterionValueController::class, 'calculateSaw'])->name('calculate-saw'); 
+     });
+
+    Route::prefix('saw-results')->name('saw-results.')->group(function () {
+        Route::get('/', [CriterionValueController::class, 'sawResultsIndex'])->name('index');
+        Route::get('/{sawResult}', [CriterionValueController::class, 'sawResultsShow'])->name('show');
+    });
 });
+
 
 // ============================================================
 // SISWA ROUTES - Hanya untuk role 'siswa'

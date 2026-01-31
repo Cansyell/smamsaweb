@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Service;
 
 use App\Models\Criteria;
 use App\Models\CriterionWeight;
@@ -90,7 +90,7 @@ class SawService
                     'total_students' => count($results),
                     'results' => $results,
                 ],
-                'message' => "Perhitungan SAW berhasil untuk {count($results)} siswa",
+                'message' => "Perhitungan SAW berhasil untuk " . count($results) . " siswa",
             ];
 
         } catch (\Exception $e) {
