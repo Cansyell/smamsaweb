@@ -76,9 +76,16 @@ class Student extends Model
         return $this->hasOne(FinalScore::class);
     }
 
+    // MODIFIED: Ubah dari hasOne menjadi hasMany karena siswa bisa punya multiple SAW results
+    public function sawResults()
+    {
+        return $this->hasMany(SawResult::class);
+    }
+
+    // ADDED: Untuk backward compatibility, ambil SAW result sesuai specialization siswa
     public function sawResult()
     {
-        return $this->hasOne(SawResult::class);
+        return $this->hasOne(SawResult::class)->where('specialization', $this->specialization);
     }
 
     public function criterionValues()
@@ -353,11 +360,29 @@ class Student extends Model
         ];
     }
 
+    // MODIFIED: Sesuaikan dengan logika SAW dan Regular
     public function getFinalResult(): array
     {
-        $finalScore = $this->finalScore;
+        // Untuk siswa REGULAR: gunakan final_status dari students table
+        if ($this->specialization === 'regular') {
+            return [
+                'calculated' => !empty($this->final_status),
+                'academic_score' => null,
+                'test_score' => null,
+                'total_score' => null,
+                'ranking' => $this->ranking ?? null,
+                'class_type' => $this->final_class_type ?? 'regular',
+                'status' => $this->final_status ?? 'pending',
+            ];
+        }
 
-        if (!$finalScore) {
+        // Untuk siswa TAHFIZ/LANGUAGE: gunakan SAW Result
+        $sawResult = $this->sawResults()
+            ->where('academic_year_id', $this->academic_year_id)
+            ->where('specialization', $this->specialization)
+            ->first();
+
+        if (!$sawResult) {
             return [
                 'calculated' => false,
                 'academic_score' => null,
@@ -369,14 +394,17 @@ class Student extends Model
             ];
         }
 
+        // Tentukan status berdasarkan ranking dan quota
+        $status = $this->determineAcceptanceStatus($sawResult);
+
         return [
             'calculated' => true,
-            'academic_score' => $finalScore->academic_score,
-            'test_score' => $finalScore->test_score,
-            'total_score' => $finalScore->total_score,
-            'ranking' => $this->ranking ?? null,
-            'class_type' => $this->final_class_type ?? null,
-            'status' => $this->final_status ?? null,
+            'academic_score' => null, // SAW tidak memisahkan academic/test score
+            'test_score' => null,
+            'total_score' => $sawResult->final_score,
+            'ranking' => $sawResult->rank,
+            'class_type' => $this->specialization,
+            'status' => $status,
         ];
     }
 
@@ -390,17 +418,33 @@ class Student extends Model
     }
 
     /* =======================
-     | RANKING METHODS
+     | RANKING METHODS (MODIFIED)
      ======================= */
 
+    // MODIFIED: Cek apakah punya SAW result untuk specialization yang dipilih
     public function hasRanking(): bool
     {
-        return $this->sawResult()->exists();
+        if ($this->specialization === 'regular') {
+            return false; // Regular tidak menggunakan ranking
+        }
+
+        return $this->sawResults()
+            ->where('academic_year_id', $this->academic_year_id)
+            ->where('specialization', $this->specialization)
+            ->exists();
     }
 
+    // MODIFIED: Ambil SAW result sesuai specialization siswa
     public function getRankingInfo(): ?array
     {
-        $sawResult = $this->sawResult;
+        if ($this->specialization === 'regular') {
+            return null; // Regular tidak ada ranking
+        }
+
+        $sawResult = $this->sawResults()
+            ->where('academic_year_id', $this->academic_year_id)
+            ->where('specialization', $this->specialization)
+            ->first();
 
         if (!$sawResult) {
             return null;
@@ -415,16 +459,41 @@ class Student extends Model
         ];
     }
 
+    // ADDED: Get all SAW results (untuk Tahfiz dan Language)
+    public function getAllSawResults(): array
+    {
+        $results = $this->sawResults()
+            ->where('academic_year_id', $this->academic_year_id)
+            ->get()
+            ->keyBy('specialization');
+
+        return [
+            'tahfiz' => $results->get('tahfiz'),
+            'language' => $results->get('language'),
+        ];
+    }
+
+    // MODIFIED: Tentukan acceptance status berdasarkan SAW result
     public function isAccepted(): ?bool
     {
-        $sawResult = $this->sawResult;
+        // Regular menggunakan FCFS, bukan SAW
+        if ($this->specialization === 'regular') {
+            return $this->final_status === 'accepted';
+        }
+
+        $sawResult = $this->sawResults()
+            ->where('academic_year_id', $this->academic_year_id)
+            ->where('specialization', $this->specialization)
+            ->first();
 
         if (!$sawResult || !$this->specialization) {
             return null;
         }
 
         // Ambil quota dari SpecializationQuota
-        $quota = SpecializationQuota::getActiveByAcademicYear($this->academic_year_id);
+        $quota = SpecializationQuota::where('academic_year_id', $this->academic_year_id)
+            ->where('is_active', true)
+            ->first();
 
         if (!$quota) {
             return null;
@@ -443,8 +512,15 @@ class Student extends Model
         return $sawResult->rank <= $specializationQuota;
     }
 
+    // MODIFIED: Tentukan status acceptance (accepted/waiting_list/rejected)
     public function getAcceptanceStatus(): string
     {
+        // Untuk regular, ambil dari final_status
+        if ($this->specialization === 'regular') {
+            return $this->final_status ?? 'pending';
+        }
+
+        // Untuk tahfiz/language, hitung dari SAW result
         $isAccepted = $this->isAccepted();
 
         if ($isAccepted === null) {
@@ -452,6 +528,38 @@ class Student extends Model
         }
 
         return $isAccepted ? 'accepted' : 'rejected';
+    }
+
+    // ADDED: Helper untuk menentukan status berdasarkan SAW result dan quota
+    private function determineAcceptanceStatus($sawResult): string
+    {
+        $quota = SpecializationQuota::where('academic_year_id', $this->academic_year_id)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$quota) {
+            return 'pending';
+        }
+
+        $mainQuota = match($this->specialization) {
+            'tahfiz' => $quota->tahfiz_quota,
+            'language' => $quota->language_quota,
+            default => 0,
+        };
+
+        $waitingListQuota = match($this->specialization) {
+            'tahfiz' => $quota->tahfiz_waiting_list ?? 0,
+            'language' => $quota->language_waiting_list ?? 0,
+            default => 0,
+        };
+
+        if ($sawResult->rank <= $mainQuota) {
+            return 'accepted';
+        } elseif ($sawResult->rank <= ($mainQuota + $waitingListQuota)) {
+            return 'waiting_list';
+        } else {
+            return 'rejected';
+        }
     }
 
     /* =======================
@@ -499,8 +607,9 @@ class Student extends Model
 
         return match($status) {
             'accepted' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Diterima</span>',
+            'waiting_list' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Daftar Tunggu</span>',
             'rejected' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Tidak Diterima</span>',
-            default => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>',
+            default => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Menunggu</span>',
         };
     }
 
@@ -523,7 +632,7 @@ class Student extends Model
     }
 
     /* =======================
-     | STATIC QUERIES
+     | STATIC QUERIES (MODIFIED)
      ======================= */
 
     public static function getTotalBySpecialization(int $academicYearId, string $specialization): int
@@ -534,12 +643,21 @@ class Student extends Model
             ->count();
     }
 
+    // MODIFIED: Sesuaikan dengan SAW results
     public static function getAcceptedCount(int $academicYearId, string $specialization, int $quota): int
     {
-        return self::whereHas('sawResult', function($query) use ($academicYearId, $specialization, $quota) {
-            $query->where('academic_year_id', $academicYearId)
-                ->where('specialization', $specialization)
-                ->where('rank', '<=', $quota);
-        })->count();
+        // Untuk regular, hitung dari final_status
+        if ($specialization === 'regular') {
+            return self::where('academic_year_id', $academicYearId)
+                ->where('specialization', 'regular')
+                ->where('final_status', 'accepted')
+                ->count();
+        }
+
+        // Untuk tahfiz/language, hitung dari SAW results
+        return SawResult::where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
+            ->where('rank', '<=', $quota)
+            ->count();
     }
 }

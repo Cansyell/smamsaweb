@@ -114,6 +114,7 @@
                     <p class="font-semibold mb-1">Informasi Penting:</p>
                     <ul class="list-disc list-inside space-y-1">
                         <li>Rentang nilai: 0 - 100</li>
+                        <li>Siswa ini akan dinilai untuk <strong>SEMUA kriteria test</strong> (bukan hanya kriteria spesialisasinya)</li>
                         <li>Nilai dapat diubah kembali sebelum perhitungan SAW dilakukan</li>
                         <li>Pastikan semua kriteria terisi dengan benar</li>
                         <li>Anda dapat menyimpan sebagian nilai dan melanjutkan nanti</li>
@@ -125,23 +126,69 @@
         <form action="{{ route('committee.criterion-values.store', $student) }}" method="POST" class="space-y-6">
             @csrf
 
-            <!-- Criteria Values Section -->
+            @php
+                // Group criteria by specialization for better organization
+                $groupedCriteria = $criterias->groupBy('specialization');
+                $specializationLabels = [
+                    'tahfiz' => 'Tahfiz',
+                    'language' => 'Bahasa',
+                    'regular' => 'Reguler'
+                ];
+                $specializationColors = [
+                    'tahfiz' => 'green',
+                    'language' => 'blue',
+                    'regular' => 'gray'
+                ];
+            @endphp
+
+            <!-- Criteria Values Section - Grouped by Specialization -->
+            @foreach($groupedCriteria as $specialization => $groupCriterias)
             <div class="space-y-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Nilai Kriteria</h3>
-                
-                @foreach($criterias as $index => $criteria)
+                <!-- Specialization Header -->
+                <div class="flex items-center gap-3 mb-4 pb-2 border-b-2 border-{{ $specializationColors[$specialization] }}-200">
+                    <div class="flex-shrink-0">
+                        <span class="px-4 py-2 rounded-lg text-sm font-bold 
+                            bg-{{ $specializationColors[$specialization] }}-100 
+                            text-{{ $specializationColors[$specialization] }}-800 
+                            border-2 border-{{ $specializationColors[$specialization] }}-300">
+                            {{ $specializationLabels[$specialization] ?? ucfirst($specialization) }}
+                        </span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-800">
+                            Kriteria {{ $specializationLabels[$specialization] ?? ucfirst($specialization) }}
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                            {{ $groupCriterias->count() }} kriteria 
+                            @if($student->specialization === $specialization)
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                Spesialisasi Siswa
+                            </span>
+                            @endif
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Criteria Items -->
+                @foreach($groupCriterias as $index => $criteria)
                 @php
                     $existingValue = $existingValues->get($criteria->id);
                     $value = old('values.' . $criteria->id, $existingValue?->raw_value);
                     $note = old('notes.' . $criteria->id, $existingValue?->notes);
                 @endphp
                 
-                <div class="border border-gray-200 rounded-lg p-5 hover:border-indigo-300 transition {{ $existingValue ? 'bg-green-50' : 'bg-white' }}">
+                <div class="border border-gray-200 rounded-lg p-5 hover:border-{{ $specializationColors[$specialization] }}-300 transition {{ $existingValue ? 'bg-green-50' : 'bg-white' }}">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-2">
-                                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-semibold text-sm">
-                                    {{ $index + 1 }}
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full 
+                                    bg-{{ $specializationColors[$specialization] }}-100 
+                                    text-{{ $specializationColors[$specialization] }}-600 
+                                    font-semibold text-sm">
+                                    {{ $loop->iteration }}
                                 </span>
                                 <div>
                                     <h4 class="text-base font-semibold text-gray-800">{{ $criteria->name }}</h4>
@@ -153,7 +200,7 @@
                             <p class="text-sm text-gray-600 ml-11 mb-3">{{ $criteria->description }}</p>
                             @endif
 
-                            <div class="ml-11 flex items-center gap-4">
+                            <div class="ml-11 flex items-center gap-4 flex-wrap">
                                 <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $criteria->attribute_type === 'benefit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
                                     {{ $criteria->attribute_type === 'benefit' ? 'Benefit (Semakin besar semakin baik)' : 'Cost (Semakin kecil semakin baik)' }}
                                 </span>
@@ -192,7 +239,7 @@
                                        step="0.01"
                                        min="0"
                                        max="100"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('values.' . $criteria->id) border-red-500 @enderror"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $specializationColors[$specialization] }}-500 focus:border-transparent @error('values.' . $criteria->id) border-red-500 @enderror"
                                        placeholder="0.00"
                                        required>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -212,7 +259,7 @@
                             <textarea name="notes[{{ $criteria->id }}]" 
                                       rows="2"
                                       maxlength="500"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('notes.' . $criteria->id) border-red-500 @enderror"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $specializationColors[$specialization] }}-500 focus:border-transparent @error('notes.' . $criteria->id) border-red-500 @enderror"
                                       placeholder="Tambahkan catatan jika diperlukan...">{{ $note }}</textarea>
                             @error('notes.' . $criteria->id)
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -222,11 +269,12 @@
                 </div>
                 @endforeach
             </div>
+            @endforeach
 
             <!-- Summary Card -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Ringkasan</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <p class="text-sm text-gray-600">Total Kriteria</p>
                         <p class="text-2xl font-bold text-gray-800">{{ $criterias->count() }}</p>
@@ -238,6 +286,10 @@
                     <div>
                         <p class="text-sm text-gray-600">Belum Diisi</p>
                         <p class="text-2xl font-bold text-yellow-600">{{ $criterias->count() - $existingValues->count() }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Kriteria Spesialisasi</p>
+                        <p class="text-2xl font-bold text-indigo-600">{{ $groupedCriteria[$student->specialization]->count() ?? 0 }}</p>
                     </div>
                 </div>
             </div>

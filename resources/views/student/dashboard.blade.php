@@ -210,147 +210,260 @@
         @endif
     </div>
 
-    <!-- Test Scores Status -->
+    <!-- Final Result: SAW for Tahfiz/Language OR FCFS Status for Regular -->
     @if($validationStatus['status'] === 'valid')
     <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Tes & Nilai</h3>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+            @if($student->specialization === 'regular')
+                Status Penerimaan (FCFS)
+            @else
+                Hasil Perhitungan SAW & Status Penerimaan
+            @endif
+        </h3>
         
-        @if($testScoresStatus['completed'])
-            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold text-blue-800">Nilai Tes Tersedia</p>
-                        <p class="text-sm text-blue-700 mt-1">
-                            Nilai tes telah diinput oleh panitia. Rata-rata: <span class="font-bold">{{ number_format($testScoresStatus['average'], 2) }}</span>
-                        </p>
+        @if($student->specialization === 'regular')
+            {{-- REGULAR: Tampilkan status FCFS --}}
+            @if($finalResult['calculated'])
+                @if($finalResult['status'] === 'accepted')
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold text-green-800 text-2xl">🎉 Selamat! Anda Diterima</p>
+                                <p class="text-green-700 mt-2">
+                                    Anda diterima di <span class="font-bold text-lg">Kelas Regular</span>
+                                </p>
+                                <p class="text-sm text-green-600 mt-3 bg-green-100 rounded-lg p-3">
+                                    <strong>Jalur Penerimaan:</strong> First Come First Serve (FCFS)<br>
+                                    Penerimaan berdasarkan urutan pendaftaran yang telah divalidasi.
+                                </p>
+                                <p class="text-sm text-green-600 mt-2">
+                                    Silakan menunggu informasi lebih lanjut dari panitia terkait daftar ulang.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif($finalResult['status'] === 'waiting_list')
+                    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold text-yellow-800 text-2xl">Daftar Tunggu</p>
+                                <p class="text-yellow-700 mt-2">
+                                    Anda berada dalam daftar tunggu untuk Kelas Regular
+                                </p>
+                                <p class="text-sm text-yellow-600 mt-3 bg-yellow-100 rounded-lg p-3">
+                                    Kuota kelas regular sudah terpenuhi. Anda akan dihubungi jika ada slot yang tersedia.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @elseif($finalResult['status'] === 'rejected')
+                    <div class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-400 rounded-lg p-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-bold text-red-800 text-2xl">Mohon Maaf</p>
+                                <p class="text-red-700 mt-2">
+                                    Terima kasih atas partisipasi Anda dalam seleksi ini.
+                                </p>
+                                <p class="text-sm text-red-600 mt-2">
+                                    Semangat untuk kesempatan selanjutnya!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @else
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-blue-800">Jalur Penerimaan: Regular (FCFS)</p>
+                            <p class="text-sm text-blue-700 mt-1">
+                                Penerimaan kelas regular menggunakan sistem <strong>First Come First Serve</strong>, 
+                                berdasarkan urutan pendaftaran yang telah divalidasi.
+                            </p>
+                            <p class="text-sm text-blue-600 mt-2">
+                                Status penerimaan Anda sedang dalam proses. Harap menunggu pengumuman dari panitia.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
             
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-                    <p class="text-xs text-purple-600 font-medium mb-1">Prestasi Quran</p>
-                    <p class="text-2xl font-bold text-purple-700">{{ $testScoresStatus['quran_achievement'] ?? '-' }}</p>
-                </div>
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-                    <p class="text-xs text-blue-600 font-medium mb-1">Baca Quran</p>
-                    <p class="text-2xl font-bold text-blue-700">{{ $testScoresStatus['quran_reading'] ?? '-' }}</p>
-                </div>
-                <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                    <p class="text-xs text-green-600 font-medium mb-1">Wawancara</p>
-                    <p class="text-2xl font-bold text-green-700">{{ $testScoresStatus['interview'] ?? '-' }}</p>
-                </div>
-                <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200">
-                    <p class="text-xs text-amber-600 font-medium mb-1">Public Speaking</p>
-                    <p class="text-2xl font-bold text-amber-700">{{ $testScoresStatus['public_speaking'] ?? '-' }}</p>
-                </div>
-                <div class="bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-lg border border-pink-200">
-                    <p class="text-xs text-pink-600 font-medium mb-1">Dialog</p>
-                    <p class="text-2xl font-bold text-pink-700">{{ $testScoresStatus['dialogue'] ?? '-' }}</p>
-                </div>
-            </div>
         @else
-            <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-gray-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold text-gray-700">Menunggu Jadwal Tes</p>
-                        <p class="text-sm text-gray-600 mt-1">
-                            Nilai tes belum diinput. Harap menunggu penjadwalan tes dari panitia.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        @endif
-    </div>
-    @endif
-
-    <!-- Final Result -->
-    @if($finalResult['calculated'])
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Hasil Seleksi Akhir</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-lg border-2 border-indigo-300">
-                <p class="text-sm text-indigo-600 font-medium mb-1">Nilai Akademik</p>
-                <p class="text-3xl font-bold text-indigo-700">{{ number_format($finalResult['academic_score'], 2) }}</p>
-            </div>
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-2 border-purple-300">
-                <p class="text-sm text-purple-600 font-medium mb-1">Nilai Tes</p>
-                <p class="text-3xl font-bold text-purple-700">{{ number_format($finalResult['test_score'], 2) }}</p>
-            </div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-2 border-blue-300">
-                <p class="text-sm text-blue-600 font-medium mb-1">Total Nilai</p>
-                <p class="text-3xl font-bold text-blue-700">{{ number_format($finalResult['total_score'], 2) }}</p>
-            </div>
-            <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-lg border-2 border-teal-300">
-                <p class="text-sm text-teal-600 font-medium mb-1">Peringkat</p>
-                <p class="text-3xl font-bold text-teal-700">{{ $finalResult['ranking'] ?? '-' }}</p>
-            </div>
-        </div>
-        
-        @if($finalResult['status'] === 'accepted')
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            {{-- TAHFIZ/LANGUAGE: Tampilkan SAW Results --}}
+            @if($sawResults->isEmpty())
+                <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-gray-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="font-bold text-green-800 text-2xl">🎉 Selamat! Anda Diterima</p>
-                        <p class="text-green-700 mt-2">
-                            Anda diterima di <span class="font-bold text-lg">Kelas {{ ucfirst($finalResult['class_type']) }}</span>
-                        </p>
-                        <p class="text-sm text-green-600 mt-2">
-                            Silakan menunggu informasi lebih lanjut dari panitia terkait daftar ulang.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        @elseif($finalResult['status'] === 'waiting_list')
-            <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="font-bold text-yellow-800 text-2xl">Daftar Tunggu</p>
-                        <p class="text-yellow-700 mt-2">
-                            Anda berada dalam daftar tunggu untuk Kelas {{ ucfirst($finalResult['class_type']) }}
-                        </p>
-                        <p class="text-sm text-yellow-600 mt-2">
-                            Harap menunggu informasi lebih lanjut dari panitia.
-                        </p>
+                        <div>
+                            <p class="font-semibold text-gray-700">Belum Ada Perhitungan Nilai</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Perhitungan nilai SAW belum dilakukan oleh panitia. Harap menunggu.
+                            </p>
+                            <p class="text-sm text-gray-500 mt-2">
+                                <strong>Jalur Penerimaan:</strong> SAW (Simple Additive Weighting)<br>
+                                Penerimaan berdasarkan perhitungan kriteria dan bobot nilai.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @elseif($finalResult['status'] === 'rejected')
-            <div class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-400 rounded-lg p-6">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+            @else
+                {{-- Tampilkan SAW result untuk specialization yang dipilih siswa --}}
+                @php
+                    $studentSawResult = $sawResults->get($student->specialization);
+                @endphp
+                
+                @if($studentSawResult)
+                    {{-- Score Display --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-lg border-2 border-indigo-300">
+                            <p class="text-sm text-indigo-600 font-medium mb-1">Final Score SAW</p>
+                            <p class="text-3xl font-bold text-indigo-700">{{ number_format($studentSawResult->final_score, 4) }}</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-2 border-purple-300">
+                            <p class="text-sm text-purple-600 font-medium mb-1">Ranking</p>
+                            <p class="text-3xl font-bold text-purple-700">{{ $studentSawResult->rank ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-2 border-blue-300">
+                            <p class="text-sm text-blue-600 font-medium mb-1">Spesialisasi</p>
+                            <p class="text-xl font-bold text-blue-700">{{ ucfirst($student->specialization) }}</p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <p class="font-bold text-red-800 text-2xl">Mohon Maaf</p>
-                        <p class="text-red-700 mt-2">
-                            Terima kasih atas partisipasi Anda dalam seleksi ini.
-                        </p>
-                        <p class="text-sm text-red-600 mt-2">
-                            Semangat untuk kesempatan selanjutnya!
+                    
+                    {{-- Detail Calculation --}}
+                    @if($studentSawResult->detail_calculation)
+                        <details class="mb-6 bg-gray-50 rounded-lg p-4">
+                            <summary class="cursor-pointer text-sm font-medium text-indigo-700 hover:text-indigo-800 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Lihat Detail Perhitungan SAW
+                            </summary>
+                            <div class="mt-3 bg-white rounded-lg p-4 border border-indigo-200">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b border-indigo-200">
+                                            <th class="text-left py-2 text-indigo-700">Kriteria</th>
+                                            <th class="text-center py-2 text-indigo-700">Bobot</th>
+                                            <th class="text-center py-2 text-indigo-700">Nilai Normalisasi</th>
+                                            <th class="text-right py-2 text-indigo-700">Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($studentSawResult->detail_calculation as $code => $detail)
+                                            <tr class="border-b border-gray-100">
+                                                <td class="py-2 text-gray-700">{{ $detail['criteria_name'] }}</td>
+                                                <td class="text-center py-2 text-gray-600">{{ number_format($detail['weight'], 4) }}</td>
+                                                <td class="text-center py-2 text-gray-600">{{ number_format($detail['normalized_value'], 4) }}</td>
+                                                <td class="text-right py-2 font-semibold text-indigo-600">{{ number_format($detail['score'], 4) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                <p class="text-xs text-gray-500 mt-3">
+                                    Dihitung pada: {{ $studentSawResult->calculated_at->format('d M Y H:i') }}
+                                </p>
+                            </div>
+                        </details>
+                    @endif
+                    
+                    {{-- Acceptance Status --}}
+                    @if($finalResult['calculated'])
+                        @if($finalResult['status'] === 'accepted')
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-bold text-green-800 text-2xl">🎉 Selamat! Anda Diterima</p>
+                                        <p class="text-green-700 mt-2">
+                                            Anda diterima di <span class="font-bold text-lg">Kelas {{ ucfirst($finalResult['class_type']) }}</span>
+                                        </p>
+                                        <p class="text-sm text-green-600 mt-2">
+                                            Silakan menunggu informasi lebih lanjut dari panitia terkait daftar ulang.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif($finalResult['status'] === 'waiting_list')
+                            <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-bold text-yellow-800 text-2xl">Daftar Tunggu</p>
+                                        <p class="text-yellow-700 mt-2">
+                                            Anda berada dalam daftar tunggu untuk Kelas {{ ucfirst($finalResult['class_type']) }}
+                                        </p>
+                                        <p class="text-sm text-yellow-600 mt-2">
+                                            Harap menunggu informasi lebih lanjut dari panitia.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif($finalResult['status'] === 'rejected')
+                            <div class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-400 rounded-lg p-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-bold text-red-800 text-2xl">Mohon Maaf</p>
+                                        <p class="text-red-700 mt-2">
+                                            Terima kasih atas partisipasi Anda dalam seleksi ini.
+                                        </p>
+                                        <p class="text-sm text-red-600 mt-2">
+                                            Semangat untuk kesempatan selanjutnya!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p class="text-sm text-blue-700">
+                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                Status penerimaan akan diumumkan setelah perhitungan SAW selesai untuk semua siswa.
+                            </p>
+                        </div>
+                    @endif
+                @else
+                    <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
+                        <p class="text-sm text-gray-600">
+                            Perhitungan SAW untuk spesialisasi <strong>{{ ucfirst($student->specialization) }}</strong> belum tersedia.
                         </p>
                     </div>
-                </div>
-            </div>
+                @endif
+            @endif
         @endif
     </div>
     @endif

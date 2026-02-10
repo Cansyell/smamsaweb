@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\SawResult;
 
 class StudentDashboardController extends Controller
 {
@@ -22,6 +23,15 @@ class StudentDashboardController extends Controller
                 ->with('info', 'Silakan lengkapi data pribadi Anda terlebih dahulu.');
         }
 
+        // Ambil SAW Result untuk student ini (hanya jika bukan regular)
+        $sawResults = collect();
+        if (in_array($student->specialization, ['tahfiz', 'language'])) {
+            $sawResults = SawResult::where('student_id', $student->id)
+                ->where('academic_year_id', $student->academic_year_id)
+                ->get()
+                ->keyBy('specialization');
+        }
+        
         return view('student.dashboard', [
             'page' => 'dashboard',
             'student' => $student,
@@ -59,6 +69,7 @@ class StudentDashboardController extends Controller
             'validationStatus' => $student->getValidationStatus(),
             'testScoresStatus' => $student->getTestScoresStatus(),
             'finalResult' => $student->getFinalResult(),
+            'sawResults' => $sawResults, // Data SAW Result
         ]);
     }
 }

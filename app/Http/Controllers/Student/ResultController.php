@@ -18,7 +18,7 @@ class ResultController extends Controller
     }
 
     /**
-     * Display ranking results
+     * Display ranking results for all specializations
      */
     public function index(Request $request)
     {
@@ -35,31 +35,105 @@ class ResultController extends Controller
                 ->with('warning', 'Anda harus memilih peminatan terlebih dahulu untuk melihat hasil ranking');
         }
 
-        // Ambil filter specialization dari request atau gunakan specialization siswa
+        // Ambil filter specialization dari request, default ke pilihan siswa
         $filterSpecialization = $request->input('specialization', $student->specialization);
 
-        // Validasi filter specialization
+        // Validasi filter - siswa bisa lihat semua tab tapi ada highlight untuk pilihan mereka
         if (!in_array($filterSpecialization, ['tahfiz', 'language', 'regular'])) {
             $filterSpecialization = $student->specialization;
         }
 
-        // Ambil data ranking berdasarkan specialization
-        $rankings = SawResult::with(['student.user', 'student.reportGrade', 'student.testScore'])
-            ->where('academic_year_id', $student->academic_year_id)
-            ->where('specialization', $filterSpecialization)
-            ->orderBy('rank', 'asc')
-            ->paginate(20);
+        $rankings = null;
+        $myPosition = null;
+        $statistics = null;
 
-        // Ambil ranking siswa saat ini
-        $myRanking = $this->specializationService->getStudentRanking($student);
+        // Untuk REGULAR: gunakan sistem FCFS (tidak ada SAW ranking)
+        if ($filterSpecialization === 'regular') {
+            // Ambil siswa regular yang sudah divalidasi, diurutkan berdasarkan validated_at (FCFS)
+            $rankings = Student::with(['user', 'reportGrade', 'testScore'])
+                ->where('academic_year_id', $student->academic_year_id)
+                ->where('specialization', 'regular')
+                ->where('validation_status', 'valid')
+                ->orderBy('validated_at', 'asc')
+                ->paginate(20);
 
-        // Ambil statistik peminatan yang dipilih
-        $statistics = $this->specializationService->getSpecializationStatistics(
-            $student->academic_year_id,
-            $filterSpecialization
-        );
+            // Ambil posisi siswa dalam antrian FCFS (jika siswa pilih regular)
+            if ($student->specialization === 'regular' && $student->validation_status === 'valid') {
+                $myPosition = Student::where('academic_year_id', $student->academic_year_id)
+                    ->where('specialization', 'regular')
+                    ->where('validation_status', 'valid')
+                    ->where('validated_at', '<=', $student->validated_at)
+                    ->count();
+            }
 
-        // Ambil kuota informasi
+            // Statistik untuk regular
+            $totalRegular = Student::where('academic_year_id', $student->academic_year_id)
+                ->where('specialization', 'regular')
+                ->where('validation_status', 'valid')
+                ->count();
+
+            $statistics = [
+                'total_students' => $totalRegular,
+                'average_score' => null,
+                'highest_score' => null,
+                'lowest_score' => null,
+            ];
+
+        } else {
+            // Untuk TAHFIZ/LANGUAGE: gunakan SAW ranking
+            $rankings = SawResult::with(['student.user', 'student.reportGrade', 'student.testScore'])
+                ->where('academic_year_id', $student->academic_year_id)
+                ->where('specialization', $filterSpecialization)
+                ->orderBy('rank', 'asc')
+                ->paginate(20);
+
+            // Ambil posisi siswa (jika siswa pilih spesialisasi yang sama)
+            if ($student->specialization === $filterSpecialization) {
+                $myRankingData = SawResult::where('student_id', $student->id)
+                    ->where('academic_year_id', $student->academic_year_id)
+                    ->where('specialization', $filterSpecialization)
+                    ->first();
+                
+                if ($myRankingData) {
+                    $myPosition = $myRankingData->rank;
+                }
+            }
+
+            // Ambil statistik peminatan yang dipilih
+            $statistics = $this->specializationService->getSpecializationStatistics(
+                $student->academic_year_id,
+                $filterSpecialization
+            );
+        }
+
+        // Ambil ranking siswa untuk pilihan mereka sendiri (untuk card display)
+        $myRanking = null;
+        if ($student->specialization === 'regular') {
+            if ($student->validation_status === 'valid') {
+                $fcfsPosition = Student::where('academic_year_id', $student->academic_year_id)
+                    ->where('specialization', 'regular')
+                    ->where('validation_status', 'valid')
+                    ->where('validated_at', '<=', $student->validated_at)
+                    ->count();
+
+                $totalRegular = Student::where('academic_year_id', $student->academic_year_id)
+                    ->where('specialization', 'regular')
+                    ->where('validation_status', 'valid')
+                    ->count();
+
+                $myRanking = [
+                    'rank' => $fcfsPosition,
+                    'total_students' => $totalRegular,
+                    'final_score' => null,
+                    'is_accepted' => $student->final_status === 'accepted',
+                    'specialization' => 'regular',
+                ];
+            }
+        } else {
+            $myRanking = $this->specializationService->getStudentRanking($student);
+        }
+
+        // Ambil kuota informasi untuk semua spesialisasi
         $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
 
         $progress = $student->getRegistrationProgress();
@@ -68,6 +142,7 @@ class ResultController extends Controller
             'student',
             'rankings',
             'myRanking',
+            'myPosition',
             'statistics',
             'quotaInfo',
             'filterSpecialization',
@@ -92,7 +167,13 @@ class ResultController extends Controller
                 ->with('warning', 'Anda belum memilih peminatan');
         }
 
-        // Ambil data SAW Result siswa
+        // Untuk siswa REGULAR: redirect ke halaman index karena tidak ada detail perhitungan SAW
+        if ($student->specialization === 'regular') {
+            return redirect()->route('student.result.index')
+                ->with('info', 'Siswa regular menggunakan sistem First Come First Serve (FCFS), tidak ada perhitungan SAW.');
+        }
+
+        // Ambil data SAW Result siswa (untuk tahfiz/language)
         $sawResult = SawResult::with(['student.reportGrade', 'student.testScore'])
             ->where('student_id', $student->id)
             ->where('academic_year_id', $student->academic_year_id)
@@ -136,6 +217,12 @@ class ResultController extends Controller
         if (empty($student->specialization)) {
             return redirect()->route('student.specialization.index')
                 ->with('warning', 'Anda belum memilih peminatan');
+        }
+
+        // Untuk siswa REGULAR: tidak ada comparison karena menggunakan FCFS
+        if ($student->specialization === 'regular') {
+            return redirect()->route('student.result.index')
+                ->with('info', 'Fitur perbandingan tidak tersedia untuk siswa regular (FCFS).');
         }
 
         // Ambil ranking siswa
@@ -204,7 +291,44 @@ class ResultController extends Controller
                 ->with('warning', 'Anda belum memilih peminatan');
         }
 
-        // Ambil ranking siswa
+        // Untuk REGULAR: buat card khusus FCFS
+        if ($student->specialization === 'regular') {
+            if ($student->validation_status !== 'valid') {
+                return redirect()->route('student.result.index')
+                    ->with('info', 'Berkas Anda belum divalidasi.');
+            }
+
+            // Hitung posisi FCFS
+            $fcfsPosition = Student::where('academic_year_id', $student->academic_year_id)
+                ->where('specialization', 'regular')
+                ->where('validation_status', 'valid')
+                ->where('validated_at', '<=', $student->validated_at)
+                ->count();
+
+            $totalRegular = Student::where('academic_year_id', $student->academic_year_id)
+                ->where('specialization', 'regular')
+                ->where('validation_status', 'valid')
+                ->count();
+
+            $myRanking = [
+                'rank' => $fcfsPosition,
+                'total_students' => $totalRegular,
+                'final_score' => null,
+                'is_accepted' => $student->final_status === 'accepted',
+                'specialization' => 'regular',
+                'validated_at' => $student->validated_at,
+            ];
+
+            $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
+
+            return view('student.result.card-regular', compact(
+                'student',
+                'myRanking',
+                'quotaInfo'
+            ));
+        }
+
+        // Untuk TAHFIZ/LANGUAGE: gunakan card SAW
         $myRanking = $this->specializationService->getStudentRanking($student);
 
         if (!$myRanking) {

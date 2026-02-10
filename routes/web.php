@@ -18,6 +18,7 @@ use App\Http\Controllers\Committee\CommitteeDashboardController;
 use App\Http\Controllers\Committee\TestScoreController;
 use App\Http\Controllers\Committee\ValidationController;
 use App\Http\Controllers\Committee\CriterionValueController;
+use App\Http\Controllers\Committee\SawResultController;
 
 
 
@@ -122,46 +123,100 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // ============================================================
 // PANITIA ROUTES - Hanya untuk role 'panitia'
 // ============================================================
-Route::middleware(['auth', 'role:committee'])->prefix('committee')->name('committee.')->group(function () {
-    
-    // Dashboard Panitia
-    Route::get('/dashboard', [CommitteeDashboardController::class, 'index'])->name('dashboard');
-    
-    // Profile Panitia
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    // TAMBAHKAN VALIDATION ROUTES DI SINI
+Route::middleware(['auth', 'role:committee'])
+    ->prefix('committee')
+    ->name('committee.')
+    ->group(function () {
+
+    /* =====================================================
+     | Dashboard
+     ===================================================== */
+    Route::get('/dashboard', [CommitteeDashboardController::class, 'index'])
+        ->name('dashboard');
+
+
+    /* =====================================================
+     | Profile
+     ===================================================== */
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+
+    /* =====================================================
+     | Validation (Verifikasi Berkas & Data Siswa)
+     ===================================================== */
     Route::prefix('validation')->name('validation.')->group(function () {
         Route::get('/', [ValidationController::class, 'index'])->name('index');
         Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
+
         Route::post('/{student}/approve', [ValidationController::class, 'approve'])->name('approve');
         Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
+
         Route::post('/batch/approve', [ValidationController::class, 'batchApprove'])->name('batch.approve');
-        Route::get('/{student}/check-completeness', [ValidationController::class, 'checkCompleteness'])->name('check-completeness');
-        Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])->name('documents.validate');
+
+        Route::get('/{student}/check-completeness', [ValidationController::class, 'check-completeness'])
+            ->name('check-completeness');
+
+        Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])
+            ->name('documents.validate');
     });
-    
-    // Criterion Values Input Routes
+
+
+    /* =====================================================
+     | Criterion Values (Input & Manajemen Nilai SAW)
+     ===================================================== */
     Route::prefix('criterion-values')->name('criterion-values.')->group(function () {
+
+        // List siswa
         Route::get('/', [CriterionValueController::class, 'index'])->name('index');
+
+        // Input per siswa
         Route::get('/create/{student}', [CriterionValueController::class, 'create'])->name('create');
         Route::post('/store/{student}', [CriterionValueController::class, 'store'])->name('store');
-        Route::get('/show/{student}', [CriterionValueController::class, 'show'])->name('show');
-        
-        // Bulk input
-        Route::get('/bulk-create', [CriterionValueController::class, 'bulkCreate'])->name('bulk-create');
-        Route::post('/bulk-store', [CriterionValueController::class, 'bulkStore'])->name('bulk-store');
-        
-        // Calculate SAW
-        Route::post('/calculate-saw', [CriterionValueController::class, 'calculateSaw'])->name('calculate-saw'); 
-     });
 
-    Route::prefix('saw-results')->name('saw-results.')->group(function () {
-        Route::get('/', [CriterionValueController::class, 'sawResultsIndex'])->name('index');
-        Route::get('/{sawResult}', [CriterionValueController::class, 'sawResultsShow'])->name('show');
+        // Detail nilai siswa
+        Route::get('/show/{student}', [CriterionValueController::class, 'show'])->name('show');
+
+        // Sync nilai rapor → kriteria
+        Route::post('/sync-report-grade/{student}', [CriterionValueController::class, 'syncFromReportGrade'])
+            ->name('sync-report-grade');
+
+        // Batch sync semua siswa
+        Route::post('/batch-sync-report-grade', [CriterionValueController::class, 'batchSyncReportGrades'])
+            ->name('batch-sync-report-grade');
+
+        // Hitung SAW (Tahfiz & Language)
+        Route::post('/calculate-saw', [CriterionValueController::class, 'calculateSaw'])
+            ->name('calculate-saw');
+
+        // Tentukan status penerimaan
+        Route::post('/determine-acceptance', [CriterionValueController::class, 'determineAcceptance'])
+            ->name('determine-acceptance');
     });
+
+
+    /* =====================================================
+     | SAW Results (Ranking & Hasil Akhir)
+     ===================================================== */
+    Route::prefix('saw-results')->name('saw-results.')->group(function () {
+        Route::get('/', [SawResultController::class, 'index'])->name('index');
+        Route::get('/{student}', [SawResultController::class, 'show'])->name('show');
+    });
+
+
+    /* =====================================================
+     | Acceptance Result (Optional – Jika Ada Halaman Khusus)
+     ===================================================== */
+    // Route::prefix('acceptance')->name('acceptance.')->group(function () {
+    //     Route::get('/', [AcceptanceController::class, 'index'])->name('index');
+    // });
+
 });
+
 
 
 // ============================================================

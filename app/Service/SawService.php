@@ -13,19 +13,83 @@ use Illuminate\Support\Facades\Log;
 class SawService
 {
     /**
-     * Hitung SAW score untuk semua siswa dalam specialization tertentu
+     * Hitung SAW score untuk SEMUA siswa di SEMUA spesialisasi (Tahfiz & Language)
+     * Setiap siswa akan memiliki 2 SAW results (1 untuk Tahfiz, 1 untuk Language)
+     *
+     * @param int $academicYearId
+     * @param int|null $calculatedBy
+     * @return array
+     */
+    public function calculateAllScores(int $academicYearId, ?int $calculatedBy = null): array
+    {
+        try {
+            DB::beginTransaction();
+
+            $results = [
+                'tahfiz' => ['success' => false, 'data' => [], 'message' => ''],
+                'language' => ['success' => false, 'data' => [], 'message' => ''],
+            ];
+
+            // Hitung untuk KEDUA spesialisasi
+            foreach (['tahfiz', 'language'] as $specialization) {
+                $result = $this->calculateScoresForSpecialization(
+                    $academicYearId,
+                    $specialization,
+                    $calculatedBy
+                );
+                
+                $results[$specialization] = $result;
+
+                if (!$result['success']) {
+                    DB::rollBack();
+                    return [
+                        'success' => false,
+                        'message' => "Gagal menghitung SAW untuk {$specialization}: {$result['message']}",
+                    ];
+                }
+            }
+
+            DB::commit();
+
+            $totalTahfiz = $results['tahfiz']['data']['total_students'] ?? 0;
+            $totalLanguage = $results['language']['data']['total_students'] ?? 0;
+
+            return [
+                'success' => true,
+                'data' => [
+                    'tahfiz' => $results['tahfiz']['data'],
+                    'language' => $results['language']['data'],
+                ],
+                'message' => "Perhitungan SAW berhasil! Tahfiz: {$totalTahfiz} siswa, Language: {$totalLanguage} siswa",
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('SAW Calculation Error (All): ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menghitung SAW: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Hitung SAW score untuk satu specialization
+     * SEMUA siswa valid akan dihitung, tidak peduli pilihan spesialisasi mereka
      *
      * @param int $academicYearId
      * @param string $specialization
      * @param int|null $calculatedBy
      * @return array
      */
-    public function calculateScores(int $academicYearId, string $specialization, ?int $calculatedBy = null): array
-    {
+    private function calculateScoresForSpecialization(
+        int $academicYearId,
+        string $specialization,
+        ?int $calculatedBy = null
+    ): array {
         try {
-            DB::beginTransaction();
-
-            // 1. Ambil bobot kriteria dari AHP
+            // 1. Ambil bobot kriteria dari AHP untuk spesialisasi ini
             $weights = CriterionWeight::with('criteria')
                 ->forAcademicYearAndSpecialization($academicYearId, $specialization)
                 ->consistent()
@@ -35,17 +99,18 @@ class SawService
                 throw new \Exception("Bobot kriteria belum dihitung atau tidak konsisten untuk {$specialization}");
             }
 
-            // 2. Ambil semua siswa yang mendaftar di specialization ini
+            // 2. Ambil siswa yang BUKAN regular (hanya tahfiz & language yang perlu SAW)
+            // Siswa regular langsung masuk jalur FCFS, tidak perlu SAW
             $students = Student::where('academic_year_id', $academicYearId)
-                ->where('specialization', $specialization)
                 ->where('validation_status', 'valid')
+                ->whereIn('specialization', ['tahfiz', 'language']) // HANYA tahfiz & language
                 ->get();
 
             if ($students->isEmpty()) {
-                throw new \Exception("Tidak ada siswa yang valid untuk spesializasi {$specialization}");
+                throw new \Exception("Tidak ada siswa yang memilih tahfiz atau language");
             }
 
-            // 3. Ambil semua nilai siswa untuk kriteria ini
+            // 3. Ambil semua nilai siswa untuk kriteria specialization ini
             $criteriaIds = $weights->pluck('criteria_id')->toArray();
             $studentIds = $students->pluck('id')->toArray();
 
@@ -54,10 +119,23 @@ class SawService
                 ->get()
                 ->groupBy('criteria_id');
 
-            // 4. Normalisasi nilai untuk setiap kriteria
+            // 4. Validasi: Pastikan semua siswa memiliki nilai lengkap untuk kriteria ini
+            foreach ($students as $student) {
+                $studentValueCount = StudentCriterionValue::where('student_id', $student->id)
+                    ->whereIn('criteria_id', $criteriaIds)
+                    ->count();
+
+                if ($studentValueCount !== count($criteriaIds)) {
+                    throw new \Exception(
+                        "Siswa {$student->full_name} (NISN: {$student->nisn}) belum memiliki nilai lengkap untuk kriteria {$specialization}"
+                    );
+                }
+            }
+
+            // 5. Normalisasi nilai untuk setiap kriteria
             $normalizedValues = $this->normalizeValues($allValues, $weights);
 
-            // 5. Hitung SAW score untuk setiap siswa
+            // 6. Hitung SAW score untuk setiap siswa
             $results = [];
             foreach ($students as $student) {
                 $sawScore = $this->calculateStudentScore($student->id, $weights, $normalizedValues);
@@ -79,10 +157,8 @@ class SawService
                 $results[] = $result;
             }
 
-            // 6. Update ranking
+            // 7. Update ranking
             $this->updateRankings($academicYearId, $specialization);
-
-            DB::commit();
 
             return [
                 'success' => true,
@@ -90,16 +166,15 @@ class SawService
                     'total_students' => count($results),
                     'results' => $results,
                 ],
-                'message' => "Perhitungan SAW berhasil untuk " . count($results) . " siswa",
+                'message' => "Perhitungan SAW berhasil untuk {$specialization}: " . count($results) . " siswa",
             ];
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('SAW Calculation Error: ' . $e->getMessage());
+            Log::error("SAW Calculation Error ({$specialization}): " . $e->getMessage());
 
             return [
                 'success' => false,
-                'message' => 'Gagal menghitung SAW: ' . $e->getMessage(),
+                'message' => $e->getMessage(),
             ];
         }
     }
@@ -190,7 +265,8 @@ class SawService
      */
     private function updateRankings(int $academicYearId, string $specialization): void
     {
-        $results = SawResult::forAcademicYearAndSpecialization($academicYearId, $specialization)
+        $results = SawResult::where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
             ->orderBy('final_score', 'desc')
             ->get();
 
@@ -207,8 +283,9 @@ class SawService
     public function getRankings(int $academicYearId, string $specialization, int $limit = null): array
     {
         $query = SawResult::with(['student', 'student.user'])
-            ->forAcademicYearAndSpecialization($academicYearId, $specialization)
-            ->ranked();
+            ->where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
+            ->orderBy('rank');
 
         if ($limit) {
             $query->limit($limit);
@@ -218,7 +295,24 @@ class SawService
     }
 
     /**
-     * Get student score detail
+     * Get student score detail untuk semua spesialisasi
+     */
+    public function getStudentAllScores(int $studentId, int $academicYearId): array
+    {
+        $results = SawResult::with(['student', 'academicYear'])
+            ->where('student_id', $studentId)
+            ->where('academic_year_id', $academicYearId)
+            ->get()
+            ->keyBy('specialization');
+
+        return [
+            'tahfiz' => $results->get('tahfiz'),
+            'language' => $results->get('language'),
+        ];
+    }
+
+    /**
+     * Get student score detail untuk satu spesialisasi
      */
     public function getStudentScoreDetail(int $studentId, int $academicYearId, string $specialization): ?array
     {
