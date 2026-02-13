@@ -11,6 +11,70 @@
         <p class="text-blue-100 text-sm mt-1">Tahun Ajaran: {{ $student->academicYear->year ?? '-' }}</p>
     </div>
 
+    <!-- Announcements Section -->
+    @if(isset($announcements) && $announcements->count() > 0)
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                Pengumuman Terbaru
+            </h3>
+        </div>
+        <div class="space-y-3">
+            @foreach($announcements as $announcement)
+            <a href="{{ route('student.announcements.show', $announcement) }}"
+               class="flex items-start p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-indigo-300 transition group">
+                @if($announcement->image_path)
+                    <img src="{{ asset('storage/' . $announcement->image_path) }}"
+                         alt="{{ $announcement->title }}"
+                         class="w-16 h-16 object-cover rounded mr-4 flex-shrink-0"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="w-16 h-16 bg-indigo-50 rounded mr-4 flex-shrink-0 items-center justify-center" style="display:none;">
+                        <svg class="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                    </div>
+                @else
+                    <div class="w-16 h-16 bg-indigo-50 rounded mr-4 flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                    </div>
+                @endif
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-gray-900 group-hover:text-indigo-600 transition truncate">
+                        {{ $announcement->title }}
+                    </h4>
+                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $announcement->excerpt }}</p>
+                    <div class="flex items-center mt-2 text-xs text-gray-400 gap-3">
+                        <span class="flex items-center">
+                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {{ $announcement->published_date }}
+                        </span>
+                        @if($announcement->file_path)
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-red-100 text-red-600">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+                            </svg>
+                            PDF
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                <svg class="w-4 h-4 text-gray-300 group-hover:text-indigo-400 flex-shrink-0 ml-2 mt-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    @if(!$finalResult['calculated'])
     <!-- Overall Progress Card -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
@@ -25,8 +89,6 @@
                 <p class="text-xs text-gray-500 mt-1">Selesai</p>
             </div>
         </div>
-        
-        <!-- Progress Bar -->
         <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500 relative" 
                  style="width: {{ $progress['percentage'] }}%">
@@ -35,7 +97,6 @@
                 @endif
             </div>
         </div>
-        
         @if($progress['percentage'] < 100)
         <p class="text-sm text-amber-600 mt-2">
             <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -56,12 +117,10 @@
     <!-- Registration Steps -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Langkah Pendaftaran</h3>
-        
         <div class="space-y-4">
             @foreach($steps as $index => $step)
             <div class="border-2 {{ $step['completed'] ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white' }} rounded-lg p-4 hover:shadow-md transition">
                 <div class="flex items-start">
-                    <!-- Step Number/Icon -->
                     <div class="flex-shrink-0 mr-4">
                         @if($step['completed'])
                             <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
@@ -75,8 +134,6 @@
                             </div>
                         @endif
                     </div>
-                    
-                    <!-- Step Content -->
                     <div class="flex-1">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
@@ -84,8 +141,6 @@
                                     {{ $step['name'] }}
                                 </h4>
                                 <p class="text-sm text-gray-600 mt-1">{{ $step['description'] }}</p>
-                                
-                                <!-- Step Details -->
                                 <div class="mt-3">
                                     @if($step['name'] === 'Data Pribadi')
                                         <div class="flex items-center space-x-4 text-sm">
@@ -114,9 +169,7 @@
                                         <div class="text-sm text-gray-600">
                                             <span class="font-medium">{{ $step['details']['completed'] }}</span> dokumen terupload
                                             @if(count($step['details']['files']) > 0)
-                                                <span class="ml-2 text-xs text-gray-500">
-                                                    ({{ implode(', ', $step['details']['files']) }})
-                                                </span>
+                                                <span class="ml-2 text-xs text-gray-500">({{ implode(', ', $step['details']['files']) }})</span>
                                             @endif
                                         </div>
                                     @elseif($step['name'] === 'Pilih Peminatan')
@@ -127,15 +180,11 @@
                                             </span>
                                         </div>
                                         @else
-                                        <div class="text-sm text-gray-600">
-                                            Belum memilih peminatan
-                                        </div>
+                                        <div class="text-sm text-gray-600">Belum memilih peminatan</div>
                                         @endif
                                     @endif
                                 </div>
                             </div>
-                            
-                            <!-- Action Button -->
                             <a href="{{ route($step['route']) }}" 
                                class="ml-4 inline-flex items-center px-4 py-2 {{ $step['completed'] ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700' }} text-white text-sm font-medium rounded-lg transition">
                                 {{ $step['completed'] ? 'Lihat' : 'Lengkapi' }}
@@ -150,11 +199,11 @@
             @endforeach
         </div>
     </div>
+    @endif
 
     <!-- Validation Status -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Validasi Berkas</h3>
-        
         @if($validationStatus['status'] === 'pending')
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                 <div class="flex items-start">
@@ -164,10 +213,8 @@
                     <div>
                         <p class="font-semibold text-yellow-800">Menunggu Validasi</p>
                         <p class="text-sm text-yellow-700 mt-1">
-                            Berkas Anda sedang dalam proses validasi oleh panitia. 
-                            @if($progress['percentage'] < 100)
-                                Pastikan semua langkah pendaftaran telah diselesaikan.
-                            @endif
+                            Berkas Anda sedang dalam proses validasi oleh panitia.
+                            @if($progress['percentage'] < 100) Pastikan semua langkah pendaftaran telah diselesaikan. @endif
                         </p>
                     </div>
                 </div>
@@ -183,9 +230,9 @@
                         <p class="text-sm text-green-700 mt-1">
                             Berkas Anda telah divalidasi pada {{ $validationStatus['validated_at']?->format('d M Y H:i') }}
                         </p>
-                        <p class="text-sm text-green-600 mt-2">
-                            Silakan menunggu jadwal tes dari panitia.
-                        </p>
+                        @if(!$finalResult['calculated'])
+                        <p class="text-sm text-green-600 mt-2">Silakan menunggu jadwal tes dari panitia.</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -210,39 +257,29 @@
         @endif
     </div>
 
-    <!-- Final Result: SAW for Tahfiz/Language OR FCFS Status for Regular -->
+    <!-- Final Result -->
     @if($validationStatus['status'] === 'valid')
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">
-            @if($student->specialization === 'regular')
-                Status Penerimaan (FCFS)
-            @else
-                Hasil Perhitungan SAW & Status Penerimaan
+            @if($student->specialization === 'regular') Status Penerimaan (FCFS)
+            @else Hasil Perhitungan SAW & Status Penerimaan
             @endif
         </h3>
         
         @if($student->specialization === 'regular')
-            {{-- REGULAR: Tampilkan status FCFS --}}
             @if($finalResult['calculated'])
                 @if($finalResult['status'] === 'accepted')
                     <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
+                            <svg class="w-12 h-12 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
                             <div class="ml-4">
                                 <p class="font-bold text-green-800 text-2xl">🎉 Selamat! Anda Diterima</p>
-                                <p class="text-green-700 mt-2">
-                                    Anda diterima di <span class="font-bold text-lg">Kelas Regular</span>
-                                </p>
+                                <p class="text-green-700 mt-2">Anda diterima di <span class="font-bold text-lg">Kelas Regular</span></p>
                                 <p class="text-sm text-green-600 mt-3 bg-green-100 rounded-lg p-3">
                                     <strong>Jalur Penerimaan:</strong> First Come First Serve (FCFS)<br>
                                     Penerimaan berdasarkan urutan pendaftaran yang telah divalidasi.
-                                </p>
-                                <p class="text-sm text-green-600 mt-2">
-                                    Silakan menunggu informasi lebih lanjut dari panitia terkait daftar ulang.
                                 </p>
                             </div>
                         </div>
@@ -250,38 +287,25 @@
                 @elseif($finalResult['status'] === 'waiting_list')
                     <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
+                            <svg class="w-12 h-12 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
                             <div class="ml-4">
                                 <p class="font-bold text-yellow-800 text-2xl">Daftar Tunggu</p>
-                                <p class="text-yellow-700 mt-2">
-                                    Anda berada dalam daftar tunggu untuk Kelas Regular
-                                </p>
-                                <p class="text-sm text-yellow-600 mt-3 bg-yellow-100 rounded-lg p-3">
-                                    Kuota kelas regular sudah terpenuhi. Anda akan dihubungi jika ada slot yang tersedia.
-                                </p>
+                                <p class="text-yellow-700 mt-2">Anda berada dalam daftar tunggu untuk Kelas Regular</p>
+                                <p class="text-sm text-yellow-600 mt-3 bg-yellow-100 rounded-lg p-3">Kuota kelas regular sudah terpenuhi. Anda akan dihubungi jika ada slot yang tersedia.</p>
                             </div>
                         </div>
                     </div>
                 @elseif($finalResult['status'] === 'rejected')
                     <div class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-400 rounded-lg p-6">
                         <div class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </div>
+                            <svg class="w-12 h-12 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                             <div class="ml-4">
                                 <p class="font-bold text-red-800 text-2xl">Mohon Maaf</p>
-                                <p class="text-red-700 mt-2">
-                                    Terima kasih atas partisipasi Anda dalam seleksi ini.
-                                </p>
-                                <p class="text-sm text-red-600 mt-2">
-                                    Semangat untuk kesempatan selanjutnya!
-                                </p>
+                                <p class="text-red-700 mt-2">Terima kasih atas partisipasi Anda dalam seleksi ini.</p>
                             </div>
                         </div>
                     </div>
@@ -294,20 +318,12 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-blue-800">Jalur Penerimaan: Regular (FCFS)</p>
-                            <p class="text-sm text-blue-700 mt-1">
-                                Penerimaan kelas regular menggunakan sistem <strong>First Come First Serve</strong>, 
-                                berdasarkan urutan pendaftaran yang telah divalidasi.
-                            </p>
-                            <p class="text-sm text-blue-600 mt-2">
-                                Status penerimaan Anda sedang dalam proses. Harap menunggu pengumuman dari panitia.
-                            </p>
+                            <p class="text-sm text-blue-700 mt-1">Status penerimaan Anda sedang dalam proses. Harap menunggu pengumuman dari panitia.</p>
                         </div>
                     </div>
                 </div>
             @endif
-            
         @else
-            {{-- TAHFIZ/LANGUAGE: Tampilkan SAW Results --}}
             @if($sawResults->isEmpty())
                 <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
                     <div class="flex items-start">
@@ -316,24 +332,13 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-gray-700">Belum Ada Perhitungan Nilai</p>
-                            <p class="text-sm text-gray-600 mt-1">
-                                Perhitungan nilai SAW belum dilakukan oleh panitia. Harap menunggu.
-                            </p>
-                            <p class="text-sm text-gray-500 mt-2">
-                                <strong>Jalur Penerimaan:</strong> SAW (Simple Additive Weighting)<br>
-                                Penerimaan berdasarkan perhitungan kriteria dan bobot nilai.
-                            </p>
+                            <p class="text-sm text-gray-600 mt-1">Perhitungan nilai SAW belum dilakukan oleh panitia. Harap menunggu.</p>
                         </div>
                     </div>
                 </div>
             @else
-                {{-- Tampilkan SAW result untuk specialization yang dipilih siswa --}}
-                @php
-                    $studentSawResult = $sawResults->get($student->specialization);
-                @endphp
-                
+                @php $studentSawResult = $sawResults->get($student->specialization); @endphp
                 @if($studentSawResult)
-                    {{-- Score Display --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-lg border-2 border-indigo-300">
                             <p class="text-sm text-indigo-600 font-medium mb-1">Final Score SAW</p>
@@ -348,8 +353,6 @@
                             <p class="text-xl font-bold text-blue-700">{{ ucfirst($student->specialization) }}</p>
                         </div>
                     </div>
-                    
-                    {{-- Detail Calculation --}}
                     @if($studentSawResult->detail_calculation)
                         <details class="mb-6 bg-gray-50 rounded-lg p-4">
                             <summary class="cursor-pointer text-sm font-medium text-indigo-700 hover:text-indigo-800 flex items-center">
@@ -370,78 +373,53 @@
                                     </thead>
                                     <tbody>
                                         @foreach($studentSawResult->detail_calculation as $code => $detail)
-                                            <tr class="border-b border-gray-100">
-                                                <td class="py-2 text-gray-700">{{ $detail['criteria_name'] }}</td>
-                                                <td class="text-center py-2 text-gray-600">{{ number_format($detail['weight'], 4) }}</td>
-                                                <td class="text-center py-2 text-gray-600">{{ number_format($detail['normalized_value'], 4) }}</td>
-                                                <td class="text-right py-2 font-semibold text-indigo-600">{{ number_format($detail['score'], 4) }}</td>
-                                            </tr>
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-2 text-gray-700">{{ $detail['criteria_name'] }}</td>
+                                            <td class="text-center py-2 text-gray-600">{{ number_format($detail['weight'], 4) }}</td>
+                                            <td class="text-center py-2 text-gray-600">{{ number_format($detail['normalized_value'], 4) }}</td>
+                                            <td class="text-right py-2 font-semibold text-indigo-600">{{ number_format($detail['score'], 4) }}</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <p class="text-xs text-gray-500 mt-3">
-                                    Dihitung pada: {{ $studentSawResult->calculated_at->format('d M Y H:i') }}
-                                </p>
+                                <p class="text-xs text-gray-500 mt-3">Dihitung pada: {{ $studentSawResult->calculated_at->format('d M Y H:i') }}</p>
                             </div>
                         </details>
                     @endif
-                    
-                    {{-- Acceptance Status --}}
                     @if($finalResult['calculated'])
                         @if($finalResult['status'] === 'accepted')
                             <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-6">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
+                                    <svg class="w-12 h-12 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
                                     <div class="ml-4">
                                         <p class="font-bold text-green-800 text-2xl">🎉 Selamat! Anda Diterima</p>
-                                        <p class="text-green-700 mt-2">
-                                            Anda diterima di <span class="font-bold text-lg">Kelas {{ ucfirst($finalResult['class_type']) }}</span>
-                                        </p>
-                                        <p class="text-sm text-green-600 mt-2">
-                                            Silakan menunggu informasi lebih lanjut dari panitia terkait daftar ulang.
-                                        </p>
+                                        <p class="text-green-700 mt-2">Anda diterima di <span class="font-bold text-lg">Kelas {{ ucfirst($finalResult['class_type']) }}</span></p>
                                     </div>
                                 </div>
                             </div>
                         @elseif($finalResult['status'] === 'waiting_list')
                             <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-400 rounded-lg p-6">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
+                                    <svg class="w-12 h-12 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
                                     <div class="ml-4">
                                         <p class="font-bold text-yellow-800 text-2xl">Daftar Tunggu</p>
-                                        <p class="text-yellow-700 mt-2">
-                                            Anda berada dalam daftar tunggu untuk Kelas {{ ucfirst($finalResult['class_type']) }}
-                                        </p>
-                                        <p class="text-sm text-yellow-600 mt-2">
-                                            Harap menunggu informasi lebih lanjut dari panitia.
-                                        </p>
+                                        <p class="text-yellow-700 mt-2">Anda berada dalam daftar tunggu untuk Kelas {{ ucfirst($finalResult['class_type']) }}</p>
                                     </div>
                                 </div>
                             </div>
                         @elseif($finalResult['status'] === 'rejected')
                             <div class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-400 rounded-lg p-6">
                                 <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </div>
+                                    <svg class="w-12 h-12 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
                                     <div class="ml-4">
                                         <p class="font-bold text-red-800 text-2xl">Mohon Maaf</p>
-                                        <p class="text-red-700 mt-2">
-                                            Terima kasih atas partisipasi Anda dalam seleksi ini.
-                                        </p>
-                                        <p class="text-sm text-red-600 mt-2">
-                                            Semangat untuk kesempatan selanjutnya!
-                                        </p>
+                                        <p class="text-red-700 mt-2">Terima kasih atas partisipasi Anda dalam seleksi ini.</p>
                                     </div>
                                 </div>
                             </div>
@@ -458,9 +436,7 @@
                     @endif
                 @else
                     <div class="bg-gray-50 border-l-4 border-gray-400 p-4">
-                        <p class="text-sm text-gray-600">
-                            Perhitungan SAW untuk spesialisasi <strong>{{ ucfirst($student->specialization) }}</strong> belum tersedia.
-                        </p>
+                        <p class="text-sm text-gray-600">Perhitungan SAW untuk spesialisasi <strong>{{ ucfirst($student->specialization) }}</strong> belum tersedia.</p>
                     </div>
                 @endif
             @endif

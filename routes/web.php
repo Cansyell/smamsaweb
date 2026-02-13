@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\AhpResultController;
-
+use App\Http\Controllers\AnnouncementController;
 
 // Panitia Controllers
 use App\Http\Controllers\Committee\CommitteeDashboardController;
@@ -19,8 +19,6 @@ use App\Http\Controllers\Committee\TestScoreController;
 use App\Http\Controllers\Committee\ValidationController;
 use App\Http\Controllers\Committee\CriterionValueController;
 use App\Http\Controllers\Committee\SawResultController;
-
-
 
 // Student Controllers
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
@@ -75,7 +73,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Group Admin dengan prefix dan name
     Route::prefix('admin')->name('admin.')->group(function () {
         
-        // Data Siswa
+        /* =====================================================
+         | Data Siswa
+         ===================================================== */
         Route::prefix('students')->name('students.')->group(function () {
             Route::get('/', [StudentController::class, 'index'])->name('index');
             Route::get('/create', [StudentController::class, 'create'])->name('create');
@@ -87,7 +87,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/export', [StudentController::class, 'export'])->name('export');
         });
         
-        // Kriteria Penilaian - Resource route dengan custom routes
+        /* =====================================================
+         | Kriteria Penilaian
+         ===================================================== */
         Route::resource('criterias', CriteriaController::class);
         
         // Route tambahan untuk Criteria
@@ -98,32 +100,62 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             ->name('criterias.reorder')
             ->whereIn('specialization', ['tahfiz', 'language']);
 
-        //ahp matrix
+        /* =====================================================
+         | AHP Matrix (Perhitungan Kriteria)
+         ===================================================== */
         Route::resource('ahp-matrices', AhpMatrixController::class)->only(['index', 'store', 'show']);
-        Route::post('ahp-matrices/calculate-weights', [AhpMatrixController::class, 'calculateWeights'])->name('ahp-matrices.calculate-weights');
-        Route::delete('ahp-matrices/reset', [AhpMatrixController::class, 'reset'])->name('ahp-matrices.reset');
+        Route::post('ahp-matrices/calculate-weights', [AhpMatrixController::class, 'calculateWeights'])
+            ->name('ahp-matrices.calculate-weights');
+        Route::delete('ahp-matrices/reset', [AhpMatrixController::class, 'reset'])
+            ->name('ahp-matrices.reset');
 
-        // AHP Results - Hasil Perhitungan
-        Route::get('ahp-results', [AhpResultController::class, 'index'])->name('ahp-results.index');
+        /* =====================================================
+         | AHP Results (Hasil Perhitungan)
+         ===================================================== */
+        Route::get('ahp-results', [AhpResultController::class, 'index'])
+            ->name('ahp-results.index');
 
-        //academic-years
+        /* =====================================================
+         | Academic Years (Tahun Ajaran)
+         ===================================================== */
         Route::resource('academic-years', AcademicYearController::class);
         Route::patch('academic-years/{academicYear}/toggle-active', [AcademicYearController::class, 'toggleActive'])
-        ->name('academic-years.toggle-active');
+            ->name('academic-years.toggle-active');
         
-        // Specialization Quotas Routes
+        /* =====================================================
+         | Specialization Quotas (Kuota Peminatan)
+         ===================================================== */
         Route::resource('specialization-quotas', SpecializationQuotaController::class);
         Route::patch('specialization-quotas/{specializationQuota}/toggle-active', 
             [SpecializationQuotaController::class, 'toggleActive'])
             ->name('specialization-quotas.toggle-active');
         
+        /* =====================================================
+         | Announcements (Pengumuman)
+         ===================================================== */
+        Route::resource('announcements', AnnouncementController::class);
+        
+        // Additional announcement routes
+        Route::patch('announcements/{announcement}/toggle-status', [AnnouncementController::class, 'toggleStatus'])
+            ->name('announcements.toggle-status');
+        
+        Route::patch('announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])
+            ->name('announcements.publish');
+        
+        Route::patch('announcements/{announcement}/unpublish', [AnnouncementController::class, 'unpublish'])
+            ->name('announcements.unpublish');
+        
+        Route::delete('announcements/{announcement}/delete-image', [AnnouncementController::class, 'deleteImage'])
+            ->name('announcements.delete-image');
+        
+        Route::delete('announcements/{announcement}/delete-file', [AnnouncementController::class, 'deleteFile'])
+            ->name('announcements.delete-file');
     });
 });
 
 // ============================================================
-// PANITIA ROUTES - Hanya untuk role 'panitia'
+// PANITIA ROUTES - Hanya untuk role 'committee'
 // ============================================================
-
 Route::middleware(['auth', 'role:committee'])
     ->prefix('committee')
     ->name('committee.')
@@ -207,38 +239,44 @@ Route::middleware(['auth', 'role:committee'])
         Route::get('/{student}', [SawResultController::class, 'show'])->name('show');
     });
 
-
     /* =====================================================
-     | Acceptance Result (Optional – Jika Ada Halaman Khusus)
+     | Announcements (View Only)
      ===================================================== */
-    // Route::prefix('acceptance')->name('acceptance.')->group(function () {
-    //     Route::get('/', [AcceptanceController::class, 'index'])->name('index');
-    // });
-
+    Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])
+        ->name('announcements.show');
 });
 
 
-
 // ============================================================
-// SISWA ROUTES - Hanya untuk role 'siswa'
+// SISWA ROUTES - Hanya untuk role 'student'
 // ============================================================
 Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
     
-   // Dashboard
+    /* =====================================================
+     | Dashboard
+     ===================================================== */
     Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
     
-    // Profile
+    /* =====================================================
+     | Profile
+     ===================================================== */
     Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile', [StudentProfileController::class, 'store'])->name('profile.store');
     Route::put('/profile/{student}', [StudentProfileController::class, 'update'])->name('profile.update');
     
-    // Report Grades
+    /* =====================================================
+     | Report Grades
+     ===================================================== */
     Route::resource('report-grades', ReportGradeController::class);
     
-    // Documents
+    /* =====================================================
+     | Documents
+     ===================================================== */
     Route::resource('documents', DocumentController::class);
     
-    // Specialization
+    /* =====================================================
+     | Specialization
+     ===================================================== */
     Route::prefix('specialization')->name('specialization.')->group(function () {
         Route::get('/', [SpecializationController::class, 'index'])->name('index');
         Route::get('/create', [SpecializationController::class, 'create'])->name('create');
@@ -248,13 +286,21 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
         Route::put('/', [SpecializationController::class, 'update'])->name('update');
     });
     
-    // Result Routes (Ranking)
+    /* =====================================================
+     | Result Routes (Ranking)
+     ===================================================== */
     Route::prefix('result')->name('result.')->group(function () {
         Route::get('/', [ResultController::class, 'index'])->name('index');
         Route::get('/detail', [ResultController::class, 'show'])->name('show');
         Route::get('/comparison', [ResultController::class, 'comparison'])->name('comparison');
         Route::get('/card', [ResultController::class, 'card'])->name('card');
     });
+
+    /* =====================================================
+     | Announcements (View Only)
+     ===================================================== */
+    Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])
+        ->name('announcements.show');
 });
 
 // ============================================================

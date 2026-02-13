@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\SawResult;
+use App\Models\Announcement;
 
 class StudentDashboardController extends Controller
 {
@@ -23,7 +24,6 @@ class StudentDashboardController extends Controller
                 ->with('info', 'Silakan lengkapi data pribadi Anda terlebih dahulu.');
         }
 
-        // Ambil SAW Result untuk student ini (hanya jika bukan regular)
         $sawResults = collect();
         if (in_array($student->specialization, ['tahfiz', 'language'])) {
             $sawResults = SawResult::where('student_id', $student->id)
@@ -31,45 +31,48 @@ class StudentDashboardController extends Controller
                 ->get()
                 ->keyBy('specialization');
         }
-        
+
+        $announcements = Announcement::getLatestForDashboard(3);
+
         return view('student.dashboard', [
-            'page' => 'dashboard',
-            'student' => $student,
-            'progress' => $student->getRegistrationProgress(),
-            'steps' => [
+            'page'             => 'dashboard',
+            'student'          => $student,
+            'progress'         => $student->getRegistrationProgress(),
+            'steps'            => [
                 [
-                    'name' => 'Data Pribadi',
-                    'completed' => $student->isPersonalDataCompleted(),
-                    'route' => 'student.profile.index',
+                    'name'        => 'Data Pribadi',
+                    'completed'   => $student->isPersonalDataCompleted(),
+                    'route'       => 'student.profile.index',
                     'description' => 'Lengkapi data pribadi dan informasi orang tua',
-                    'details' => $student->getPersonalDataDetails(),
+                    'details'     => $student->getPersonalDataDetails(),
                 ],
                 [
-                    'name' => 'Nilai Rapor',
-                    'completed' => $student->isReportGradeCompleted(),
-                    'route' => 'student.report-grades.index',
+                    'name'        => 'Nilai Rapor',
+                    'completed'   => $student->isReportGradeCompleted(),
+                    'route'       => 'student.report-grades.index',
                     'description' => 'Input nilai PAI, Bahasa Indonesia, dan Bahasa Inggris',
-                    'details' => $student->getGradesDetails(),
+                    'details'     => $student->getGradesDetails(),
                 ],
                 [
-                    'name' => 'Upload Berkas',
-                    'completed' => $student->isDocumentsCompleted(),
-                    'route' => 'student.documents.index',
+                    'name'        => 'Upload Berkas',
+                    'completed'   => $student->isDocumentsCompleted(),
+                    'route'       => 'student.documents.index',
                     'description' => 'Upload ijazah dan rapor SMP/MTs',
-                    'details' => $student->getDocumentsDetails(),
+                    'details'     => $student->getDocumentsDetails(),
                 ],
                 [
-                    'name' => 'Pilih Peminatan',
-                    'completed' => $student->isSpecializationCompleted(),
-                    'route' => 'student.specialization.index',
+                    'name'        => 'Pilih Peminatan',
+                    'completed'   => $student->isSpecializationCompleted(),
+                    'route'       => 'student.specialization.index',
                     'description' => 'Pilih peminatan Tahfiz atau Bahasa',
-                    'details' => $student->getSpecializationDetails(),
+                    'details'     => $student->getSpecializationDetails(),
                 ],
             ],
             'validationStatus' => $student->getValidationStatus(),
             'testScoresStatus' => $student->getTestScoresStatus(),
-            'finalResult' => $student->getFinalResult(),
-            'sawResults' => $sawResults, // Data SAW Result
+            'finalResult'      => $student->getFinalResult(),
+            'sawResults'       => $sawResults,
+            'announcements'    => $announcements,
         ]);
     }
 }

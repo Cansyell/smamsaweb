@@ -38,12 +38,15 @@ class DashboardController extends Controller
                                 ->latest()
                                 ->limit(10)
                                 ->get();
-        
+                            $announcements = \App\Models\Announcement::getLatestForDashboard(3);
+    
         return view('dashboard', [
             'page' => 'dashboard',
             'stats' => $stats,
             'recentStudents' => $recentStudents,
-            'activeYear' => $activeYear
+            'activeYear' => $activeYear,
+            'announcements' => $announcements, // TAMBAHKAN BARIS INI
         ]);
     }
+        
 }
