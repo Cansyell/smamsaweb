@@ -63,85 +63,48 @@
         </div>
 
         <!-- Grades Detail -->
-        <div class="px-6 py-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">Detail Nilai Mata Pelajaran</h3>
-            
-            <div class="space-y-6">
-                <!-- Pendidikan Agama Islam -->
-                <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-green-100 rounded-full">
-                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 text-lg">Pendidikan Agama Islam</h4>
-                                <p class="text-sm text-gray-600">Rata-rata Semester 1-5</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-4xl font-bold text-green-600">{{ number_format($reportGrade->islamic_studies, 2) }}</p>
-                            <p class="text-sm text-gray-600">/100</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-green-200 rounded-full h-3">
-                        <div class="bg-gradient-to-r from-green-500 to-emerald-600 h-3 rounded-full transition-all duration-500" 
-                             style="width: {{ $reportGrade->islamic_studies }}%"></div>
-                    </div>
-                </div>
+        <div class="space-y-4">
+            @php
+                $subjects = [
+                    ['key' => 'islamic_studies',    'label' => 'Pendidikan Agama Islam', 'from' => 'green-50',  'to' => 'emerald-50',  'border' => 'green-200',  'text' => 'green-600',  'bar_from' => 'green-500',  'bar_to' => 'emerald-600'],
+                    ['key' => 'indonesian_language', 'label' => 'Bahasa Indonesia',       'from' => 'blue-50',   'to' => 'indigo-50',   'border' => 'blue-200',   'text' => 'blue-600',   'bar_from' => 'blue-500',   'bar_to' => 'indigo-600'],
+                    ['key' => 'english_language',   'label' => 'Bahasa Inggris',         'from' => 'purple-50', 'to' => 'pink-50',     'border' => 'purple-200', 'text' => 'purple-600', 'bar_from' => 'purple-500', 'bar_to' => 'pink-600'],
+                    ['key' => 'ppkn',               'label' => 'PPKn',                   'from' => 'yellow-50', 'to' => 'amber-50',    'border' => 'yellow-200', 'text' => 'yellow-600', 'bar_from' => 'yellow-500', 'bar_to' => 'amber-600'],
+                    ['key' => 'mtk',                'label' => 'Matematika',             'from' => 'red-50',    'to' => 'rose-50',     'border' => 'red-200',    'text' => 'red-600',    'bar_from' => 'red-500',    'bar_to' => 'rose-600'],
+                    ['key' => 'ipa',                'label' => 'IPA',                    'from' => 'teal-50',   'to' => 'cyan-50',     'border' => 'teal-200',   'text' => 'teal-600',   'bar_from' => 'teal-500',   'bar_to' => 'cyan-600'],
+                    ['key' => 'seni_budaya',        'label' => 'Seni Budaya',            'from' => 'pink-50',   'to' => 'fuchsia-50',  'border' => 'pink-200',   'text' => 'pink-600',   'bar_from' => 'pink-500',   'bar_to' => 'fuchsia-600'],
+                    ['key' => 'penjas',             'label' => 'Pendidikan Jasmani',     'from' => 'orange-50', 'to' => 'amber-50',    'border' => 'orange-200', 'text' => 'orange-600', 'bar_from' => 'orange-500', 'bar_to' => 'amber-600'],
+                    ['key' => 'prakarya',           'label' => 'Prakarya',               'from' => 'indigo-50', 'to' => 'violet-50',   'border' => 'indigo-200', 'text' => 'indigo-600', 'bar_from' => 'indigo-500', 'bar_to' => 'violet-600'],
+                ];
+            @endphp
 
-                <!-- Bahasa Indonesia -->
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+            @foreach($subjects as $s)
+                @if($reportGrade->{$s['key']} !== null)
+                <div class="bg-gradient-to-r from-{{ $s['from'] }} to-{{ $s['to'] }} rounded-lg p-6 border border-{{ $s['border'] }}">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-4">
-                            <div class="p-3 bg-blue-100 rounded-full">
-                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                            <div class="p-3 bg-white/60 rounded-full">
+                                <svg class="w-8 h-8 text-{{ $s['text'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-gray-800 text-lg">Bahasa Indonesia</h4>
+                                <h4 class="font-semibold text-gray-800 text-lg">{{ $s['label'] }}</h4>
                                 <p class="text-sm text-gray-600">Rata-rata Semester 1-5</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <p class="text-4xl font-bold text-blue-600">{{ number_format($reportGrade->indonesian_language, 2) }}</p>
+                            <p class="text-4xl font-bold text-{{ $s['text'] }}">{{ number_format($reportGrade->{$s['key']}, 2) }}</p>
                             <p class="text-sm text-gray-600">/100</p>
                         </div>
                     </div>
-                    <div class="w-full bg-blue-200 rounded-full h-3">
-                        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-500" 
-                             style="width: {{ $reportGrade->indonesian_language }}%"></div>
+                    <div class="w-full bg-white/50 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-{{ $s['bar_from'] }} to-{{ $s['bar_to'] }} h-3 rounded-full transition-all duration-500"
+                            style="width: {{ $reportGrade->{$s['key']} }}%"></div>
                     </div>
                 </div>
-
-                <!-- Bahasa Inggris -->
-                <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-6 border border-purple-200">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-purple-100 rounded-full">
-                                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-800 text-lg">Bahasa Inggris</h4>
-                                <p class="text-sm text-gray-600">Rata-rata Semester 1-5</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-4xl font-bold text-purple-600">{{ number_format($reportGrade->english_language, 2) }}</p>
-                            <p class="text-sm text-gray-600">/100</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-purple-200 rounded-full h-3">
-                        <div class="bg-gradient-to-r from-purple-500 to-pink-600 h-3 rounded-full transition-all duration-500" 
-                             style="width: {{ $reportGrade->english_language }}%"></div>
-                    </div>
-                </div>
-            </div>
+                @endif
+            @endforeach
         </div>
 
         <!-- Metadata -->

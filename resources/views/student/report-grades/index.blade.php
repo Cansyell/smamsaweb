@@ -92,56 +92,41 @@
 
             <!-- Detail Nilai -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-1">Pendidikan Agama Islam</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($reportGrade->islamic_studies, 2) }}</p>
-                        </div>
-                        <div class="p-3 bg-green-100 rounded-full">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-green-500 h-2 rounded-full" style="width: {{ $reportGrade->islamic_studies }}%"></div>
-                    </div>
-                </div>
+                @php
+                    $subjects = [
+                        ['key' => 'islamic_studies',    'label' => 'Pendidikan Agama Islam', 'color' => 'green'],
+                        ['key' => 'indonesian_language', 'label' => 'Bahasa Indonesia',       'color' => 'blue'],
+                        ['key' => 'english_language',   'label' => 'Bahasa Inggris',         'color' => 'purple'],
+                        ['key' => 'ppkn',               'label' => 'PPKn',                   'color' => 'yellow'],
+                        ['key' => 'mtk',                'label' => 'Matematika',             'color' => 'red'],
+                        ['key' => 'ipa',                'label' => 'IPA',                    'color' => 'teal'],
+                        ['key' => 'seni_budaya',        'label' => 'Seni Budaya',            'color' => 'pink'],
+                        ['key' => 'penjas',             'label' => 'Pendidikan Jasmani',     'color' => 'orange'],
+                        ['key' => 'prakarya',           'label' => 'Prakarya',               'color' => 'indigo'],
+                    ];
+                @endphp
 
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-1">Bahasa Indonesia</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($reportGrade->indonesian_language, 2) }}</p>
+                @foreach($subjects as $subject)
+                    @if($reportGrade->{$subject['key']} !== null)
+                    @php $color = $subject['color']; @endphp
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">{{ $subject['label'] }}</p>
+                                <p class="text-2xl font-bold text-gray-800">{{ number_format($reportGrade->{$subject['key']}, 2) }}</p>
+                            </div>
+                            <div class="p-3 bg-{{ $color }}-100 rounded-full">
+                                <svg class="w-6 h-6 text-{{ $color }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
                         </div>
-                        <div class="p-3 bg-blue-100 rounded-full">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $reportGrade->indonesian_language }}%"></div>
-                    </div>
-                </div>
-
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-1">Bahasa Inggris</p>
-                            <p class="text-2xl font-bold text-gray-800">{{ number_format($reportGrade->english_language, 2) }}</p>
-                        </div>
-                        <div class="p-3 bg-purple-100 rounded-full">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-{{ $color }}-500 h-2 rounded-full" style="width: {{ $reportGrade->{$subject['key']} }}%"></div>
                         </div>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-500 h-2 rounded-full" style="width: {{ $reportGrade->english_language }}%"></div>
-                    </div>
-                </div>
+                    @endif
+                @endforeach
             </div>
 
             <!-- Action Buttons -->

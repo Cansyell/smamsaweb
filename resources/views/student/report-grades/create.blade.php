@@ -10,12 +10,10 @@
             <h3 class="text-lg font-semibold text-gray-800">Progress Pendaftaran</h3>
             <span class="text-2xl font-bold text-indigo-600">{{ number_format($progress['percentage'], 0) }}%</span>
         </div>
-        
         <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500" 
                  style="width: {{ $progress['percentage'] }}%"></div>
         </div>
-        
         <p class="text-sm text-gray-600">
             {{ $progress['completed'] }} dari {{ $progress['total'] }} langkah telah diselesaikan
         </p>
@@ -69,7 +67,8 @@
                     <ul class="list-disc list-inside space-y-1">
                         <li>Nilai yang diinput adalah rata-rata nilai dari semester 1 sampai semester 5</li>
                         <li>Rentang nilai: 0 - 100</li>
-                        <li>Nilai rata-rata akan dihitung secara otomatis</li>
+                        <li>Kolom bertanda <span class="text-red-500 font-bold">*</span> wajib diisi</li>
+                        <li>Nilai rata-rata akan dihitung secara otomatis dari semua nilai yang diisi</li>
                     </ul>
                 </div>
             </div>
@@ -92,10 +91,11 @@
                 </div>
             </div>
 
-            <!-- Nilai Section -->
+            <!-- Mata Pelajaran Wajib -->
             <div class="border-b border-gray-200 pb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Nilai Mata Pelajaran</h3>
-                
+                <h3 class="text-lg font-semibold text-gray-800 mb-1">Mata Pelajaran Wajib</h3>
+                <p class="text-sm text-gray-500 mb-4">Ketiga mata pelajaran berikut wajib diisi</p>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Pendidikan Agama Islam -->
                     <div>
@@ -103,15 +103,10 @@
                             Pendidikan Agama Islam <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="number" 
-                                   name="islamic_studies" 
-                                   value="{{ old('islamic_studies') }}"
-                                   step="0.01"
-                                   min="0"
-                                   max="100"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('islamic_studies') border-red-500 @enderror"
-                                   placeholder="0.00"
-                                   required>
+                            <input type="number" name="islamic_studies" value="{{ old('islamic_studies') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('islamic_studies') border-red-500 @enderror"
+                                   placeholder="0.00" required>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-gray-500 text-sm">/100</span>
                             </div>
@@ -127,15 +122,10 @@
                             Bahasa Indonesia <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="number" 
-                                   name="indonesian_language" 
-                                   value="{{ old('indonesian_language') }}"
-                                   step="0.01"
-                                   min="0"
-                                   max="100"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('indonesian_language') border-red-500 @enderror"
-                                   placeholder="0.00"
-                                   required>
+                            <input type="number" name="indonesian_language" value="{{ old('indonesian_language') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('indonesian_language') border-red-500 @enderror"
+                                   placeholder="0.00" required>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-gray-500 text-sm">/100</span>
                             </div>
@@ -151,15 +141,10 @@
                             Bahasa Inggris <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="number" 
-                                   name="english_language" 
-                                   value="{{ old('english_language') }}"
-                                   step="0.01"
-                                   min="0"
-                                   max="100"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('english_language') border-red-500 @enderror"
-                                   placeholder="0.00"
-                                   required>
+                            <input type="number" name="english_language" value="{{ old('english_language') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('english_language') border-red-500 @enderror"
+                                   placeholder="0.00" required>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <span class="text-gray-500 text-sm">/100</span>
                             </div>
@@ -169,18 +154,129 @@
                         @enderror
                     </div>
                 </div>
+            </div>
 
-                <!-- Average Preview (Optional with JavaScript) -->
-                <div class="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-600 mb-1">Nilai Rata-rata (Preview)</p>
-                            <p class="text-2xl font-bold text-indigo-600" id="averagePreview">0.00</p>
+            <!-- Mata Pelajaran Opsional -->
+            <div class="border-b border-gray-200 pb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-1">Mata Pelajaran Lainnya</h3>
+                <p class="text-sm text-gray-500 mb-4">Opsional — kosongkan jika tidak tersedia di raport Anda</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- PPKn -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">PPKn</label>
+                        <div class="relative">
+                            <input type="number" name="ppkn" value="{{ old('ppkn') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('ppkn') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-600 mb-1">Status</p>
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800" id="statusBadge">Belum Lengkap</span>
+                        @error('ppkn')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Matematika -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Matematika</label>
+                        <div class="relative">
+                            <input type="number" name="mtk" value="{{ old('mtk') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('mtk') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
                         </div>
+                        @error('mtk')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- IPA -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">IPA</label>
+                        <div class="relative">
+                            <input type="number" name="ipa" value="{{ old('ipa') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('ipa') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
+                        </div>
+                        @error('ipa')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Seni Budaya -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Seni Budaya</label>
+                        <div class="relative">
+                            <input type="number" name="seni_budaya" value="{{ old('seni_budaya') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('seni_budaya') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
+                        </div>
+                        @error('seni_budaya')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Pendidikan Jasmani -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pendidikan Jasmani</label>
+                        <div class="relative">
+                            <input type="number" name="penjas" value="{{ old('penjas') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('penjas') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
+                        </div>
+                        @error('penjas')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Prakarya -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prakarya</label>
+                        <div class="relative">
+                            <input type="number" name="prakarya" value="{{ old('prakarya') }}"
+                                   step="0.01" min="0" max="100"
+                                   class="grade-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('prakarya') border-red-500 @enderror"
+                                   placeholder="0.00">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 text-sm">/100</span>
+                            </div>
+                        </div>
+                        @error('prakarya')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Preview -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Nilai Rata-rata (Preview)</p>
+                        <p class="text-2xl font-bold text-indigo-600" id="averagePreview">0.00</p>
+                        <p class="text-xs text-gray-500 mt-1" id="countPreview">Dari 0 mata pelajaran</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600 mb-1">Status</p>
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800" id="statusBadge">Belum Lengkap</span>
                     </div>
                 </div>
             </div>
@@ -205,48 +301,45 @@
 
 @push('scripts')
 <script>
-    // Calculate average in real-time
-    document.addEventListener('DOMContentLoaded', function() {
-        const inputs = {
-            islamic: document.querySelector('input[name="islamic_studies"]'),
-            indonesian: document.querySelector('input[name="indonesian_language"]'),
-            english: document.querySelector('input[name="english_language"]')
-        };
-        
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputs = document.querySelectorAll('.grade-input');
         const averageDisplay = document.getElementById('averagePreview');
-        const statusBadge = document.getElementById('statusBadge');
-        
+        const countDisplay   = document.getElementById('countPreview');
+        const statusBadge    = document.getElementById('statusBadge');
+
         function calculateAverage() {
-            const islamic = parseFloat(inputs.islamic.value) || 0;
-            const indonesian = parseFloat(inputs.indonesian.value) || 0;
-            const english = parseFloat(inputs.english.value) || 0;
-            
-            const average = (islamic + indonesian + english) / 3;
+            const values = Array.from(inputs)
+                .map(i => i.value !== '' ? parseFloat(i.value) : null)
+                .filter(v => v !== null);
+
+            const count   = values.length;
+            const average = count > 0 ? values.reduce((a, b) => a + b, 0) / count : 0;
+
             averageDisplay.textContent = average.toFixed(2);
-            
-            // Update status badge
-            if (islamic === 0 || indonesian === 0 || english === 0) {
-                statusBadge.textContent = 'Belum Lengkap';
-                statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800';
+            countDisplay.textContent   = `Dari ${count} mata pelajaran`;
+
+            const requiredFilled = ['islamic_studies', 'indonesian_language', 'english_language']
+                .every(name => document.querySelector(`[name="${name}"]`).value !== '');
+
+            if (!requiredFilled) {
+                statusBadge.textContent  = 'Belum Lengkap';
+                statusBadge.className    = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800';
             } else if (average >= 85) {
-                statusBadge.textContent = 'Sangat Baik';
-                statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800';
+                statusBadge.textContent  = 'Sangat Baik';
+                statusBadge.className    = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800';
             } else if (average >= 75) {
-                statusBadge.textContent = 'Baik';
-                statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800';
+                statusBadge.textContent  = 'Baik';
+                statusBadge.className    = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800';
             } else if (average >= 65) {
-                statusBadge.textContent = 'Cukup';
-                statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800';
+                statusBadge.textContent  = 'Cukup';
+                statusBadge.className    = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800';
             } else {
-                statusBadge.textContent = 'Kurang';
-                statusBadge.className = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
+                statusBadge.textContent  = 'Kurang';
+                statusBadge.className    = 'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800';
             }
         }
-        
-        // Add event listeners
-        Object.values(inputs).forEach(input => {
-            input.addEventListener('input', calculateAverage);
-        });
+
+        inputs.forEach(input => input.addEventListener('input', calculateAverage));
     });
 </script>
 @endpush

@@ -84,7 +84,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
             Route::get('/{student}/edit', [StudentController::class, 'edit'])->name('edit');
             Route::put('/{student}', [StudentController::class, 'update'])->name('update');
             Route::delete('/{student}', [StudentController::class, 'destroy'])->name('destroy');
-            Route::get('/export', [StudentController::class, 'export'])->name('export');
+            Route::get('students/export', [StudentController::class, 'export'])->name('export');
         });
         
         /* =====================================================

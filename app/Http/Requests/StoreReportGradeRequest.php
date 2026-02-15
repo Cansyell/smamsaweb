@@ -6,49 +6,47 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReportGradeRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'islamic_studies' => 'required|numeric|between:0,100',
+            'islamic_studies'    => 'required|numeric|between:0,100',
             'indonesian_language' => 'required|numeric|between:0,100',
-            'english_language' => 'required|numeric|between:0,100',
+            'english_language'   => 'required|numeric|between:0,100',
+            'ppkn'               => 'nullable|numeric|between:0,100',
+            'mtk'                => 'nullable|numeric|between:0,100',
+            'ipa'                => 'nullable|numeric|between:0,100',
+            'seni_budaya'        => 'nullable|numeric|between:0,100',
+            'penjas'             => 'nullable|numeric|between:0,100',
+            'prakarya'           => 'nullable|numeric|between:0,100',
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     */
     public function attributes(): array
     {
         return [
-            'islamic_studies' => 'Nilai Pendidikan Agama Islam',
+            'islamic_studies'    => 'Nilai Pendidikan Agama Islam',
             'indonesian_language' => 'Nilai Bahasa Indonesia',
-            'english_language' => 'Nilai Bahasa Inggris',
+            'english_language'   => 'Nilai Bahasa Inggris',
+            'ppkn'               => 'Nilai PPKn',
+            'mtk'                => 'Nilai Matematika',
+            'ipa'                => 'Nilai IPA',
+            'seni_budaya'        => 'Nilai Seni Budaya',
+            'penjas'             => 'Nilai Pendidikan Jasmani',
+            'prakarya'           => 'Nilai Prakarya',
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     */
     public function messages(): array
     {
         return [
             'required' => ':attribute wajib diisi',
-            'numeric' => ':attribute harus berupa angka',
-            'between' => ':attribute harus antara :min dan :max',
+            'numeric'  => ':attribute harus berupa angka',
+            'between'  => ':attribute harus antara :min dan :max',
         ];
     }
 }

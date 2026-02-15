@@ -16,14 +16,26 @@ class ReportGrade extends Model
         'islamic_studies',
         'indonesian_language',
         'english_language',
+        'ppkn',
+        'mtk',
+        'ipa',
+        'seni_budaya',
+        'penjas',
+        'prakarya',
         'average_grade',
     ];
 
     protected $casts = [
-        'islamic_studies' => 'decimal:2',
+        'islamic_studies'    => 'decimal:2',
         'indonesian_language' => 'decimal:2',
-        'english_language' => 'decimal:2',
-        'average_grade' => 'decimal:2',
+        'english_language'   => 'decimal:2',
+        'ppkn'               => 'decimal:2',
+        'mtk'                => 'decimal:2',
+        'ipa'                => 'decimal:2',
+        'seni_budaya'        => 'decimal:2',
+        'penjas'             => 'decimal:2',
+        'prakarya'           => 'decimal:2',
+        'average_grade'      => 'decimal:2',
     ];
 
     /* =======================
@@ -39,24 +51,31 @@ class ReportGrade extends Model
      ======================= */
     public static function createGrade(array $data): self
     {
-        $averageGrade = ($data['islamic_studies'] + $data['indonesian_language'] + $data['english_language']) / 3;
-        
-        return self::create([
-            'student_id' => $data['student_id'],
-            'islamic_studies' => $data['islamic_studies'],
-            'indonesian_language' => $data['indonesian_language'],
-            'english_language' => $data['english_language'],
-            'average_grade' => round($averageGrade, 2),
-        ]);
+        $data['average_grade'] = self::computeAverage($data);
+
+        return self::create($data);
     }
 
     public function updateGrade(array $data): bool
     {
-        $averageGrade = ($data['islamic_studies'] + $data['indonesian_language'] + $data['english_language']) / 3;
-        
-        $data['average_grade'] = round($averageGrade, 2);
-        
+        $data['average_grade'] = self::computeAverage($data);
+
         return $this->update($data);
+    }
+
+    private static function computeAverage(array $data): float
+    {
+        $fields = [
+            'islamic_studies', 'indonesian_language', 'english_language',
+            'ppkn', 'mtk', 'ipa', 'seni_budaya', 'penjas', 'prakarya',
+        ];
+
+        $values = array_filter(
+            array_map(fn($f) => isset($data[$f]) ? (float) $data[$f] : null, $fields),
+            fn($v) => $v !== null
+        );
+
+        return count($values) > 0 ? round(array_sum($values) / count($values), 2) : 0;
     }
 
     /* =======================
@@ -64,8 +83,8 @@ class ReportGrade extends Model
      ======================= */
     public function getIsCompleteAttribute(): bool
     {
-        return $this->islamic_studies !== null 
-            && $this->indonesian_language !== null 
+        return $this->islamic_studies !== null
+            && $this->indonesian_language !== null
             && $this->english_language !== null;
     }
 

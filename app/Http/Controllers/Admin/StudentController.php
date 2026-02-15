@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Http\Requests\StudentRequest;
 use Illuminate\Http\Request;
+use App\Export\StudentExport;
+
 
 class StudentController extends Controller
 {
@@ -216,19 +218,6 @@ class StudentController extends Controller
     }
 
     /**
-     * Export students data (optional feature)
-     */
-    public function export(Request $request)
-    {
-        // TODO: Implement export functionality (Excel/PDF)
-        // This is placeholder for future implementation
-        
-        return redirect()
-            ->back()
-            ->with('info', 'Fitur export sedang dalam pengembangan.');
-    }
-
-    /**
      * Get statistics for dashboard
      */
     public function statistics()
@@ -247,4 +236,13 @@ class StudentController extends Controller
 
         return response()->json($stats);
     }
-}
+
+    public function export(Request $request)
+    {
+        $filters  = $request->only(['status', 'gender', 'specialization', 'search']);
+        $filename = 'data-siswa-' . now()->format('Ymd-His') . '.xlsx';
+
+        return (new StudentExport($filters))->download($filename);
+    }
+
+    }
