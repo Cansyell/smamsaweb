@@ -21,12 +21,10 @@
             <h3 class="text-lg font-semibold text-gray-800">Progress Input Nilai</h3>
             <span class="text-2xl font-bold text-indigo-600">{{ number_format($progress['percentage'], 0) }}%</span>
         </div>
-        
         <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500" 
                  style="width: {{ $progress['percentage'] }}%"></div>
         </div>
-        
         <p class="text-sm text-gray-600">
             {{ $progress['completed'] }} dari {{ $progress['total'] }} kriteria telah diisi
         </p>
@@ -73,6 +71,21 @@
     </div>
     @endif
 
+    <!-- ReportGrade warning jika tidak ditemukan -->
+    @if(!$reportGrade)
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-sm text-yellow-800">
+                <p class="font-semibold">Data Rapor Belum Tersedia</p>
+                <p class="mt-1">Siswa ini belum memiliki data rapor. Nilai Agama dan Bahasa Inggris tidak dapat diisi otomatis. Pastikan data rapor sudah diinput terlebih dahulu.</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Form Card -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="mb-6">
@@ -113,8 +126,17 @@
                 <div class="text-sm text-blue-800">
                     <p class="font-semibold mb-1">Informasi Penting:</p>
                     <ul class="list-disc list-inside space-y-1">
-                        <li>Rentang nilai: 0 - 100</li>
-                        <li>Siswa ini akan dinilai untuk <strong>SEMUA kriteria test</strong> (bukan hanya kriteria spesialisasinya)</li>
+                        <li>Rentang nilai: 0 – 100</li>
+                        <li>
+                            Nilai <strong>Agama (PAI)</strong> dan <strong>Bahasa Inggris</strong>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                </svg>
+                                Dari Rapor
+                            </span>
+                            diambil otomatis dari data rapor siswa dan <strong>tidak dapat diubah</strong> di sini.
+                        </li>
                         <li>Nilai dapat diubah kembali sebelum perhitungan SAW dilakukan</li>
                         <li>Pastikan semua kriteria terisi dengan benar</li>
                         <li>Anda dapat menyimpan sebagian nilai dan melanjutkan nanti</li>
@@ -127,21 +149,19 @@
             @csrf
 
             @php
-                // Group criteria by specialization for better organization
                 $groupedCriteria = $criterias->groupBy('specialization');
                 $specializationLabels = [
-                    'tahfiz' => 'Tahfiz',
+                    'tahfiz'   => 'Tahfiz',
                     'language' => 'Bahasa',
-                    'regular' => 'Reguler'
+                    'regular'  => 'Reguler',
                 ];
                 $specializationColors = [
-                    'tahfiz' => 'green',
+                    'tahfiz'   => 'green',
                     'language' => 'blue',
-                    'regular' => 'gray'
+                    'regular'  => 'gray',
                 ];
             @endphp
 
-            <!-- Criteria Values Section - Grouped by Specialization -->
             @foreach($groupedCriteria as $specialization => $groupCriterias)
             <div class="space-y-4">
                 <!-- Specialization Header -->
@@ -159,7 +179,7 @@
                             Kriteria {{ $specializationLabels[$specialization] ?? ucfirst($specialization) }}
                         </h3>
                         <p class="text-sm text-gray-600">
-                            {{ $groupCriterias->count() }} kriteria 
+                            {{ $groupCriterias->count() }} kriteria
                             @if($student->specialization === $specialization)
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -172,30 +192,55 @@
                     </div>
                 </div>
 
-                <!-- Criteria Items -->
-                @foreach($groupCriterias as $index => $criteria)
+                @foreach($groupCriterias as $criteria)
                 @php
-                    $existingValue = $existingValues->get($criteria->id);
-                    $value = old('values.' . $criteria->id, $existingValue?->raw_value);
-                    $note = old('notes.' . $criteria->id, $existingValue?->notes);
+                    $isFromReportGrade = array_key_exists($criteria->id, $reportGradeCriteriaMap);
+                    $existingValue     = $existingValues->get($criteria->id);
+
+                    // Nilai: prioritas → dari ReportGrade (jika applicable), lalu DB, lalu old()
+                    if ($isFromReportGrade && $reportGrade) {
+                        $column = $reportGradeCriteriaMap[$criteria->id];
+                        $value  = $reportGrade->{$column} ?? $existingValue?->raw_value;
+                    } else {
+                        $value  = old('values.' . $criteria->id, $existingValue?->raw_value);
+                    }
+
+                    $note  = old('notes.' . $criteria->id, $existingValue?->notes);
+                    $color = $specializationColors[$specialization];
                 @endphp
-                
-                <div class="border border-gray-200 rounded-lg p-5 hover:border-{{ $specializationColors[$specialization] }}-300 transition {{ $existingValue ? 'bg-green-50' : 'bg-white' }}">
+
+                <div class="border rounded-lg p-5 transition
+                    @if($isFromReportGrade)
+                        border-orange-200 bg-orange-50
+                    @elseif($existingValue)
+                        border-green-200 bg-green-50
+                    @else
+                        border-gray-200 bg-white hover:border-{{ $color }}-300
+                    @endif">
+
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="flex items-center justify-center w-8 h-8 rounded-full 
-                                    bg-{{ $specializationColors[$specialization] }}-100 
-                                    text-{{ $specializationColors[$specialization] }}-600 
-                                    font-semibold text-sm">
+                                    bg-{{ $color }}-100 text-{{ $color }}-600 font-semibold text-sm">
                                     {{ $loop->iteration }}
                                 </span>
                                 <div>
                                     <h4 class="text-base font-semibold text-gray-800">{{ $criteria->name }}</h4>
-                                    <p class="text-sm text-gray-600">{{ $criteria->code }}</p>
+                                    <p class="text-sm text-gray-500">{{ $criteria->code }}</p>
                                 </div>
+
+                                {{-- Badge khusus untuk field dari ReportGrade --}}
+                                @if($isFromReportGrade)
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 border border-orange-300">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Diambil dari Rapor
+                                </span>
+                                @endif
                             </div>
-                            
+
                             @if($criteria->description)
                             <p class="text-sm text-gray-600 ml-11 mb-3">{{ $criteria->description }}</p>
                             @endif
@@ -204,7 +249,6 @@
                                 <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $criteria->attribute_type === 'benefit' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
                                     {{ $criteria->attribute_type === 'benefit' ? 'Benefit (Semakin besar semakin baik)' : 'Cost (Semakin kecil semakin baik)' }}
                                 </span>
-                                
                                 @if($criteria->data_source)
                                 <span class="text-xs text-gray-500">
                                     <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,7 +260,15 @@
                             </div>
                         </div>
 
-                        @if($existingValue)
+                        {{-- Status badge kanan atas --}}
+                        @if($isFromReportGrade)
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-700 border border-orange-200">
+                            <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                            </svg>
+                            Nilai Rapor
+                        </span>
+                        @elseif($existingValue)
                         <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                             <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -227,19 +279,57 @@
                     </div>
 
                     <div class="ml-11 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Nilai Input -->
+
+                        {{-- ============================================================
+                             NILAI INPUT
+                             • Jika dari ReportGrade: tampilkan sebagai display + hidden input
+                             • Jika bisa diedit: tampilkan input number biasa
+                        ============================================================ --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                Nilai <span class="text-red-500">*</span>
+                                Nilai
+                                @if(!$isFromReportGrade)
+                                    <span class="text-red-500">*</span>
+                                @endif
                             </label>
+
+                            @if($isFromReportGrade)
+                            {{-- READ-ONLY: tampilkan nilai dari rapor, tidak ada input tersembunyi
+                                 karena store() akan mengambil langsung dari DB --}}
                             <div class="relative">
-                                <input type="number" 
-                                       name="values[{{ $criteria->id }}]" 
+                                <div class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-lg text-gray-700 font-semibold flex items-center justify-between">
+                                    <span class="text-lg">
+                                        @if($value !== null)
+                                            {{ number_format((float)$value, 2) }}
+                                        @else
+                                            <span class="text-gray-400 italic font-normal text-sm">Belum ada data rapor</span>
+                                        @endif
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 text-sm">/100</span>
+                                        <svg class="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-orange-600 mt-1 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Nilai diambil otomatis dari data rapor siswa. Ubah di halaman rapor jika perlu koreksi.
+                                </p>
+                            </div>
+
+                            @else
+                            {{-- EDITABLE: input number biasa --}}
+                            <div class="relative">
+                                <input type="number"
+                                       name="values[{{ $criteria->id }}]"
                                        value="{{ $value }}"
                                        step="0.01"
                                        min="0"
                                        max="100"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $specializationColors[$specialization] }}-500 focus:border-transparent @error('values.' . $criteria->id) border-red-500 @enderror"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $color }}-500 focus:border-transparent @error('values.' . $criteria->id) border-red-500 @enderror"
                                        placeholder="0.00"
                                        required>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -249,22 +339,32 @@
                             @error('values.' . $criteria->id)
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                            @endif
                         </div>
 
-                        <!-- Catatan (Optional) -->
+                        {{-- CATATAN --}}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Catatan <span class="text-gray-400 text-xs">(Opsional)</span>
                             </label>
-                            <textarea name="notes[{{ $criteria->id }}]" 
+
+                            @if($isFromReportGrade)
+                            {{-- Catatan readonly untuk field dari rapor --}}
+                            <div class="w-full px-4 py-3 bg-orange-50 border-2 border-orange-200 rounded-lg text-sm text-orange-700 italic min-h-[72px]">
+                                Nilai ini sinkron dengan data rapor siswa.
+                            </div>
+                            @else
+                            <textarea name="notes[{{ $criteria->id }}]"
                                       rows="2"
                                       maxlength="500"
-                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $specializationColors[$specialization] }}-500 focus:border-transparent @error('notes.' . $criteria->id) border-red-500 @enderror"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-{{ $color }}-500 focus:border-transparent @error('notes.' . $criteria->id) border-red-500 @enderror"
                                       placeholder="Tambahkan catatan jika diperlukan...">{{ $note }}</textarea>
                             @error('notes.' . $criteria->id)
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                            @endif
                         </div>
+
                     </div>
                 </div>
                 @endforeach
@@ -274,7 +374,7 @@
             <!-- Summary Card -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Ringkasan</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <p class="text-sm text-gray-600">Total Kriteria</p>
                         <p class="text-2xl font-bold text-gray-800">{{ $criterias->count() }}</p>
@@ -288,8 +388,8 @@
                         <p class="text-2xl font-bold text-yellow-600">{{ $criterias->count() - $existingValues->count() }}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Kriteria Spesialisasi</p>
-                        <p class="text-2xl font-bold text-indigo-600">{{ $groupedCriteria[$student->specialization]->count() ?? 0 }}</p>
+                        <p class="text-sm text-gray-600">Dari Rapor (Otomatis)</p>
+                        <p class="text-2xl font-bold text-orange-600">{{ count($reportGradeCriteriaMap) }}</p>
                     </div>
                 </div>
             </div>
@@ -303,9 +403,9 @@
                     </svg>
                     Batal
                 </a>
-                
+
                 <div class="flex gap-3">
-                    <button type="submit" 
+                    <button type="submit"
                             name="action"
                             value="save"
                             class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-lg hover:shadow-xl">
@@ -322,19 +422,14 @@
 
 @push('scripts')
 <script>
-    // Auto-save indicator (optional)
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
+    document.addEventListener('DOMContentLoaded', function () {
+        const form  = document.querySelector('form');
         const inputs = form.querySelectorAll('input[type="number"]');
-        
+
         inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                // You can add auto-save functionality here if needed
-                // For now, just visual feedback
+            input.addEventListener('input', function () {
                 this.classList.add('border-yellow-300');
-                setTimeout(() => {
-                    this.classList.remove('border-yellow-300');
-                }, 300);
+                setTimeout(() => this.classList.remove('border-yellow-300'), 300);
             });
         });
     });

@@ -34,12 +34,19 @@ class Student extends Model
         'ranking',
         'final_class_type',
         'final_status',
+        'resubmission_count',
+        'resubmitted_at',
+        'resubmission_notes',
+        'has_pending_resubmission',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'graduation_year' => 'integer',
         'validated_at' => 'datetime',
+        'resubmitted_at'            => 'datetime',
+        'has_pending_resubmission'  => 'boolean',
+        'resubmission_count'        => 'integer',
     ];
 
     /* =======================
@@ -93,6 +100,11 @@ class Student extends Model
         return $this->hasMany(StudentCriterionValue::class);
     }
 
+    public function validationLogs()
+    {
+        return $this->hasMany(\App\Models\ValidationLog::class)->latest();
+    }
+
     /* =======================
      | SCOPES
      ======================= */
@@ -140,6 +152,11 @@ class Student extends Model
     public function scopeWithoutSpecialization($query)
     {
         return $query->whereNull('specialization');
+    }
+
+    public function scopeResubmitted($query)
+    {
+        return $query->where('has_pending_resubmission', true);
     }
 
     /* =======================
@@ -562,6 +579,12 @@ class Student extends Model
         }
     }
 
+    public function canResubmit(): bool
+    {
+        return $this->validation_status === 'invalid'
+            && !$this->has_pending_resubmission;
+    }
+
     /* =======================
      | ACCESSORS
      ======================= */
@@ -573,11 +596,16 @@ class Student extends Model
 
     public function getStatusBadgeAttribute(): string
     {
+        // Show "Diperbaiki" badge on top of pending when resubmission is pending
+        if ($this->validation_status === 'pending' && $this->has_pending_resubmission) {
+            return '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Diperbaiki</span>';
+        }
+
         return match($this->validation_status) {
             'pending' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>',
-            'valid' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Valid</span>',
+            'valid'   => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Valid</span>',
             'invalid' => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Invalid</span>',
-            default => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Unknown</span>',
+            default   => '<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Unknown</span>',
         };
     }
 

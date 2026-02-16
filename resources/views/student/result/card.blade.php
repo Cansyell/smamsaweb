@@ -179,8 +179,8 @@
     <div class="card">
         <!-- Header -->
         <div class="header">
-            <h1>KARTU HASIL SELEKSI PEMINATAN</h1>
-            <p>SMK Muhammadiyah 1 Semarang</p>
+            <h1>KARTU HASIL SELEKSI</h1>
+            <p>SMA Muhammadiyah 1 Purwokerto</p>
             <p>Tahun Ajaran {{ $student->academicYear->year ?? '2024/2025' }}</p>
         </div>
 
@@ -294,8 +294,8 @@
         <!-- Footer -->
         <div class="footer">
             <p>Dokumen ini dicetak secara otomatis dari Sistem Informasi Penerimaan Siswa Baru</p>
-            <p>SMK Muhammadiyah 1 Semarang</p>
-            <p style="margin-top: 10px;">Jl. Tentara Pelajar No. 1, Semarang - Telp: (024) 8414168</p>
+            <p>SMA Muhammadiyah 1 Purwokerto</p>
+            <p style="margin-top: 10px;">Jl. Dr. Angka No.1, Karangjengkol, Sokanegara, Kec. Purwokerto Tim., Kabupaten Banyumas, Jawa Tengah 53115</p>
         </div>
     </div>
 

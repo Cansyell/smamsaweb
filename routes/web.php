@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\AhpResultController;
+use App\Http\Controllers\Admin\ReportGradeController as AdminReportGradeController;
 use App\Http\Controllers\AnnouncementController;
 
 // Panitia Controllers
@@ -19,6 +20,8 @@ use App\Http\Controllers\Committee\TestScoreController;
 use App\Http\Controllers\Committee\ValidationController;
 use App\Http\Controllers\Committee\CriterionValueController;
 use App\Http\Controllers\Committee\SawResultController;
+use App\Http\Controllers\Committee\CommitteeStudentController;
+
 
 // Student Controllers
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
@@ -27,6 +30,7 @@ use App\Http\Controllers\Student\DocumentController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\SpecializationController;
 use App\Http\Controllers\Student\ResultController;
+use App\Http\Controllers\Student\ResubmissionController;
 
 
 // ============================================================
@@ -150,7 +154,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         
         Route::delete('announcements/{announcement}/delete-file', [AnnouncementController::class, 'deleteFile'])
             ->name('announcements.delete-file');
+
+        /* ===== NILAI RAPOR ===== */
+        Route::get('report-grades',             [AdminReportGradeController::class, 'index'])  ->name('report-grades.index');
+        Route::get('report-grades/export',      [AdminReportGradeController::class, 'export']) ->name('report-grades.export');
+        Route::get('report-grades/{student}',   [AdminReportGradeController::class, 'show'])   ->name('report-grades.show');
+        Route::get('report-grades/{student}/edit', [AdminReportGradeController::class, 'edit'])->name('report-grades.edit');
+        Route::put('report-grades/{student}',   [AdminReportGradeController::class, 'update']) ->name('report-grades.update');
+        Route::delete('report-grades/{student}',[AdminReportGradeController::class, 'destroy'])->name('report-grades.destroy');
     });
+
 });
 
 // ============================================================
@@ -181,22 +194,31 @@ Route::middleware(['auth', 'role:committee'])
     /* =====================================================
      | Validation (Verifikasi Berkas & Data Siswa)
      ===================================================== */
+    // Route::prefix('validation')->name('validation.')->group(function () {
+    //     Route::get('/', [ValidationController::class, 'index'])->name('index');
+    //     Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
+
+    //     Route::post('/{student}/approve', [ValidationController::class, 'approve'])->name('approve');
+    //     Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
+
+    //     Route::post('/batch/approve', [ValidationController::class, 'batchApprove'])->name('batch.approve');
+
+    //     Route::get('/{student}/check-completeness', [ValidationController::class, 'check-completeness'])
+    //         ->name('check-completeness');
+
+    //     Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])
+    //         ->name('documents.validate');
+    // });
+
     Route::prefix('validation')->name('validation.')->group(function () {
-        Route::get('/', [ValidationController::class, 'index'])->name('index');
-        Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
-
-        Route::post('/{student}/approve', [ValidationController::class, 'approve'])->name('approve');
-        Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
-
-        Route::post('/batch/approve', [ValidationController::class, 'batchApprove'])->name('batch.approve');
-
-        Route::get('/{student}/check-completeness', [ValidationController::class, 'check-completeness'])
-            ->name('check-completeness');
-
-        Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])
-            ->name('documents.validate');
+        Route::get('/',                           [ValidationController::class, 'index'])             ->name('index');
+        Route::get('/{student}',                  [ValidationController::class, 'show'])              ->name('show');
+        Route::post('/{student}/approve',         [ValidationController::class, 'approve'])           ->name('approve');
+        Route::post('/{student}/reject',          [ValidationController::class, 'reject'])            ->name('reject');
+        Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument']) ->name('document.validate');
+        Route::post('/batch-approve',             [ValidationController::class, 'batchApprove'])      ->name('batch-approve');
+        Route::get('/{student}/completeness',     [ValidationController::class, 'checkCompleteness']) ->name('completeness');
     });
-
 
     /* =====================================================
      | Criterion Values (Input & Manajemen Nilai SAW)
@@ -239,6 +261,16 @@ Route::middleware(['auth', 'role:committee'])
         Route::get('/{student}', [SawResultController::class, 'show'])->name('show');
     });
 
+    Route::prefix('students')->name('students.')->group(function () {
+            Route::get('/', [CommitteeStudentController::class, 'index'])->name('index');
+            Route::get('/create', [CommitteeStudentController::class, 'create'])->name('create');
+            Route::post('/', [CommitteeStudentController::class, 'store'])->name('store');
+            Route::get('/{student}', [CommitteeStudentController::class, 'show'])->name('show');
+            Route::get('/{student}/edit', [CommitteeStudentController::class, 'edit'])->name('edit');
+            Route::put('/{student}', [CommitteeStudentController::class, 'update'])->name('update');
+            Route::delete('/{student}', [CommitteeStudentController::class, 'destroy'])->name('destroy');
+            Route::get('students/export', [CommitteeStudentController::class, 'export'])->name('export');
+        });
     /* =====================================================
      | Announcements (View Only)
      ===================================================== */
@@ -274,6 +306,14 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
      ===================================================== */
     Route::resource('documents', DocumentController::class);
     
+    Route::prefix('resubmission/{student}')->name('resubmission.')->group(function () {
+        Route::get('/',                  [ResubmissionController::class, 'show'])              ->name('show');
+        Route::put('/personal-data',     [ResubmissionController::class, 'updatePersonalData'])->name('update-personal');
+        Route::put('/report-grade',      [ResubmissionController::class, 'updateReportGrade']) ->name('update-grade');
+        Route::post('/replace-document', [ResubmissionController::class, 'replaceDocument'])  ->name('replace-document');
+        Route::post('/submit',           [ResubmissionController::class, 'submit'])            ->name('submit');
+    });
+
     /* =====================================================
      | Specialization
      ===================================================== */

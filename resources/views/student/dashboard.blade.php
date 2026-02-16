@@ -205,20 +205,50 @@
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Validasi Berkas</h3>
         @if($validationStatus['status'] === 'pending')
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold text-yellow-800">Menunggu Validasi</p>
-                        <p class="text-sm text-yellow-700 mt-1">
-                            Berkas Anda sedang dalam proses validasi oleh panitia.
-                            @if($progress['percentage'] < 100) Pastikan semua langkah pendaftaran telah diselesaikan. @endif
-                        </p>
+            @if($student->has_pending_resubmission)
+                <!-- Resubmission Pending -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <div class="flex-1">
+                            <p class="font-semibold text-blue-800 flex items-center">
+                                Data Perbaikan Sedang Direview
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                    Review ke-{{ $student->resubmission_count }}
+                                </span>
+                            </p>
+                            <p class="text-sm text-blue-700 mt-2">
+                                Anda telah mengajukan perbaikan data pada <strong>{{ $student->resubmitted_at?->format('d M Y, H:i') }}</strong>. 
+                                Panitia sedang melakukan review ulang terhadap data yang telah Anda perbaiki.
+                            </p>
+                            @if($student->resubmission_notes)
+                            <div class="mt-3 bg-blue-100 rounded-lg p-3">
+                                <p class="text-xs font-medium text-blue-800 mb-1">Catatan Perbaikan Anda:</p>
+                                <p class="text-sm text-blue-700">{{ $student->resubmission_notes }}</p>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
+            @else
+                <!-- Regular Pending -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                    <div class="flex items-start">
+                        <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <p class="font-semibold text-yellow-800">Menunggu Validasi</p>
+                            <p class="text-sm text-yellow-700 mt-1">
+                                Berkas Anda sedang dalam proses validasi oleh panitia.
+                                @if($progress['percentage'] < 100) Pastikan semua langkah pendaftaran telah diselesaikan. @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
         @elseif($validationStatus['status'] === 'valid')
             <div class="bg-green-50 border-l-4 border-green-400 p-4">
                 <div class="flex items-start">
@@ -236,21 +266,137 @@
                     </div>
                 </div>
             </div>
-        @elseif($validationStatus['status'] === 'rejected')
-            <div class="bg-red-50 border-l-4 border-red-400 p-4">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-red-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold text-red-800">Berkas Ditolak</p>
-                        <p class="text-sm text-red-700 mt-1 font-medium">Catatan dari Panitia:</p>
-                        <p class="text-sm text-red-700 mt-1 bg-red-100 p-3 rounded">
-                            {{ $validationStatus['notes'] ?? 'Silakan perbaiki berkas Anda.' }}
+        @elseif($validationStatus['status'] === 'invalid')
+            <!-- Rejection Card with Details -->
+            <div class="bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300 rounded-xl overflow-hidden">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-red-500 to-rose-500 px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 backdrop-blur-sm rounded-full p-2 mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Data Anda Ditolak</h4>
+                                <p class="text-red-100 text-sm">Silakan perbaiki data sesuai catatan panitia</p>
+                            </div>
+                        </div>
+                        @if($student->resubmission_count > 0)
+                        <span class="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            Percobaan ke-{{ $student->resubmission_count + 1 }}
+                        </span>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 space-y-4">
+                    <!-- Catatan Penolakan -->
+                    <div class="bg-white rounded-lg p-4 border border-red-200">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm font-semibold text-red-800 mb-1">Catatan dari Panitia:</p>
+                                <p class="text-sm text-gray-700 leading-relaxed">
+                                    {{ $validationStatus['notes'] ?? 'Silakan perbaiki berkas dan data Anda.' }}
+                                </p>
+                                <p class="text-xs text-gray-500 mt-2">
+                                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Ditolak pada: {{ $validationStatus['validated_at']?->format('d M Y, H:i') ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dokumen Bermasalah -->
+                    @php
+                        $rejectedDocuments = $student->documents->where('validation_status', 'invalid');
+                        $pendingDocuments = $student->documents->where('validation_status', 'pending');
+                    @endphp
+
+                    @if($rejectedDocuments->count() > 0)
+                    <div class="bg-white rounded-lg p-4 border border-orange-200">
+                        <p class="text-sm font-semibold text-orange-800 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Dokumen yang Perlu Diperbaiki ({{ $rejectedDocuments->count() }})
                         </p>
-                        <a href="{{ route('student.documents.index') }}" class="inline-block mt-3 text-sm font-medium text-red-700 hover:text-red-800">
-                            Perbaiki Berkas →
-                        </a>
+                        <div class="space-y-2">
+                            @foreach($rejectedDocuments as $doc)
+                            <div class="flex items-start bg-orange-50 rounded-lg p-3 border border-orange-200">
+                                <svg class="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900">{{ $doc->type_label }}</p>
+                                    <p class="text-xs text-gray-600 mt-0.5 truncate">{{ $doc->file_name }}</p>
+                                    @if($doc->notes)
+                                    <p class="text-xs text-orange-700 mt-1 bg-orange-100 px-2 py-1 rounded">
+                                        <strong>Alasan:</strong> {{ $doc->notes }}
+                                    </p>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Data Pribadi yang Bermasalah (optional indicator) -->
+                    @if(str_contains(strtolower($validationStatus['notes'] ?? ''), 'data pribadi') || 
+                        str_contains(strtolower($validationStatus['notes'] ?? ''), 'nisn') ||
+                        str_contains(strtolower($validationStatus['notes'] ?? ''), 'nama') ||
+                        str_contains(strtolower($validationStatus['notes'] ?? ''), 'tanggal lahir'))
+                    <div class="bg-white rounded-lg p-4 border border-amber-200">
+                        <p class="text-sm font-semibold text-amber-800 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            Ada Masalah dengan Data Pribadi
+                        </p>
+                        <p class="text-xs text-gray-600">Silakan periksa dan perbaiki data pribadi Anda sesuai catatan panitia di atas.</p>
+                    </div>
+                    @endif
+
+                    <!-- Action Button -->
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg p-4 mt-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <p class="text-white font-semibold mb-1">Perbaiki Data Sekarang</p>
+                                <p class="text-indigo-100 text-xs">Klik tombol di samping untuk mengedit data dan upload ulang dokumen</p>
+                            </div>
+                            <a href="{{ route('student.resubmission.show', $student) }}" 
+                               class="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 text-indigo-600 font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all ml-4 whitespace-nowrap">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Perbaiki Data
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Helpful Tips -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-xs font-semibold text-blue-800 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Tips Perbaikan:
+                        </p>
+                        <ul class="text-xs text-blue-700 space-y-1 ml-5 list-disc">
+                            <li>Baca dengan teliti catatan dari panitia</li>
+                            <li>Pastikan dokumen yang diupload jelas dan dapat dibaca</li>
+                            <li>Format file: PDF, JPG, atau PNG (maksimal 5MB)</li>
+                            <li>Periksa kembali data pribadi sebelum submit</li>
+                            <li>Setelah perbaikan, klik "Submit Perbaikan" untuk review ulang</li>
+                        </ul>
                     </div>
                 </div>
             </div>

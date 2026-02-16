@@ -26,7 +26,7 @@ class ValidationController extends Controller
     public function index(Request $request)
     {
         $activeYear = AcademicYear::getActiveYear();
-        
+
         if (!$activeYear) {
             return redirect()->route('committee.dashboard')
                 ->with('error', 'Tidak ada tahun ajaran aktif');
@@ -35,39 +35,39 @@ class ValidationController extends Controller
         $query = Student::byAcademicYear($activeYear->id)
             ->with(['user', 'reportGrade', 'documents', 'testScore']);
 
-        // Filter by validation status
         $status = $request->get('status', 'pending');
-        if ($status === 'all') {
-            // Show all students
-        } elseif (in_array($status, ['pending', 'valid', 'invalid'])) {
+        if ($status !== 'all' && in_array($status, ['pending', 'valid', 'invalid'])) {
             $query->where('validation_status', $status);
         }
 
-        // Filter by specialization
         if ($request->filled('specialization')) {
             $query->where('specialization', $request->specialization);
         }
 
-        // Search by name or NISN
+        // Flag: resubmitted students on top
+        if ($status === 'pending') {
+            $query->orderByDesc('has_pending_resubmission')->latest();
+        } else {
+            $query->latest();
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
                   ->orWhere('nisn', 'like', "%{$search}%")
                   ->orWhere('student_id', 'like', "%{$search}%");
             });
         }
 
-        $students = $query->latest()->paginate(20);
-
-        // Get statistics
-        $stats = $this->validationService->getValidationStatistics($activeYear->id);
+        $students = $query->paginate(20);
+        $stats    = $this->validationService->getValidationStatistics($activeYear->id);
 
         return view('committee.validation.index', [
-            'page' => 'validation',
-            'students' => $students,
-            'stats' => $stats,
-            'activeYear' => $activeYear,
+            'page'          => 'validation',
+            'students'      => $students,
+            'stats'         => $stats,
+            'activeYear'    => $activeYear,
             'currentStatus' => $status,
         ]);
     }
@@ -77,12 +77,11 @@ class ValidationController extends Controller
      */
     public function show(Student $student)
     {
-        // Get detailed validation information
         $validationData = $this->validationService->getValidationDetails($student);
 
         return view('committee.validation.show', [
-            'page' => 'validation',
-            'student' => $student,
+            'page'           => 'validation',
+            'student'        => $student,
             'validationData' => $validationData,
         ]);
     }
@@ -93,9 +92,7 @@ class ValidationController extends Controller
     public function approve(ValidateStudentRequest $request, Student $student)
     {
         $result = $this->validationService->approveStudent(
-            $student,
-            auth()->id(),
-            $request->notes
+            $student, auth()->id(), $request->notes
         );
 
         if ($result['success']) {
@@ -104,10 +101,7 @@ class ValidationController extends Controller
                 ->with('success', $result['message']);
         }
 
-        return redirect()
-            ->back()
-            ->with('error', $result['message'])
-            ->withInput();
+        return redirect()->back()->with('error', $result['message'])->withInput();
     }
 
     /**
@@ -116,9 +110,7 @@ class ValidationController extends Controller
     public function reject(RejectStudentRequest $request, Student $student)
     {
         $result = $this->validationService->rejectStudent(
-            $student,
-            auth()->id(),
-            $request->notes
+            $student, auth()->id(), $request->notes
         );
 
         if ($result['success']) {
@@ -127,10 +119,7 @@ class ValidationController extends Controller
                 ->with('success', $result['message']);
         }
 
-        return redirect()
-            ->back()
-            ->with('error', $result['message'])
-            ->withInput();
+        return redirect()->back()->with('error', $result['message'])->withInput();
     }
 
     /**
@@ -140,25 +129,18 @@ class ValidationController extends Controller
     {
         $request->validate([
             'status' => 'required|in:valid,invalid',
-            'notes' => 'required_if:status,invalid|nullable|string|max:500',
+            'notes'  => 'required_if:status,invalid|nullable|string|max:500',
         ]);
 
         $result = $this->validationService->validateDocument(
-            $document,
-            $request->status,
-            $request->notes
+            $document, $request->status, $request->notes
         );
 
         if ($result['success']) {
-            return redirect()
-                ->back()
-                ->with('success', $result['message']);
+            return redirect()->back()->with('success', $result['message']);
         }
 
-        return redirect()
-            ->back()
-            ->with('error', $result['message'])
-            ->withInput();
+        return redirect()->back()->with('error', $result['message'])->withInput();
     }
 
     /**
@@ -167,20 +149,15 @@ class ValidationController extends Controller
     public function batchApprove(Request $request)
     {
         $request->validate([
-            'student_ids' => 'required|array',
+            'student_ids'   => 'required|array',
             'student_ids.*' => 'exists:students,id',
         ]);
 
-        $results = $this->validationService->batchApproveStudents(
-            $request->student_ids,
-            auth()->id()
-        );
-
+        $results      = $this->validationService->batchApproveStudents($request->student_ids, auth()->id());
         $successCount = count($results['success']);
-        $failedCount = count($results['failed']);
+        $failedCount  = count($results['failed']);
 
         $message = "{$successCount} siswa berhasil divalidasi";
-        
         if ($failedCount > 0) {
             $message .= ", {$failedCount} siswa gagal divalidasi";
         }
@@ -196,11 +173,9 @@ class ValidationController extends Controller
      */
     public function checkCompleteness(Student $student)
     {
-        $validation = $this->validationService->validateStudentCompleteness($student);
-
         return response()->json([
             'success' => true,
-            'data' => $validation
+            'data'    => $this->validationService->validateStudentCompleteness($student),
         ]);
     }
 }
