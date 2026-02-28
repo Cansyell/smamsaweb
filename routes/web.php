@@ -21,6 +21,7 @@ use App\Http\Controllers\Committee\ValidationController;
 use App\Http\Controllers\Committee\CriterionValueController;
 use App\Http\Controllers\Committee\SawResultController;
 use App\Http\Controllers\Committee\CommitteeStudentController;
+use App\Http\Controllers\Committee\SelectionResultController;
 
 
 // Student Controllers
@@ -276,6 +277,10 @@ Route::middleware(['auth', 'role:committee'])
      ===================================================== */
     Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])
         ->name('announcements.show');
+
+    // SELECTION-RESULT
+    Route::get('selection-results', [SelectionResultController::class, 'index'])
+    ->name('selection-results.index');
 });
 
 

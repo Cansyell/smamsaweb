@@ -1,277 +1,1458 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PPDB 2025/2026 – SMA Muhammadiyah 1 Purwokerto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        :root {
+            --navy:    #0a1628;
+            --navy2:   #122040;
+            --gold:    #c9972a;
+            --gold2:   #e8b84b;
+            --cream:   #f9f5ee;
+            --white:   #ffffff;
+            --gray:    #6b7280;
+            --light:   #f3f4f6;
+            --green:   #16a34a;
+            --red:     #dc2626;
+        }
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        html { scroll-behavior: smooth; }
 
-        <!-- Styles / Scripts -->
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
-            <style>
-                /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */@layer theme{:root,:host{--font-sans:'Instrument Sans',ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";--font-serif:ui-serif,Georgia,Cambria,"Times New Roman",Times,serif;--font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--color-red-50:oklch(.971 .013 17.38);--color-red-100:oklch(.936 .032 17.717);--color-red-200:oklch(.885 .062 18.334);--color-red-300:oklch(.808 .114 19.571);--color-red-400:oklch(.704 .191 22.216);--color-red-500:oklch(.637 .237 25.331);--color-red-600:oklch(.577 .245 27.325);--color-red-700:oklch(.505 .213 27.518);--color-red-800:oklch(.444 .177 26.899);--color-red-900:oklch(.396 .141 25.723);--color-red-950:oklch(.258 .092 26.042);--color-orange-50:oklch(.98 .016 73.684);--color-orange-100:oklch(.954 .038 75.164);--color-orange-200:oklch(.901 .076 70.697);--color-orange-300:oklch(.837 .128 66.29);--color-orange-400:oklch(.75 .183 55.934);--color-orange-500:oklch(.705 .213 47.604);--color-orange-600:oklch(.646 .222 41.116);--color-orange-700:oklch(.553 .195 38.402);--color-orange-800:oklch(.47 .157 37.304);--color-orange-900:oklch(.408 .123 38.172);--color-orange-950:oklch(.266 .079 36.259);--color-amber-50:oklch(.987 .022 95.277);--color-amber-100:oklch(.962 .059 95.617);--color-amber-200:oklch(.924 .12 95.746);--color-amber-300:oklch(.879 .169 91.605);--color-amber-400:oklch(.828 .189 84.429);--color-amber-500:oklch(.769 .188 70.08);--color-amber-600:oklch(.666 .179 58.318);--color-amber-700:oklch(.555 .163 48.998);--color-amber-800:oklch(.473 .137 46.201);--color-amber-900:oklch(.414 .112 45.904);--color-amber-950:oklch(.279 .077 45.635);--color-yellow-50:oklch(.987 .026 102.212);--color-yellow-100:oklch(.973 .071 103.193);--color-yellow-200:oklch(.945 .129 101.54);--color-yellow-300:oklch(.905 .182 98.111);--color-yellow-400:oklch(.852 .199 91.936);--color-yellow-500:oklch(.795 .184 86.047);--color-yellow-600:oklch(.681 .162 75.834);--color-yellow-700:oklch(.554 .135 66.442);--color-yellow-800:oklch(.476 .114 61.907);--color-yellow-900:oklch(.421 .095 57.708);--color-yellow-950:oklch(.286 .066 53.813);--color-lime-50:oklch(.986 .031 120.757);--color-lime-100:oklch(.967 .067 122.328);--color-lime-200:oklch(.938 .127 124.321);--color-lime-300:oklch(.897 .196 126.665);--color-lime-400:oklch(.841 .238 128.85);--color-lime-500:oklch(.768 .233 130.85);--color-lime-600:oklch(.648 .2 131.684);--color-lime-700:oklch(.532 .157 131.589);--color-lime-800:oklch(.453 .124 130.933);--color-lime-900:oklch(.405 .101 131.063);--color-lime-950:oklch(.274 .072 132.109);--color-green-50:oklch(.982 .018 155.826);--color-green-100:oklch(.962 .044 156.743);--color-green-200:oklch(.925 .084 155.995);--color-green-300:oklch(.871 .15 154.449);--color-green-400:oklch(.792 .209 151.711);--color-green-500:oklch(.723 .219 149.579);--color-green-600:oklch(.627 .194 149.214);--color-green-700:oklch(.527 .154 150.069);--color-green-800:oklch(.448 .119 151.328);--color-green-900:oklch(.393 .095 152.535);--color-green-950:oklch(.266 .065 152.934);--color-emerald-50:oklch(.979 .021 166.113);--color-emerald-100:oklch(.95 .052 163.051);--color-emerald-200:oklch(.905 .093 164.15);--color-emerald-300:oklch(.845 .143 164.978);--color-emerald-400:oklch(.765 .177 163.223);--color-emerald-500:oklch(.696 .17 162.48);--color-emerald-600:oklch(.596 .145 163.225);--color-emerald-700:oklch(.508 .118 165.612);--color-emerald-800:oklch(.432 .095 166.913);--color-emerald-900:oklch(.378 .077 168.94);--color-emerald-950:oklch(.262 .051 172.552);--color-teal-50:oklch(.984 .014 180.72);--color-teal-100:oklch(.953 .051 180.801);--color-teal-200:oklch(.91 .096 180.426);--color-teal-300:oklch(.855 .138 181.071);--color-teal-400:oklch(.777 .152 181.912);--color-teal-500:oklch(.704 .14 182.503);--color-teal-600:oklch(.6 .118 184.704);--color-teal-700:oklch(.511 .096 186.391);--color-teal-800:oklch(.437 .078 188.216);--color-teal-900:oklch(.386 .063 188.416);--color-teal-950:oklch(.277 .046 192.524);--color-cyan-50:oklch(.984 .019 200.873);--color-cyan-100:oklch(.956 .045 203.388);--color-cyan-200:oklch(.917 .08 205.041);--color-cyan-300:oklch(.865 .127 207.078);--color-cyan-400:oklch(.789 .154 211.53);--color-cyan-500:oklch(.715 .143 215.221);--color-cyan-600:oklch(.609 .126 221.723);--color-cyan-700:oklch(.52 .105 223.128);--color-cyan-800:oklch(.45 .085 224.283);--color-cyan-900:oklch(.398 .07 227.392);--color-cyan-950:oklch(.302 .056 229.695);--color-sky-50:oklch(.977 .013 236.62);--color-sky-100:oklch(.951 .026 236.824);--color-sky-200:oklch(.901 .058 230.902);--color-sky-300:oklch(.828 .111 230.318);--color-sky-400:oklch(.746 .16 232.661);--color-sky-500:oklch(.685 .169 237.323);--color-sky-600:oklch(.588 .158 241.966);--color-sky-700:oklch(.5 .134 242.749);--color-sky-800:oklch(.443 .11 240.79);--color-sky-900:oklch(.391 .09 240.876);--color-sky-950:oklch(.293 .066 243.157);--color-blue-50:oklch(.97 .014 254.604);--color-blue-100:oklch(.932 .032 255.585);--color-blue-200:oklch(.882 .059 254.128);--color-blue-300:oklch(.809 .105 251.813);--color-blue-400:oklch(.707 .165 254.624);--color-blue-500:oklch(.623 .214 259.815);--color-blue-600:oklch(.546 .245 262.881);--color-blue-700:oklch(.488 .243 264.376);--color-blue-800:oklch(.424 .199 265.638);--color-blue-900:oklch(.379 .146 265.522);--color-blue-950:oklch(.282 .091 267.935);--color-indigo-50:oklch(.962 .018 272.314);--color-indigo-100:oklch(.93 .034 272.788);--color-indigo-200:oklch(.87 .065 274.039);--color-indigo-300:oklch(.785 .115 274.713);--color-indigo-400:oklch(.673 .182 276.935);--color-indigo-500:oklch(.585 .233 277.117);--color-indigo-600:oklch(.511 .262 276.966);--color-indigo-700:oklch(.457 .24 277.023);--color-indigo-800:oklch(.398 .195 277.366);--color-indigo-900:oklch(.359 .144 278.697);--color-indigo-950:oklch(.257 .09 281.288);--color-violet-50:oklch(.969 .016 293.756);--color-violet-100:oklch(.943 .029 294.588);--color-violet-200:oklch(.894 .057 293.283);--color-violet-300:oklch(.811 .111 293.571);--color-violet-400:oklch(.702 .183 293.541);--color-violet-500:oklch(.606 .25 292.717);--color-violet-600:oklch(.541 .281 293.009);--color-violet-700:oklch(.491 .27 292.581);--color-violet-800:oklch(.432 .232 292.759);--color-violet-900:oklch(.38 .189 293.745);--color-violet-950:oklch(.283 .141 291.089);--color-purple-50:oklch(.977 .014 308.299);--color-purple-100:oklch(.946 .033 307.174);--color-purple-200:oklch(.902 .063 306.703);--color-purple-300:oklch(.827 .119 306.383);--color-purple-400:oklch(.714 .203 305.504);--color-purple-500:oklch(.627 .265 303.9);--color-purple-600:oklch(.558 .288 302.321);--color-purple-700:oklch(.496 .265 301.924);--color-purple-800:oklch(.438 .218 303.724);--color-purple-900:oklch(.381 .176 304.987);--color-purple-950:oklch(.291 .149 302.717);--color-fuchsia-50:oklch(.977 .017 320.058);--color-fuchsia-100:oklch(.952 .037 318.852);--color-fuchsia-200:oklch(.903 .076 319.62);--color-fuchsia-300:oklch(.833 .145 321.434);--color-fuchsia-400:oklch(.74 .238 322.16);--color-fuchsia-500:oklch(.667 .295 322.15);--color-fuchsia-600:oklch(.591 .293 322.896);--color-fuchsia-700:oklch(.518 .253 323.949);--color-fuchsia-800:oklch(.452 .211 324.591);--color-fuchsia-900:oklch(.401 .17 325.612);--color-fuchsia-950:oklch(.293 .136 325.661);--color-pink-50:oklch(.971 .014 343.198);--color-pink-100:oklch(.948 .028 342.258);--color-pink-200:oklch(.899 .061 343.231);--color-pink-300:oklch(.823 .12 346.018);--color-pink-400:oklch(.718 .202 349.761);--color-pink-500:oklch(.656 .241 354.308);--color-pink-600:oklch(.592 .249 .584);--color-pink-700:oklch(.525 .223 3.958);--color-pink-800:oklch(.459 .187 3.815);--color-pink-900:oklch(.408 .153 2.432);--color-pink-950:oklch(.284 .109 3.907);--color-rose-50:oklch(.969 .015 12.422);--color-rose-100:oklch(.941 .03 12.58);--color-rose-200:oklch(.892 .058 10.001);--color-rose-300:oklch(.81 .117 11.638);--color-rose-400:oklch(.712 .194 13.428);--color-rose-500:oklch(.645 .246 16.439);--color-rose-600:oklch(.586 .253 17.585);--color-rose-700:oklch(.514 .222 16.935);--color-rose-800:oklch(.455 .188 13.697);--color-rose-900:oklch(.41 .159 10.272);--color-rose-950:oklch(.271 .105 12.094);--color-slate-50:oklch(.984 .003 247.858);--color-slate-100:oklch(.968 .007 247.896);--color-slate-200:oklch(.929 .013 255.508);--color-slate-300:oklch(.869 .022 252.894);--color-slate-400:oklch(.704 .04 256.788);--color-slate-500:oklch(.554 .046 257.417);--color-slate-600:oklch(.446 .043 257.281);--color-slate-700:oklch(.372 .044 257.287);--color-slate-800:oklch(.279 .041 260.031);--color-slate-900:oklch(.208 .042 265.755);--color-slate-950:oklch(.129 .042 264.695);--color-gray-50:oklch(.985 .002 247.839);--color-gray-100:oklch(.967 .003 264.542);--color-gray-200:oklch(.928 .006 264.531);--color-gray-300:oklch(.872 .01 258.338);--color-gray-400:oklch(.707 .022 261.325);--color-gray-500:oklch(.551 .027 264.364);--color-gray-600:oklch(.446 .03 256.802);--color-gray-700:oklch(.373 .034 259.733);--color-gray-800:oklch(.278 .033 256.848);--color-gray-900:oklch(.21 .034 264.665);--color-gray-950:oklch(.13 .028 261.692);--color-zinc-50:oklch(.985 0 0);--color-zinc-100:oklch(.967 .001 286.375);--color-zinc-200:oklch(.92 .004 286.32);--color-zinc-300:oklch(.871 .006 286.286);--color-zinc-400:oklch(.705 .015 286.067);--color-zinc-500:oklch(.552 .016 285.938);--color-zinc-600:oklch(.442 .017 285.786);--color-zinc-700:oklch(.37 .013 285.805);--color-zinc-800:oklch(.274 .006 286.033);--color-zinc-900:oklch(.21 .006 285.885);--color-zinc-950:oklch(.141 .005 285.823);--color-neutral-50:oklch(.985 0 0);--color-neutral-100:oklch(.97 0 0);--color-neutral-200:oklch(.922 0 0);--color-neutral-300:oklch(.87 0 0);--color-neutral-400:oklch(.708 0 0);--color-neutral-500:oklch(.556 0 0);--color-neutral-600:oklch(.439 0 0);--color-neutral-700:oklch(.371 0 0);--color-neutral-800:oklch(.269 0 0);--color-neutral-900:oklch(.205 0 0);--color-neutral-950:oklch(.145 0 0);--color-stone-50:oklch(.985 .001 106.423);--color-stone-100:oklch(.97 .001 106.424);--color-stone-200:oklch(.923 .003 48.717);--color-stone-300:oklch(.869 .005 56.366);--color-stone-400:oklch(.709 .01 56.259);--color-stone-500:oklch(.553 .013 58.071);--color-stone-600:oklch(.444 .011 73.639);--color-stone-700:oklch(.374 .01 67.558);--color-stone-800:oklch(.268 .007 34.298);--color-stone-900:oklch(.216 .006 56.043);--color-stone-950:oklch(.147 .004 49.25);--color-black:#000;--color-white:#fff;--spacing:.25rem;--breakpoint-sm:40rem;--breakpoint-md:48rem;--breakpoint-lg:64rem;--breakpoint-xl:80rem;--breakpoint-2xl:96rem;--container-3xs:16rem;--container-2xs:18rem;--container-xs:20rem;--container-sm:24rem;--container-md:28rem;--container-lg:32rem;--container-xl:36rem;--container-2xl:42rem;--container-3xl:48rem;--container-4xl:56rem;--container-5xl:64rem;--container-6xl:72rem;--container-7xl:80rem;--text-xs:.75rem;--text-xs--line-height:calc(1/.75);--text-sm:.875rem;--text-sm--line-height:calc(1.25/.875);--text-base:1rem;--text-base--line-height: 1.5 ;--text-lg:1.125rem;--text-lg--line-height:calc(1.75/1.125);--text-xl:1.25rem;--text-xl--line-height:calc(1.75/1.25);--text-2xl:1.5rem;--text-2xl--line-height:calc(2/1.5);--text-3xl:1.875rem;--text-3xl--line-height: 1.2 ;--text-4xl:2.25rem;--text-4xl--line-height:calc(2.5/2.25);--text-5xl:3rem;--text-5xl--line-height:1;--text-6xl:3.75rem;--text-6xl--line-height:1;--text-7xl:4.5rem;--text-7xl--line-height:1;--text-8xl:6rem;--text-8xl--line-height:1;--text-9xl:8rem;--text-9xl--line-height:1;--font-weight-thin:100;--font-weight-extralight:200;--font-weight-light:300;--font-weight-normal:400;--font-weight-medium:500;--font-weight-semibold:600;--font-weight-bold:700;--font-weight-extrabold:800;--font-weight-black:900;--tracking-tighter:-.05em;--tracking-tight:-.025em;--tracking-normal:0em;--tracking-wide:.025em;--tracking-wider:.05em;--tracking-widest:.1em;--leading-tight:1.25;--leading-snug:1.375;--leading-normal:1.5;--leading-relaxed:1.625;--leading-loose:2;--radius-xs:.125rem;--radius-sm:.25rem;--radius-md:.375rem;--radius-lg:.5rem;--radius-xl:.75rem;--radius-2xl:1rem;--radius-3xl:1.5rem;--radius-4xl:2rem;--shadow-2xs:0 1px #0000000d;--shadow-xs:0 1px 2px 0 #0000000d;--shadow-sm:0 1px 3px 0 #0000001a,0 1px 2px -1px #0000001a;--shadow-md:0 4px 6px -1px #0000001a,0 2px 4px -2px #0000001a;--shadow-lg:0 10px 15px -3px #0000001a,0 4px 6px -4px #0000001a;--shadow-xl:0 20px 25px -5px #0000001a,0 8px 10px -6px #0000001a;--shadow-2xl:0 25px 50px -12px #00000040;--inset-shadow-2xs:inset 0 1px #0000000d;--inset-shadow-xs:inset 0 1px 1px #0000000d;--inset-shadow-sm:inset 0 2px 4px #0000000d;--drop-shadow-xs:0 1px 1px #0000000d;--drop-shadow-sm:0 1px 2px #00000026;--drop-shadow-md:0 3px 3px #0000001f;--drop-shadow-lg:0 4px 4px #00000026;--drop-shadow-xl:0 9px 7px #0000001a;--drop-shadow-2xl:0 25px 25px #00000026;--ease-in:cubic-bezier(.4,0,1,1);--ease-out:cubic-bezier(0,0,.2,1);--ease-in-out:cubic-bezier(.4,0,.2,1);--animate-spin:spin 1s linear infinite;--animate-ping:ping 1s cubic-bezier(0,0,.2,1)infinite;--animate-pulse:pulse 2s cubic-bezier(.4,0,.6,1)infinite;--animate-bounce:bounce 1s infinite;--blur-xs:4px;--blur-sm:8px;--blur-md:12px;--blur-lg:16px;--blur-xl:24px;--blur-2xl:40px;--blur-3xl:64px;--perspective-dramatic:100px;--perspective-near:300px;--perspective-normal:500px;--perspective-midrange:800px;--perspective-distant:1200px;--aspect-video:16/9;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4,0,.2,1);--default-font-family:var(--font-sans);--default-font-feature-settings:var(--font-sans--font-feature-settings);--default-font-variation-settings:var(--font-sans--font-variation-settings);--default-mono-font-family:var(--font-mono);--default-mono-font-feature-settings:var(--font-mono--font-feature-settings);--default-mono-font-variation-settings:var(--font-mono--font-variation-settings)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;line-height:1.5;font-family:var(--default-font-family,ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}body{line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1;color:color-mix(in oklab,currentColor 50%,transparent)}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){-webkit-appearance:button;-moz-appearance:button;appearance:button}::file-selector-button{-webkit-appearance:button;-moz-appearance:button;appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.absolute{position:absolute}.relative{position:relative}.static{position:static}.inset-0{inset:calc(var(--spacing)*0)}.-mt-\[4\.9rem\]{margin-top:-4.9rem}.-mb-px{margin-bottom:-1px}.mb-1{margin-bottom:calc(var(--spacing)*1)}.mb-2{margin-bottom:calc(var(--spacing)*2)}.mb-4{margin-bottom:calc(var(--spacing)*4)}.mb-6{margin-bottom:calc(var(--spacing)*6)}.-ml-8{margin-left:calc(var(--spacing)*-8)}.flex{display:flex}.hidden{display:none}.inline-block{display:inline-block}.inline-flex{display:inline-flex}.table{display:table}.aspect-\[335\/376\]{aspect-ratio:335/376}.h-1{height:calc(var(--spacing)*1)}.h-1\.5{height:calc(var(--spacing)*1.5)}.h-2{height:calc(var(--spacing)*2)}.h-2\.5{height:calc(var(--spacing)*2.5)}.h-3{height:calc(var(--spacing)*3)}.h-3\.5{height:calc(var(--spacing)*3.5)}.h-14{height:calc(var(--spacing)*14)}.h-14\.5{height:calc(var(--spacing)*14.5)}.min-h-screen{min-height:100vh}.w-1{width:calc(var(--spacing)*1)}.w-1\.5{width:calc(var(--spacing)*1.5)}.w-2{width:calc(var(--spacing)*2)}.w-2\.5{width:calc(var(--spacing)*2.5)}.w-3{width:calc(var(--spacing)*3)}.w-3\.5{width:calc(var(--spacing)*3.5)}.w-\[448px\]{width:448px}.w-full{width:100%}.max-w-\[335px\]{max-width:335px}.max-w-none{max-width:none}.flex-1{flex:1}.shrink-0{flex-shrink:0}.translate-y-0{--tw-translate-y:calc(var(--spacing)*0);translate:var(--tw-translate-x)var(--tw-translate-y)}.transform{transform:var(--tw-rotate-x)var(--tw-rotate-y)var(--tw-rotate-z)var(--tw-skew-x)var(--tw-skew-y)}.flex-col{flex-direction:column}.flex-col-reverse{flex-direction:column-reverse}.items-center{align-items:center}.justify-center{justify-content:center}.justify-end{justify-content:flex-end}.gap-3{gap:calc(var(--spacing)*3)}.gap-4{gap:calc(var(--spacing)*4)}:where(.space-x-1>:not(:last-child)){--tw-space-x-reverse:0;margin-inline-start:calc(calc(var(--spacing)*1)*var(--tw-space-x-reverse));margin-inline-end:calc(calc(var(--spacing)*1)*calc(1 - var(--tw-space-x-reverse)))}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:3.40282e38px}.rounded-sm{border-radius:var(--radius-sm)}.rounded-t-lg{border-top-left-radius:var(--radius-lg);border-top-right-radius:var(--radius-lg)}.rounded-br-lg{border-bottom-right-radius:var(--radius-lg)}.rounded-bl-lg{border-bottom-left-radius:var(--radius-lg)}.border{border-style:var(--tw-border-style);border-width:1px}.border-\[\#19140035\]{border-color:#19140035}.border-\[\#e3e3e0\]{border-color:#e3e3e0}.border-black{border-color:var(--color-black)}.border-transparent{border-color:#0000}.bg-\[\#1b1b18\]{background-color:#1b1b18}.bg-\[\#FDFDFC\]{background-color:#fdfdfc}.bg-\[\#dbdbd7\]{background-color:#dbdbd7}.bg-\[\#fff2f2\]{background-color:#fff2f2}.bg-white{background-color:var(--color-white)}.p-6{padding:calc(var(--spacing)*6)}.px-5{padding-inline:calc(var(--spacing)*5)}.py-1{padding-block:calc(var(--spacing)*1)}.py-1\.5{padding-block:calc(var(--spacing)*1.5)}.py-2{padding-block:calc(var(--spacing)*2)}.pb-12{padding-bottom:calc(var(--spacing)*12)}.text-sm{font-size:var(--text-sm);line-height:var(--tw-leading,var(--text-sm--line-height))}.text-\[13px\]{font-size:13px}.leading-\[20px\]{--tw-leading:20px;line-height:20px}.leading-normal{--tw-leading:var(--leading-normal);line-height:var(--leading-normal)}.font-medium{--tw-font-weight:var(--font-weight-medium);font-weight:var(--font-weight-medium)}.text-\[\#1b1b18\]{color:#1b1b18}.text-\[\#706f6c\]{color:#706f6c}.text-\[\#F53003\],.text-\[\#f53003\]{color:#f53003}.text-white{color:var(--color-white)}.underline{text-decoration-line:underline}.underline-offset-4{text-underline-offset:4px}.opacity-100{opacity:1}.shadow-\[0px_0px_1px_0px_rgba\(0\,0\,0\,0\.03\)\,0px_1px_2px_0px_rgba\(0\,0\,0\,0\.06\)\]{--tw-shadow:0px 0px 1px 0px var(--tw-shadow-color,#00000008),0px 1px 2px 0px var(--tw-shadow-color,#0000000f);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.shadow-\[inset_0px_0px_0px_1px_rgba\(26\,26\,0\,0\.16\)\]{--tw-shadow:inset 0px 0px 0px 1px var(--tw-shadow-color,#1a1a0029);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.\!filter{filter:var(--tw-blur,)var(--tw-brightness,)var(--tw-contrast,)var(--tw-grayscale,)var(--tw-hue-rotate,)var(--tw-invert,)var(--tw-saturate,)var(--tw-sepia,)var(--tw-drop-shadow,)!important}.filter{filter:var(--tw-blur,)var(--tw-brightness,)var(--tw-contrast,)var(--tw-grayscale,)var(--tw-hue-rotate,)var(--tw-invert,)var(--tw-saturate,)var(--tw-sepia,)var(--tw-drop-shadow,)}.transition-all{transition-property:all;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.transition-opacity{transition-property:opacity;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}.delay-300{transition-delay:.3s}.duration-750{--tw-duration:.75s;transition-duration:.75s}.not-has-\[nav\]\:hidden:not(:has(:is(nav))){display:none}.before\:absolute:before{content:var(--tw-content);position:absolute}.before\:top-0:before{content:var(--tw-content);top:calc(var(--spacing)*0)}.before\:top-1\/2:before{content:var(--tw-content);top:50%}.before\:bottom-0:before{content:var(--tw-content);bottom:calc(var(--spacing)*0)}.before\:bottom-1\/2:before{content:var(--tw-content);bottom:50%}.before\:left-\[0\.4rem\]:before{content:var(--tw-content);left:.4rem}.before\:border-l:before{content:var(--tw-content);border-left-style:var(--tw-border-style);border-left-width:1px}.before\:border-\[\#e3e3e0\]:before{content:var(--tw-content);border-color:#e3e3e0}@media (hover:hover){.hover\:border-\[\#1915014a\]:hover{border-color:#1915014a}.hover\:border-\[\#19140035\]:hover{border-color:#19140035}.hover\:border-black:hover{border-color:var(--color-black)}.hover\:bg-black:hover{background-color:var(--color-black)}}@media (width>=64rem){.lg\:-mt-\[6\.6rem\]{margin-top:-6.6rem}.lg\:mb-0{margin-bottom:calc(var(--spacing)*0)}.lg\:mb-6{margin-bottom:calc(var(--spacing)*6)}.lg\:-ml-px{margin-left:-1px}.lg\:ml-0{margin-left:calc(var(--spacing)*0)}.lg\:block{display:block}.lg\:aspect-auto{aspect-ratio:auto}.lg\:w-\[438px\]{width:438px}.lg\:max-w-4xl{max-width:var(--container-4xl)}.lg\:grow{flex-grow:1}.lg\:flex-row{flex-direction:row}.lg\:justify-center{justify-content:center}.lg\:rounded-t-none{border-top-left-radius:0;border-top-right-radius:0}.lg\:rounded-tl-lg{border-top-left-radius:var(--radius-lg)}.lg\:rounded-r-lg{border-top-right-radius:var(--radius-lg);border-bottom-right-radius:var(--radius-lg)}.lg\:rounded-br-none{border-bottom-right-radius:0}.lg\:p-8{padding:calc(var(--spacing)*8)}.lg\:p-20{padding:calc(var(--spacing)*20)}}@media (prefers-color-scheme:dark){.dark\:block{display:block}.dark\:hidden{display:none}.dark\:border-\[\#3E3E3A\]{border-color:#3e3e3a}.dark\:border-\[\#eeeeec\]{border-color:#eeeeec}.dark\:bg-\[\#0a0a0a\]{background-color:#0a0a0a}.dark\:bg-\[\#1D0002\]{background-color:#1d0002}.dark\:bg-\[\#3E3E3A\]{background-color:#3e3e3a}.dark\:bg-\[\#161615\]{background-color:#161615}.dark\:bg-\[\#eeeeec\]{background-color:#eeeeec}.dark\:text-\[\#1C1C1A\]{color:#1c1c1a}.dark\:text-\[\#A1A09A\]{color:#a1a09a}.dark\:text-\[\#EDEDEC\]{color:#ededec}.dark\:text-\[\#F61500\]{color:#f61500}.dark\:text-\[\#FF4433\]{color:#f43}.dark\:shadow-\[inset_0px_0px_0px_1px_\#fffaed2d\]{--tw-shadow:inset 0px 0px 0px 1px var(--tw-shadow-color,#fffaed2d);box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow)}.dark\:before\:border-\[\#3E3E3A\]:before{content:var(--tw-content);border-color:#3e3e3a}@media (hover:hover){.dark\:hover\:border-\[\#3E3E3A\]:hover{border-color:#3e3e3a}.dark\:hover\:border-\[\#62605b\]:hover{border-color:#62605b}.dark\:hover\:border-white:hover{border-color:var(--color-white)}.dark\:hover\:bg-white:hover{background-color:var(--color-white)}}}@starting-style{.starting\:translate-y-4{--tw-translate-y:calc(var(--spacing)*4);translate:var(--tw-translate-x)var(--tw-translate-y)}}@starting-style{.starting\:translate-y-6{--tw-translate-y:calc(var(--spacing)*6);translate:var(--tw-translate-x)var(--tw-translate-y)}}@starting-style{.starting\:opacity-0{opacity:0}}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes ping{75%,to{opacity:0;transform:scale(2)}}@keyframes pulse{50%{opacity:.5}}@keyframes bounce{0%,to{animation-timing-function:cubic-bezier(.8,0,1,1);transform:translateY(-25%)}50%{animation-timing-function:cubic-bezier(0,0,.2,1);transform:none}}@property --tw-translate-x{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-y{syntax:"*";inherits:false;initial-value:0}@property --tw-translate-z{syntax:"*";inherits:false;initial-value:0}@property --tw-rotate-x{syntax:"*";inherits:false;initial-value:rotateX(0)}@property --tw-rotate-y{syntax:"*";inherits:false;initial-value:rotateY(0)}@property --tw-rotate-z{syntax:"*";inherits:false;initial-value:rotateZ(0)}@property --tw-skew-x{syntax:"*";inherits:false;initial-value:skewX(0)}@property --tw-skew-y{syntax:"*";inherits:false;initial-value:skewY(0)}@property --tw-space-x-reverse{syntax:"*";inherits:false;initial-value:0}@property --tw-border-style{syntax:"*";inherits:false;initial-value:solid}@property --tw-leading{syntax:"*";inherits:false}@property --tw-font-weight{syntax:"*";inherits:false}@property --tw-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:"*";inherits:false}@property --tw-inset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:"*";inherits:false}@property --tw-ring-color{syntax:"*";inherits:false}@property --tw-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:"*";inherits:false}@property --tw-inset-ring-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:"*";inherits:false}@property --tw-ring-offset-width{syntax:"<length>";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:"*";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:"*";inherits:false;initial-value:0 0 #0000}@property --tw-blur{syntax:"*";inherits:false}@property --tw-brightness{syntax:"*";inherits:false}@property --tw-contrast{syntax:"*";inherits:false}@property --tw-grayscale{syntax:"*";inherits:false}@property --tw-hue-rotate{syntax:"*";inherits:false}@property --tw-invert{syntax:"*";inherits:false}@property --tw-opacity{syntax:"*";inherits:false}@property --tw-saturate{syntax:"*";inherits:false}@property --tw-sepia{syntax:"*";inherits:false}@property --tw-drop-shadow{syntax:"*";inherits:false}@property --tw-duration{syntax:"*";inherits:false}@property --tw-content{syntax:"*";inherits:false;initial-value:""}
-            </style>
-        @endif
-    </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-        <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
-            @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
-                    @auth
-                        <a
-                            href="{{ url('/dashboard') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
-                        >
-                            Dashboard
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
-                        >
-                            Log in
-                        </a>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
+            overflow-x: hidden;
+        }
 
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
-                                Register
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
-        </header>
-        <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
-            <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
-                <div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
-                    <h1 class="mb-1 font-medium">Let's get started</h1>
-                    <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">Laravel has an incredibly rich ecosystem. <br>We suggest starting with the following.</p>
-                    <ul class="flex flex-col mb-4 lg:mb-6">
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:top-1/2 before:bottom-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
-                                </span>
-                            </span>
-                            <span>
-                                Read the
-                                <a href="https://laravel.com/docs" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Documentation</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
-                                    </svg>
-                                </a>
-                            </span>
-                        </li>
-                        <li class="flex items-center gap-4 py-2 relative before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A] before:bottom-1/2 before:top-0 before:left-[0.4rem] before:absolute">
-                            <span class="relative py-1 bg-white dark:bg-[#161615]">
-                                <span class="flex items-center justify-center rounded-full bg-[#FDFDFC] dark:bg-[#161615] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] w-3.5 h-3.5 border dark:border-[#3E3E3A] border-[#e3e3e0]">
-                                    <span class="rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A] w-1.5 h-1.5"></span>
-                                </span>
-                            </span>
-                            <span>
-                                Watch video tutorials at
-                                <a href="https://laracasts.com" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#f53003] dark:text-[#FF4433] ml-1">
-                                    <span>Laracasts</span>
-                                    <svg
-                                        width="10"
-                                        height="11"
-                                        viewBox="0 0 10 11"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="w-2.5 h-2.5"
-                                    >
-                                        <path
-                                            d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                            stroke="currentColor"
-                                            stroke-linecap="square"
-                                        />
-                                    </svg>
-                                </a>
-                            </span>
-                        </li>
-                    </ul>
-                    <ul class="flex gap-3 text-sm leading-normal">
-                        <li>
-                            <a href="https://cloud.laravel.com" target="_blank" class="inline-block dark:bg-[#eeeeec] dark:border-[#eeeeec] dark:text-[#1C1C1A] dark:hover:bg-white dark:hover:border-white hover:bg-black hover:border-black px-5 py-1.5 bg-[#1b1b18] rounded-sm border border-black text-white text-sm leading-normal">
-                                Deploy now
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
-                    {{-- Laravel Logo --}}
-                    <svg class="w-full text-[#F53003] dark:text-[#F61500] transition-all translate-y-0 opacity-100 max-w-none duration-750 starting:opacity-0 starting:translate-y-6" viewBox="0 0 438 104" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.2036 -3H0V102.197H49.5189V86.7187H17.2036V-3Z" fill="currentColor" />
-                        <path d="M110.256 41.6337C108.061 38.1275 104.945 35.3731 100.905 33.3681C96.8667 31.3647 92.8016 30.3618 88.7131 30.3618C83.4247 30.3618 78.5885 31.3389 74.201 33.2923C69.8111 35.2456 66.0474 37.928 62.9059 41.3333C59.7643 44.7401 57.3198 48.6726 55.5754 53.1293C53.8287 57.589 52.9572 62.274 52.9572 67.1813C52.9572 72.1925 53.8287 76.8995 55.5754 81.3069C57.3191 85.7173 59.7636 89.6241 62.9059 93.0293C66.0474 96.4361 69.8119 99.1155 74.201 101.069C78.5885 103.022 83.4247 103.999 88.7131 103.999C92.8016 103.999 96.8667 102.997 100.905 100.994C104.945 98.9911 108.061 96.2359 110.256 92.7282V102.195H126.563V32.1642H110.256V41.6337ZM108.76 75.7472C107.762 78.4531 106.366 80.8078 104.572 82.8112C102.776 84.8161 100.606 86.4183 98.0637 87.6206C95.5202 88.823 92.7004 89.4238 89.6103 89.4238C86.5178 89.4238 83.7252 88.823 81.2324 87.6206C78.7388 86.4183 76.5949 84.8161 74.7998 82.8112C73.004 80.8078 71.6319 78.4531 70.6856 75.7472C69.7356 73.0421 69.2644 70.1868 69.2644 67.1821C69.2644 64.1758 69.7356 61.3205 70.6856 58.6154C71.6319 55.9102 73.004 53.5571 74.7998 51.5522C76.5949 49.5495 78.738 47.9451 81.2324 46.7427C83.7252 45.5404 86.5178 44.9396 89.6103 44.9396C92.7012 44.9396 95.5202 45.5404 98.0637 46.7427C100.606 47.9451 102.776 49.5487 104.572 51.5522C106.367 53.5571 107.762 55.9102 108.76 58.6154C109.756 61.3205 110.256 64.1758 110.256 67.1821C110.256 70.1868 109.756 73.0421 108.76 75.7472Z" fill="currentColor" />
-                        <path d="M242.805 41.6337C240.611 38.1275 237.494 35.3731 233.455 33.3681C229.416 31.3647 225.351 30.3618 221.262 30.3618C215.974 30.3618 211.138 31.3389 206.75 33.2923C202.36 35.2456 198.597 37.928 195.455 41.3333C192.314 44.7401 189.869 48.6726 188.125 53.1293C186.378 57.589 185.507 62.274 185.507 67.1813C185.507 72.1925 186.378 76.8995 188.125 81.3069C189.868 85.7173 192.313 89.6241 195.455 93.0293C198.597 96.4361 202.361 99.1155 206.75 101.069C211.138 103.022 215.974 103.999 221.262 103.999C225.351 103.999 229.416 102.997 233.455 100.994C237.494 98.9911 240.611 96.2359 242.805 92.7282V102.195H259.112V32.1642H242.805V41.6337ZM241.31 75.7472C240.312 78.4531 238.916 80.8078 237.122 82.8112C235.326 84.8161 233.156 86.4183 230.614 87.6206C228.07 88.823 225.251 89.4238 222.16 89.4238C219.068 89.4238 216.275 88.823 213.782 87.6206C211.289 86.4183 209.145 84.8161 207.35 82.8112C205.554 80.8078 204.182 78.4531 203.236 75.7472C202.286 73.0421 201.814 70.1868 201.814 67.1821C201.814 64.1758 202.286 61.3205 203.236 58.6154C204.182 55.9102 205.554 53.5571 207.35 51.5522C209.145 49.5495 211.288 47.9451 213.782 46.7427C216.275 45.5404 219.068 44.9396 222.16 44.9396C225.251 44.9396 228.07 45.5404 230.614 46.7427C233.156 47.9451 235.326 49.5487 237.122 51.5522C238.917 53.5571 240.312 55.9102 241.31 58.6154C242.306 61.3205 242.806 64.1758 242.806 67.1821C242.805 70.1868 242.305 73.0421 241.31 75.7472Z" fill="currentColor" />
-                        <path d="M438 -3H421.694V102.197H438V-3Z" fill="currentColor" />
-                        <path d="M139.43 102.197H155.735V48.2834H183.712V32.1665H139.43V102.197Z" fill="currentColor" />
-                        <path d="M324.49 32.1665L303.995 85.794L283.498 32.1665H266.983L293.748 102.197H314.242L341.006 32.1665H324.49Z" fill="currentColor" />
-                        <path d="M376.571 30.3656C356.603 30.3656 340.797 46.8497 340.797 67.1828C340.797 89.6597 356.094 104 378.661 104C391.29 104 399.354 99.1488 409.206 88.5848L398.189 80.0226C398.183 80.031 389.874 90.9895 377.468 90.9895C363.048 90.9895 356.977 79.3111 356.977 73.269H411.075C413.917 50.1328 398.775 30.3656 376.571 30.3656ZM357.02 61.0967C357.145 59.7487 359.023 43.3761 376.442 43.3761C393.861 43.3761 395.978 59.7464 396.099 61.0967H357.02Z" fill="currentColor" />
-                    </svg>
+        /* ── NAVBAR ─────────────────────────── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5vw;
+            height: 72px;
+            background: rgba(10,22,40,.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(201,151,42,.25);
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; color: var(--gold2); letter-spacing: .03em;
+        }
+        .nav-brand .emblem {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: grid; place-items: center;
+            font-size: 1.1rem; font-weight: 900; color: var(--navy);
+        }
+        .nav-links { display: flex; gap: 32px; list-style: none; }
+        .nav-links a {
+            color: rgba(255,255,255,.75); text-decoration: none;
+            font-size: .875rem; font-weight: 500; letter-spacing: .04em;
+            text-transform: uppercase; transition: color .2s;
+        }
+        .nav-links a:hover { color: var(--gold2); }
 
-                    {{-- Light Mode 12 SVG --}}
-                    <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] dark:hidden" viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" fill="black" />
-                            <path d="M9.11884 226.339L-13.7396 226.338L-42.7286 176.132L43.0733 176.135L175.595 405.649L112.651 405.647L9.11884 226.339Z" fill="black" />
-                            <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" stroke="#1B1B18" stroke-width="1" />
-                            <path d="M9.11884 226.339L-13.7396 226.338L-42.7286 176.132L43.0733 176.135L175.595 405.649L112.651 405.647L9.11884 226.339Z" stroke="#1B1B18" stroke-width="1" />
-                            <path d="M204.592 327.449L204.923 327.449C211.769 320.564 222.094 311.479 235.897 300.196C249.258 288.912 259.306 279.923 266.042 273.23C272.668 266.345 277.195 259.077 279.624 251.427C282.053 243.777 280.893 235.839 276.145 227.615C270.844 218.435 263.39 211.071 253.782 205.524C244.285 199.786 234.236 196.917 223.635 196.916C213.255 196.916 206.464 199.689 203.262 205.235C199.949 210.59 201.054 218.049 206.575 227.612L141.975 227.61C132.699 211.544 128.723 197.2 130.048 184.577C131.593 171.954 137.887 162.2 148.93 155.315C160.083 148.239 174.935 144.701 193.487 144.702C212.922 144.703 232.192 148.242 251.296 155.319C270.289 162.205 287.627 171.96 303.308 184.583C318.989 197.207 331.468 211.552 340.745 227.618C349.358 242.536 353.169 255.637 352.175 266.921C351.403 278.205 347.704 288.055 341.078 296.47C334.674 304.885 324.736 315.213 311.264 327.453L393.422 327.456L422.246 377.375L233.415 377.368L204.592 327.449Z" fill="#F8B803" />
-                            <path d="M25.447 198.058L2.58852 198.057L-26.4005 147.851L59.4015 147.854L191.923 377.368L128.979 377.365L25.447 198.058Z" fill="#F8B803" />
-                            <path d="M204.592 327.449L204.923 327.449C211.769 320.564 222.094 311.479 235.897 300.196C249.258 288.912 259.306 279.923 266.042 273.23C272.668 266.345 277.195 259.077 279.624 251.427C282.053 243.777 280.893 235.839 276.145 227.615C270.844 218.435 263.39 211.071 253.782 205.524C244.285 199.786 234.236 196.917 223.635 196.916C213.255 196.916 206.464 199.689 203.262 205.235C199.949 210.59 201.054 218.049 206.575 227.612L141.975 227.61C132.699 211.544 128.723 197.2 130.048 184.577C131.593 171.954 137.887 162.2 148.93 155.315C160.083 148.239 174.935 144.701 193.487 144.702C212.922 144.703 232.192 148.242 251.296 155.319C270.289 162.205 287.627 171.96 303.308 184.583C318.989 197.207 331.468 211.552 340.745 227.618C349.358 242.536 353.169 255.637 352.175 266.921C351.403 278.205 347.704 288.055 341.078 296.47C334.674 304.885 324.736 315.213 311.264 327.453L393.422 327.456L422.246 377.375L233.415 377.368L204.592 327.449Z" stroke="#1B1B18" stroke-width="1" />
-                            <path d="M25.447 198.058L2.58852 198.057L-26.4005 147.851L59.4015 147.854L191.923 377.368L128.979 377.365L25.447 198.058Z" stroke="#1B1B18" stroke-width="1" />
-                        </g>
-                        <g style="mix-blend-mode: hard-light" class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M217.342 305.363L217.673 305.363C224.519 298.478 234.844 289.393 248.647 278.11C262.008 266.826 272.056 257.837 278.792 251.144C285.418 244.259 289.945 236.991 292.374 229.341C294.803 221.691 293.643 213.753 288.895 205.529C283.594 196.349 276.14 188.985 266.532 183.438C257.035 177.7 246.986 174.831 236.385 174.83C226.005 174.83 219.214 177.603 216.012 183.149C212.699 188.504 213.804 195.963 219.325 205.527L154.725 205.524C145.449 189.458 141.473 175.114 142.798 162.491C144.343 149.868 150.637 140.114 161.68 133.229C172.833 126.153 187.685 122.615 206.237 122.616C225.672 122.617 244.942 126.156 264.046 133.233C283.039 140.119 300.377 149.874 316.058 162.497C331.739 175.121 344.218 189.466 353.495 205.532C362.108 220.45 365.919 233.551 364.925 244.835C364.153 256.12 360.454 265.969 353.828 274.384C347.424 282.799 337.486 293.127 324.014 305.367L406.172 305.37L434.996 355.289L246.165 355.282L217.342 305.363Z" fill="#F0ACB8" />
-                            <path d="M38.197 175.972L15.3385 175.971L-13.6505 125.765L72.1515 125.768L204.673 355.282L141.729 355.279L38.197 175.972Z" fill="#F0ACB8" />
-                            <path d="M217.342 305.363L217.673 305.363C224.519 298.478 234.844 289.393 248.647 278.11C262.008 266.826 272.056 257.837 278.792 251.144C285.418 244.259 289.945 236.991 292.374 229.341C294.803 221.691 293.643 213.753 288.895 205.529C283.594 196.349 276.14 188.985 266.532 183.438C257.035 177.7 246.986 174.831 236.385 174.83C226.005 174.83 219.214 177.603 216.012 183.149C212.699 188.504 213.804 195.963 219.325 205.527L154.725 205.524C145.449 189.458 141.473 175.114 142.798 162.491C144.343 149.868 150.637 140.114 161.68 133.229C172.833 126.153 187.685 122.615 206.237 122.616C225.672 122.617 244.942 126.156 264.046 133.233C283.039 140.119 300.377 149.874 316.058 162.497C331.739 175.121 344.218 189.466 353.495 205.532C362.108 220.45 365.919 233.551 364.925 244.835C364.153 256.12 360.454 265.969 353.828 274.384C347.424 282.799 337.486 293.127 324.014 305.367L406.172 305.37L434.996 355.289L246.165 355.282L217.342 305.363Z" stroke="#1B1B18" stroke-width="1" />
-                            <path d="M38.197 175.972L15.3385 175.971L-13.6505 125.765L72.1515 125.768L204.673 355.282L141.729 355.279L38.197 175.972Z" stroke="#1B1B18" stroke-width="1" />
-                        </g>
-                        <g style="mix-blend-mode: plus-darker" class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M230.951 281.792L231.282 281.793C238.128 274.907 248.453 265.823 262.256 254.539C275.617 243.256 285.666 234.267 292.402 227.573C299.027 220.688 303.554 213.421 305.983 205.771C308.412 198.12 307.253 190.183 302.504 181.959C297.203 172.778 289.749 165.415 280.142 159.868C270.645 154.13 260.596 151.26 249.995 151.26C239.615 151.26 232.823 154.033 229.621 159.579C226.309 164.934 227.413 172.393 232.935 181.956L168.335 181.954C159.058 165.888 155.082 151.543 156.407 138.92C157.953 126.298 164.247 116.544 175.289 109.659C186.442 102.583 201.294 99.045 219.846 99.0457C239.281 99.0464 258.551 102.585 277.655 109.663C296.649 116.549 313.986 126.303 329.667 138.927C345.349 151.551 357.827 165.895 367.104 181.961C375.718 196.88 379.528 209.981 378.535 221.265C377.762 232.549 374.063 242.399 367.438 250.814C361.033 259.229 351.095 269.557 337.624 281.796L419.782 281.8L448.605 331.719L259.774 331.712L230.951 281.792Z" fill="#F3BEC7" />
-                            <path d="M51.8063 152.402L28.9479 152.401L-0.0411453 102.195L85.7608 102.198L218.282 331.711L155.339 331.709L51.8063 152.402Z" fill="#F3BEC7" />
-                            <path d="M230.951 281.792L231.282 281.793C238.128 274.907 248.453 265.823 262.256 254.539C275.617 243.256 285.666 234.267 292.402 227.573C299.027 220.688 303.554 213.421 305.983 205.771C308.412 198.12 307.253 190.183 302.504 181.959C297.203 172.778 289.749 165.415 280.142 159.868C270.645 154.13 260.596 151.26 249.995 151.26C239.615 151.26 232.823 154.033 229.621 159.579C226.309 164.934 227.413 172.393 232.935 181.956L168.335 181.954C159.058 165.888 155.082 151.543 156.407 138.92C157.953 126.298 164.247 116.544 175.289 109.659C186.442 102.583 201.294 99.045 219.846 99.0457C239.281 99.0464 258.551 102.585 277.655 109.663C296.649 116.549 313.986 126.303 329.667 138.927C345.349 151.551 357.827 165.895 367.104 181.961C375.718 196.88 379.528 209.981 378.535 221.265C377.762 232.549 374.063 242.399 367.438 250.814C361.033 259.229 351.095 269.557 337.624 281.796L419.782 281.8L448.605 331.719L259.774 331.712L230.951 281.792Z" stroke="#1B1B18" stroke-width="1" />
-                            <path d="M51.8063 152.402L28.9479 152.401L-0.0411453 102.195L85.7608 102.198L218.282 331.711L155.339 331.709L51.8063 152.402Z" stroke="#1B1B18" stroke-width="1" />
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M188.467 355.363L188.798 355.363C195.644 348.478 205.969 339.393 219.772 328.11C233.133 316.826 243.181 307.837 249.917 301.144C253.696 297.217 256.792 293.166 259.205 288.991C261.024 285.845 262.455 282.628 263.499 279.341C265.928 271.691 264.768 263.753 260.02 255.529C254.719 246.349 247.265 238.985 237.657 233.438C228.16 227.7 218.111 224.831 207.51 224.83C197.13 224.83 190.339 227.603 187.137 233.149C183.824 238.504 184.929 245.963 190.45 255.527L125.851 255.524C116.574 239.458 112.598 225.114 113.923 212.491C114.615 206.836 116.261 201.756 118.859 197.253C122.061 191.704 126.709 187.03 132.805 183.229C143.958 176.153 158.81 172.615 177.362 172.616C196.797 172.617 216.067 176.156 235.171 183.233C254.164 190.119 271.502 199.874 287.183 212.497C302.864 225.121 315.343 239.466 324.62 255.532C333.233 270.45 337.044 283.551 336.05 294.835C335.46 303.459 333.16 311.245 329.151 318.194C327.915 320.337 326.515 322.4 324.953 324.384C318.549 332.799 308.611 343.127 295.139 355.367L377.297 355.37L406.121 405.289L217.29 405.282L188.467 355.363Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M9.32197 225.972L-13.5365 225.971L-42.5255 175.765L43.2765 175.768L175.798 405.282L112.854 405.279L9.32197 225.972Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M345.247 111.915C329.566 99.2919 312.229 89.5371 293.235 82.6512L235.167 183.228C254.161 190.114 271.498 199.869 287.179 212.492L345.247 111.915Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M382.686 154.964C373.41 138.898 360.931 124.553 345.25 111.93L287.182 212.506C302.863 225.13 315.342 239.475 324.618 255.541L382.686 154.964Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M293.243 82.6472C274.139 75.57 254.869 72.031 235.434 72.0303L177.366 172.607C196.801 172.608 216.071 176.147 235.175 183.224L293.243 82.6472Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M394.118 194.257C395.112 182.973 391.301 169.872 382.688 154.953L324.619 255.53C333.233 270.448 337.044 283.55 336.05 294.834L394.118 194.257Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M235.432 72.0311C216.88 72.0304 202.027 75.5681 190.875 82.6442L132.806 183.221C143.959 176.145 158.812 172.607 177.363 172.608L235.432 72.0311Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M265.59 124.25C276.191 124.251 286.24 127.12 295.737 132.858L237.669 233.435C228.172 227.697 218.123 224.828 207.522 224.827L265.59 124.25Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M295.719 132.859C305.326 138.406 312.78 145.77 318.081 154.95L260.013 255.527C254.712 246.347 247.258 238.983 237.651 233.436L295.719 132.859Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M387.218 217.608C391.227 210.66 393.527 202.874 394.117 194.25L336.049 294.827C335.459 303.451 333.159 311.237 329.15 318.185L387.218 217.608Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M245.211 132.577C248.413 127.03 255.204 124.257 265.584 124.258L207.516 224.835C197.136 224.834 190.345 227.607 187.143 233.154L245.211 132.577Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M318.094 154.945C322.842 163.17 324.002 171.107 321.573 178.757L263.505 279.334C265.934 271.684 264.774 263.746 260.026 255.522L318.094 154.945Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M176.925 96.6737C180.127 91.1249 184.776 86.4503 190.871 82.6499L132.803 183.227C126.708 187.027 122.059 191.702 118.857 197.25L176.925 96.6737Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M387.226 217.606C385.989 219.749 384.59 221.813 383.028 223.797L324.96 324.373C326.522 322.39 327.921 320.326 329.157 318.183L387.226 217.606Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M317.269 188.408C319.087 185.262 320.519 182.045 321.562 178.758L263.494 279.335C262.451 282.622 261.019 285.839 259.201 288.985L317.269 188.408Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M245.208 132.573C241.895 137.928 243 145.387 248.522 154.95L190.454 255.527C184.932 245.964 183.827 238.505 187.14 233.15L245.208 132.573Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M176.93 96.6719C174.331 101.175 172.686 106.255 171.993 111.91L113.925 212.487C114.618 206.831 116.263 201.752 118.862 197.249L176.93 96.6719Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M317.266 188.413C314.853 192.589 311.757 196.64 307.978 200.566L249.91 301.143C253.689 297.216 256.785 293.166 259.198 288.99L317.266 188.413Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M464.198 304.708L435.375 254.789L377.307 355.366L406.13 405.285L464.198 304.708Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M353.209 254.787C366.68 242.548 376.618 232.22 383.023 223.805L324.955 324.382C318.55 332.797 308.612 343.124 295.141 355.364L353.209 254.787Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M435.37 254.787L353.212 254.784L295.144 355.361L377.302 355.364L435.37 254.787Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M183.921 154.947L248.521 154.95L190.453 255.527L125.853 255.524L183.921 154.947Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M171.992 111.914C170.668 124.537 174.643 138.881 183.92 154.947L125.852 255.524C116.575 239.458 112.599 225.114 113.924 212.491L171.992 111.914Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M307.987 200.562C301.251 207.256 291.203 216.244 277.842 227.528L219.774 328.105C233.135 316.821 243.183 307.832 249.919 301.139L307.987 200.562Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M15.5469 75.1797L44.5359 125.386L-13.5321 225.963L-42.5212 175.756L15.5469 75.1797Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M277.836 227.536C264.033 238.82 253.708 247.904 246.862 254.789L188.794 355.366C195.64 348.481 205.965 339.397 219.768 328.113L277.836 227.536Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M275.358 304.706L464.189 304.713L406.12 405.29L217.29 405.283L275.358 304.706Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M44.5279 125.39L67.3864 125.39L9.31834 225.967L-13.5401 225.966L44.5279 125.39Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M101.341 75.1911L233.863 304.705L175.795 405.282L43.2733 175.768L101.341 75.1911ZM15.5431 75.19L-42.525 175.767L43.277 175.77L101.345 75.1932L15.5431 75.19Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M246.866 254.784L246.534 254.784L188.466 355.361L188.798 355.361L246.866 254.784Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M246.539 254.781L275.362 304.701L217.294 405.277L188.471 355.358L246.539 254.781Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M67.3906 125.391L170.923 304.698L112.855 405.275L9.32257 225.967L67.3906 125.391Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                            <path d="M170.921 304.699L233.865 304.701L175.797 405.278L112.853 405.276L170.921 304.699Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="bevel" />
-                        </g>
-                        <g style="mix-blend-mode: hard-light" class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M246.544 254.79L246.875 254.79C253.722 247.905 264.046 238.82 277.849 227.537C291.21 216.253 301.259 207.264 307.995 200.57C314.62 193.685 319.147 186.418 321.577 178.768C324.006 171.117 322.846 163.18 318.097 154.956C312.796 145.775 305.342 138.412 295.735 132.865C286.238 127.127 276.189 124.258 265.588 124.257C255.208 124.257 248.416 127.03 245.214 132.576C241.902 137.931 243.006 145.39 248.528 154.953L183.928 154.951C174.652 138.885 170.676 124.541 172 111.918C173.546 99.2946 179.84 89.5408 190.882 82.6559C202.035 75.5798 216.887 72.0421 235.439 72.0428C254.874 72.0435 274.144 75.5825 293.248 82.6598C312.242 89.5457 329.579 99.3005 345.261 111.924C360.942 124.548 373.421 138.892 382.697 154.958C391.311 169.877 395.121 182.978 394.128 194.262C393.355 205.546 389.656 215.396 383.031 223.811C376.627 232.226 366.688 242.554 353.217 254.794L435.375 254.797L464.198 304.716L275.367 304.709L246.544 254.79Z" fill="#F0ACB8" />
-                            <path d="M246.544 254.79L246.875 254.79C253.722 247.905 264.046 238.82 277.849 227.537C291.21 216.253 301.259 207.264 307.995 200.57C314.62 193.685 319.147 186.418 321.577 178.768C324.006 171.117 322.846 163.18 318.097 154.956C312.796 145.775 305.342 138.412 295.735 132.865C286.238 127.127 276.189 124.258 265.588 124.257C255.208 124.257 248.416 127.03 245.214 132.576C241.902 137.931 243.006 145.39 248.528 154.953L183.928 154.951C174.652 138.885 170.676 124.541 172 111.918C173.546 99.2946 179.84 89.5408 190.882 82.6559C202.035 75.5798 216.887 72.0421 235.439 72.0428C254.874 72.0435 274.144 75.5825 293.248 82.6598C312.242 89.5457 329.579 99.3005 345.261 111.924C360.942 124.548 373.421 138.892 382.697 154.958C391.311 169.877 395.121 182.978 394.128 194.262C393.355 205.546 389.656 215.396 383.031 223.811C376.627 232.226 366.688 242.554 353.217 254.794L435.375 254.797L464.198 304.716L275.367 304.709L246.544 254.79Z" stroke="#1B1B18" stroke-width="1" stroke-linejoin="round" />
-                        </g>
-                        <g style="mix-blend-mode: hard-light" class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" fill="#F0ACB8" />
-                            <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" stroke="#1B1B18" stroke-width="1" />
-                        </g>
-                    </svg>
+        /* NAV AUTH BUTTONS */
+        .nav-auth {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .btn-nav-login {
+            padding: 9px 22px; border-radius: 4px;
+            border: 1px solid rgba(201,151,42,.5);
+            color: var(--gold2); font-weight: 600; font-size: .85rem;
+            background: transparent; cursor: pointer;
+            transition: all .2s; font-family: 'DM Sans', sans-serif;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-nav-login:hover { background: rgba(201,151,42,.1); border-color: var(--gold2); }
+        .btn-nav-register {
+            padding: 9px 22px; border-radius: 4px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); font-weight: 700; font-size: .85rem;
+            cursor: pointer; transition: opacity .2s; font-family: 'DM Sans', sans-serif;
+            border: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-nav-register:hover { opacity: .88; }
 
-                    {{-- Dark Mode 12 SVG --}}
-                    <svg class="w-[448px] max-w-none relative -mt-[4.9rem] -ml-8 lg:ml-0 lg:-mt-[6.6rem] hidden dark:block" viewBox="0 0 440 376" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" fill="black"/>
-                            <path d="M9.11884 226.339L-13.7396 226.338L-42.7286 176.132L43.0733 176.135L175.595 405.649L112.651 405.647L9.11884 226.339Z" fill="black"/>
-                            <path d="M188.263 355.73L188.595 355.73C195.441 348.845 205.766 339.761 219.569 328.477C232.93 317.193 242.978 308.205 249.714 301.511C256.34 294.626 260.867 287.358 263.296 279.708C265.725 272.058 264.565 264.121 259.816 255.896C254.516 246.716 247.062 239.352 237.454 233.805C227.957 228.067 217.908 225.198 207.307 225.198C196.927 225.197 190.136 227.97 186.934 233.516C183.621 238.872 184.726 246.331 190.247 255.894L125.647 255.891C116.371 239.825 112.395 225.481 113.72 212.858C115.265 200.235 121.559 190.481 132.602 183.596C143.754 176.52 158.607 172.982 177.159 172.983C196.594 172.984 215.863 176.523 234.968 183.6C253.961 190.486 271.299 200.241 286.98 212.864C302.661 225.488 315.14 239.833 324.416 255.899C333.03 270.817 336.841 283.918 335.847 295.203C335.075 306.487 331.376 316.336 324.75 324.751C318.346 333.167 308.408 343.494 294.936 355.734L377.094 355.737L405.917 405.656L217.087 405.649L188.263 355.73Z" stroke="#FF750F" stroke-width="1"/>
-                            <path d="M9.11884 226.339L-13.7396 226.338L-42.7286 176.132L43.0733 176.135L175.595 405.649L112.651 405.647L9.11884 226.339Z" stroke="#FF750F" stroke-width="1"/>
-                            <path d="M204.592 327.449L204.923 327.449C211.769 320.564 222.094 311.479 235.897 300.196C249.258 288.912 259.306 279.923 266.042 273.23C272.668 266.345 277.195 259.077 279.624 251.427C282.053 243.777 280.893 235.839 276.145 227.615C270.844 218.435 263.39 211.071 253.782 205.524C244.285 199.786 234.236 196.917 223.635 196.916C213.255 196.916 206.464 199.689 203.262 205.235C199.949 210.59 201.054 218.049 206.575 227.612L141.975 227.61C132.699 211.544 128.723 197.2 130.048 184.577C131.593 171.954 137.887 162.2 148.93 155.315C160.083 148.239 174.935 144.701 193.487 144.702C212.922 144.703 232.192 148.242 251.296 155.319C270.289 162.205 287.627 171.96 303.308 184.583C318.989 197.207 331.468 211.552 340.745 227.618C349.358 242.536 353.169 255.637 352.175 266.921C351.403 278.205 347.704 288.055 341.078 296.47C334.674 304.885 324.736 315.213 311.264 327.453L393.422 327.456L422.246 377.375L233.415 377.368L204.592 327.449Z" fill="#391800"/>
-                            <path d="M25.447 198.058L2.58852 198.057L-26.4005 147.851L59.4015 147.854L191.923 377.368L128.979 377.365L25.447 198.058Z" fill="#391800"/>
-                            <path d="M204.592 327.449L204.923 327.449C211.769 320.564 222.094 311.479 235.897 300.196C249.258 288.912 259.306 279.923 266.042 273.23C272.668 266.345 277.195 259.077 279.624 251.427C282.053 243.777 280.893 235.839 276.145 227.615C270.844 218.435 263.39 211.071 253.782 205.524C244.285 199.786 234.236 196.917 223.635 196.916C213.255 196.916 206.464 199.689 203.262 205.235C199.949 210.59 201.054 218.049 206.575 227.612L141.975 227.61C132.699 211.544 128.723 197.2 130.048 184.577C131.593 171.954 137.887 162.2 148.93 155.315C160.083 148.239 174.935 144.701 193.487 144.702C212.922 144.703 232.192 148.242 251.296 155.319C270.289 162.205 287.627 171.96 303.308 184.583C318.989 197.207 331.468 211.552 340.745 227.618C349.358 242.536 353.169 255.637 352.175 266.921C351.403 278.205 347.704 288.055 341.078 296.47C334.674 304.885 324.736 315.213 311.264 327.453L393.422 327.456L422.246 377.375L233.415 377.368L204.592 327.449Z" stroke="#FF750F" stroke-width="1"/>
-                            <path d="M25.447 198.058L2.58852 198.057L-26.4005 147.851L59.4015 147.854L191.923 377.368L128.979 377.365L25.447 198.058Z" stroke="#FF750F" stroke-width="1"/>
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4" style="mix-blend-mode:hard-light">
-                            <path d="M217.342 305.363L217.673 305.363C224.519 298.478 234.844 289.393 248.647 278.11C262.008 266.826 272.056 257.837 278.792 251.144C285.418 244.259 289.945 236.991 292.374 229.341C294.803 221.691 293.643 213.753 288.895 205.529C283.594 196.349 276.14 188.985 266.532 183.438C257.035 177.7 246.986 174.831 236.385 174.83C226.005 174.83 219.214 177.603 216.012 183.149C212.699 188.504 213.804 195.963 219.325 205.527L154.725 205.524C145.449 189.458 141.473 175.114 142.798 162.491C144.343 149.868 150.637 140.114 161.68 133.229C172.833 126.153 187.685 122.615 206.237 122.616C225.672 122.617 244.942 126.156 264.046 133.233C283.039 140.119 300.377 149.874 316.058 162.497C331.739 175.121 344.218 189.466 353.495 205.532C362.108 220.45 365.919 233.551 364.925 244.835C364.153 256.12 360.454 265.969 353.828 274.384C347.424 282.799 337.486 293.127 324.014 305.367L406.172 305.37L434.996 355.289L246.165 355.282L217.342 305.363Z" fill="#733000"/>
-                            <path d="M38.197 175.972L15.3385 175.971L-13.6505 125.765L72.1515 125.768L204.673 355.282L141.729 355.279L38.197 175.972Z" fill="#733000"/>
-                            <path d="M217.342 305.363L217.673 305.363C224.519 298.478 234.844 289.393 248.647 278.11C262.008 266.826 272.056 257.837 278.792 251.144C285.418 244.259 289.945 236.991 292.374 229.341C294.803 221.691 293.643 213.753 288.895 205.529C283.594 196.349 276.14 188.985 266.532 183.438C257.035 177.7 246.986 174.831 236.385 174.83C226.005 174.83 219.214 177.603 216.012 183.149C212.699 188.504 213.804 195.963 219.325 205.527L154.725 205.524C145.449 189.458 141.473 175.114 142.798 162.491C144.343 149.868 150.637 140.114 161.68 133.229C172.833 126.153 187.685 122.615 206.237 122.616C225.672 122.617 244.942 126.156 264.046 133.233C283.039 140.119 300.377 149.874 316.058 162.497C331.739 175.121 344.218 189.466 353.495 205.532C362.108 220.45 365.919 233.551 364.925 244.835C364.153 256.12 360.454 265.969 353.828 274.384C347.424 282.799 337.486 293.127 324.014 305.367L406.172 305.37L434.996 355.289L246.165 355.282L217.342 305.363Z" stroke="#FF750F" stroke-width="1"/>
-                            <path d="M38.197 175.972L15.3385 175.971L-13.6505 125.765L72.1515 125.768L204.673 355.282L141.729 355.279L38.197 175.972Z" stroke="#FF750F" stroke-width="1"/>
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M217.342 305.363L217.673 305.363C224.519 298.478 234.844 289.393 248.647 278.11C262.008 266.826 272.056 257.837 278.792 251.144C285.418 244.259 289.945 236.991 292.374 229.341C294.803 221.691 293.643 213.753 288.895 205.529C283.594 196.349 276.14 188.985 266.532 183.438C257.035 177.7 246.986 174.831 236.385 174.83C226.005 174.83 219.214 177.603 216.012 183.149C212.699 188.504 213.804 195.963 219.325 205.527L154.726 205.524C145.449 189.458 141.473 175.114 142.798 162.491C144.343 149.868 150.637 140.114 161.68 133.229C172.833 126.153 187.685 122.615 206.237 122.616C225.672 122.617 244.942 126.156 264.046 133.233C283.039 140.119 300.377 149.874 316.058 162.497C331.739 175.121 344.218 189.466 353.495 205.532C362.108 220.45 365.919 233.551 364.925 244.835C364.153 256.12 360.454 265.969 353.828 274.384C347.424 282.799 337.486 293.127 324.014 305.367L406.172 305.37L434.996 355.289L246.165 355.282L217.342 305.363Z" stroke="#FF750F" stroke-width="1"/>
-                            <path d="M38.197 175.972L15.3385 175.971L-13.6505 125.765L72.1515 125.768L204.673 355.282L141.729 355.279L38.197 175.972Z" stroke="#FF750F" stroke-width="1"/>
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4">
-                            <path d="M188.467 355.363L188.798 355.363C195.644 348.478 205.969 339.393 219.772 328.11C233.133 316.826 243.181 307.837 249.917 301.144C253.696 297.217 256.792 293.166 259.205 288.991C261.024 285.845 262.455 282.628 263.499 279.341C265.928 271.691 264.768 263.753 260.02 255.529C254.719 246.349 247.265 238.985 237.657 233.438C228.16 227.7 218.111 224.831 207.51 224.83C197.13 224.83 190.339 227.603 187.137 233.149C183.824 238.504 184.929 245.963 190.45 255.527L125.851 255.524C116.574 239.458 112.598 225.114 113.923 212.491C114.615 206.836 116.261 201.756 118.859 197.253C122.061 191.704 126.709 187.03 132.805 183.229C143.958 176.153 158.81 172.615 177.362 172.616C196.797 172.617 216.067 176.156 235.171 183.233C254.164 190.119 271.502 199.874 287.183 212.497C302.864 225.121 315.343 239.466 324.62 255.532C333.233 270.45 337.044 283.551 336.05 294.835C335.46 303.459 333.16 311.245 329.151 318.194C327.915 320.337 326.515 322.4 324.953 324.384C318.549 332.799 308.611 343.127 295.139 355.367L377.297 355.37L406.121 405.289L217.29 405.282L188.467 355.363Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M9.32197 225.972L-13.5365 225.971L-42.5255 175.765L43.2765 175.768L175.798 405.282L112.854 405.279L9.32197 225.972Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M345.247 111.915C329.566 99.2919 312.229 89.5371 293.235 82.6512L235.167 183.228C254.161 190.114 271.498 199.869 287.179 212.492L345.247 111.915Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M382.686 154.964C373.41 138.898 360.931 124.553 345.25 111.93L287.182 212.506C302.863 225.13 315.342 239.475 324.618 255.541L382.686 154.964Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M293.243 82.6472C274.139 75.57 254.869 72.031 235.434 72.0303L177.366 172.607C196.801 172.608 216.071 176.147 235.175 183.224L293.243 82.6472Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M394.118 194.257C395.112 182.973 391.301 169.872 382.688 154.953L324.619 255.53C333.233 270.448 337.044 283.55 336.05 294.834L394.118 194.257Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M235.432 72.0311C216.88 72.0304 202.027 75.5681 190.875 82.6442L132.806 183.221C143.959 176.145 158.812 172.607 177.363 172.608L235.432 72.0311Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M265.59 124.25C276.191 124.251 286.24 127.12 295.737 132.858L237.669 233.435C228.172 227.697 218.123 224.828 207.522 224.827L265.59 124.25Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M295.719 132.859C305.326 138.406 312.78 145.77 318.081 154.95L260.013 255.527C254.712 246.347 247.258 238.983 237.651 233.436L295.719 132.859Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M387.218 217.608C391.227 210.66 393.527 202.874 394.117 194.25L336.049 294.827C335.459 303.451 333.159 311.237 329.15 318.185L387.218 217.608Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M245.211 132.577C248.413 127.03 255.204 124.257 265.584 124.258L207.516 224.835C197.136 224.834 190.345 227.607 187.143 233.154L245.211 132.577Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M318.094 154.945C322.842 163.17 324.002 171.107 321.573 178.757L263.505 279.334C265.934 271.684 264.774 263.746 260.026 255.522L318.094 154.945Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M176.925 96.6737C180.127 91.1249 184.776 86.4503 190.871 82.6499L132.803 183.227C126.708 187.027 122.059 191.702 118.857 197.25L176.925 96.6737Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M387.226 217.606C385.989 219.749 384.59 221.813 383.028 223.797L324.96 324.373C326.522 322.39 327.921 320.326 329.157 318.183L387.226 217.606Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M317.269 188.408C319.087 185.262 320.519 182.045 321.562 178.758L263.494 279.335C262.451 282.622 261.019 285.839 259.201 288.985L317.269 188.408Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M245.208 132.573C241.895 137.928 243 145.387 248.522 154.95L190.454 255.527C184.932 245.964 183.827 238.505 187.14 233.15L245.208 132.573Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M176.93 96.6719C174.331 101.175 172.686 106.255 171.993 111.91L113.925 212.487C114.618 206.831 116.263 201.752 118.862 197.249L176.93 96.6719Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M317.266 188.413C314.853 192.589 311.757 196.64 307.978 200.566L249.91 301.143C253.689 297.216 256.785 293.166 259.198 288.99L317.266 188.413Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M464.198 304.708L435.375 254.789L377.307 355.366L406.13 405.285L464.198 304.708Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M353.209 254.787C366.68 242.548 376.618 232.22 383.023 223.805L324.955 324.382C318.55 332.797 308.612 343.124 295.141 355.364L353.209 254.787Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M435.37 254.787L353.212 254.784L295.144 355.361L377.302 355.364L435.37 254.787Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M183.921 154.947L248.521 154.95L190.453 255.527L125.853 255.524L183.921 154.947Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M171.992 111.914C170.668 124.537 174.643 138.881 183.92 154.947L125.852 255.524C116.575 239.458 112.599 225.114 113.924 212.491L171.992 111.914Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M307.987 200.562C301.251 207.256 291.203 216.244 277.842 227.528L219.774 328.105C233.135 316.821 243.183 307.832 249.919 301.139L307.987 200.562Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M15.5469 75.1797L44.5359 125.386L-13.5321 225.963L-42.5212 175.756L15.5469 75.1797Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M277.836 227.536C264.033 238.82 253.708 247.904 246.862 254.789L188.794 355.366C195.64 348.481 205.965 339.397 219.768 328.113L277.836 227.536Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M275.358 304.706L464.189 304.713L406.12 405.29L217.29 405.283L275.358 304.706Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M44.5279 125.39L67.3864 125.39L9.31834 225.967L-13.5401 225.966L44.5279 125.39Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M101.341 75.1911L233.863 304.705L175.795 405.282L43.2733 175.768L101.341 75.1911ZM15.5431 75.19L-42.525 175.767L43.277 175.77L101.345 75.1932L15.5431 75.19Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M246.866 254.784L246.534 254.784L188.466 355.361L188.798 355.361L246.866 254.784Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M246.539 254.781L275.362 304.701L217.294 405.277L188.471 355.358L246.539 254.781Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M67.3906 125.391L170.923 304.698L112.855 405.275L9.32257 225.967L67.3906 125.391Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                            <path d="M170.921 304.699L233.865 304.701L175.797 405.278L112.853 405.276L170.921 304.699Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="bevel"/>
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4" style="mix-blend-mode:hard-light">
-                            <path d="M246.544 254.79L246.875 254.79C253.722 247.905 264.046 238.82 277.849 227.537C291.21 216.253 301.259 207.264 307.995 200.57C314.62 193.685 319.147 186.418 321.577 178.768C324.006 171.117 322.846 163.18 318.097 154.956C312.796 145.775 305.342 138.412 295.735 132.865C286.238 127.127 276.189 124.258 265.588 124.257C255.208 124.257 248.416 127.03 245.214 132.576C241.902 137.931 243.006 145.39 248.528 154.953L183.928 154.951C174.652 138.885 170.676 124.541 172 111.918C173.546 99.2946 179.84 89.5408 190.882 82.6559C202.035 75.5798 216.887 72.0421 235.439 72.0428C254.874 72.0435 274.144 75.5825 293.248 82.6598C312.242 89.5457 329.579 99.3005 345.261 111.924C360.942 124.548 373.421 138.892 382.697 154.958C391.311 169.877 395.121 182.978 394.128 194.262C393.355 205.546 389.656 215.396 383.031 223.811C376.627 232.226 366.688 242.554 353.217 254.794L435.375 254.797L464.198 304.716L275.367 304.709L246.544 254.79Z" fill="#4B0600"/>
-                            <path d="M246.544 254.79L246.875 254.79C253.722 247.905 264.046 238.82 277.849 227.537C291.21 216.253 301.259 207.264 307.995 200.57C314.62 193.685 319.147 186.418 321.577 178.768C324.006 171.117 322.846 163.18 318.097 154.956C312.796 145.775 305.342 138.412 295.735 132.865C286.238 127.127 276.189 124.258 265.588 124.257C255.208 124.257 248.416 127.03 245.214 132.576C241.902 137.931 243.006 145.39 248.528 154.953L183.928 154.951C174.652 138.885 170.676 124.541 172 111.918C173.546 99.2946 179.84 89.5408 190.882 82.6559C202.035 75.5798 216.887 72.0421 235.439 72.0428C254.874 72.0435 274.144 75.5825 293.248 82.6598C312.242 89.5457 329.579 99.3005 345.261 111.924C360.942 124.548 373.421 138.892 382.697 154.958C391.311 169.877 395.121 182.978 394.128 194.262C393.355 205.546 389.656 215.396 383.031 223.811C376.627 232.226 366.688 242.554 353.217 254.794L435.375 254.797L464.198 304.716L275.367 304.709L246.544 254.79Z" stroke="#FF750F" stroke-width="1" stroke-linejoin="round"/>
-                        </g>
-                        <g class="transition-all delay-300 translate-y-0 opacity-100 duration-750 starting:opacity-0 starting:translate-y-4" style="mix-blend-mode:hard-light">
-                            <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" fill="#4B0600"/>
-                            <path d="M67.41 125.402L44.5515 125.401L15.5625 75.1953L101.364 75.1985L233.886 304.712L170.942 304.71L67.41 125.402Z" stroke="#FF750F" stroke-width="1"/>
-                        </g>
-                    </svg>
-                    <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
-                </div>
-            </main>
+        /* DASHBOARD BUTTON (hidden by default) */
+        .btn-dashboard {
+            display: none;
+            padding: 9px 22px; border-radius: 4px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); font-weight: 700; font-size: .85rem;
+            cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif;
+            border: none; align-items: center; gap: 8px;
+        }
+        .btn-dashboard:hover { opacity: .88; transform: translateY(-1px); }
+        .user-nav-info {
+            display: none;
+            align-items: center; gap: 12px;
+        }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: var(--navy); font-size: .85rem;
+        }
+        .user-name { color: rgba(255,255,255,.85); font-size: .875rem; font-weight: 500; }
+        .btn-logout {
+            padding: 6px 14px; border-radius: 4px;
+            border: 1px solid rgba(255,255,255,.2);
+            color: rgba(255,255,255,.6); font-size: .78rem;
+            background: transparent; cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: all .2s;
+        }
+        .btn-logout:hover { border-color: var(--red); color: #fca5a5; }
+
+        .nav-cta {
+            padding: 10px 24px; border-radius: 4px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); font-weight: 600; font-size: .875rem;
+            text-decoration: none; transition: opacity .2s;
+        }
+        .nav-cta:hover { opacity: .88; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { display: block; width: 24px; height: 2px; background: var(--gold2); transition: .3s; }
+
+        /* ── MODAL OVERLAY ──────────────────── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(5, 12, 25, 0.82);
+            backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity .3s;
+        }
+        .modal-overlay.active {
+            opacity: 1; pointer-events: all;
+        }
+        .modal-box {
+            background: var(--navy2);
+            border: 1px solid rgba(201,151,42,.25);
+            border-radius: 16px;
+            width: 100%; max-width: 460px;
+            margin: 0 16px;
+            padding: 40px;
+            position: relative;
+            transform: translateY(24px) scale(.97);
+            transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+            box-shadow: 0 32px 80px rgba(0,0,0,.5);
+        }
+        .modal-overlay.active .modal-box {
+            transform: translateY(0) scale(1);
+        }
+        .modal-close {
+            position: absolute; top: 18px; right: 20px;
+            background: rgba(255,255,255,.08); border: none;
+            width: 32px; height: 32px; border-radius: 50%;
+            cursor: pointer; color: rgba(255,255,255,.6);
+            font-size: 1rem; display: grid; place-items: center;
+            transition: background .2s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,.15); }
+        .modal-logo {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 28px;
+        }
+        .modal-logo .emblem {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: grid; place-items: center;
+            font-weight: 900; color: var(--navy); font-size: .95rem;
+        }
+        .modal-logo span {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold2); font-size: .95rem;
+        }
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem; font-weight: 900; color: var(--white);
+            margin-bottom: 6px;
+        }
+        .modal-subtitle { font-size: .875rem; color: rgba(255,255,255,.5); margin-bottom: 32px; }
+        .modal-subtitle a { color: var(--gold2); cursor: pointer; text-decoration: none; }
+        .modal-subtitle a:hover { text-decoration: underline; }
+
+        /* FORM ELEMENTS */
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; font-size: .8rem; font-weight: 600;
+            color: rgba(255,255,255,.65); margin-bottom: 8px;
+            letter-spacing: .06em; text-transform: uppercase;
+        }
+        .form-control {
+            width: 100%; padding: 12px 16px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 8px; color: var(--white);
+            font-size: .95rem; font-family: 'DM Sans', sans-serif;
+            transition: border-color .2s, background .2s;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--gold2);
+            background: rgba(255,255,255,.09);
+        }
+        .form-control::placeholder { color: rgba(255,255,255,.3); }
+        .form-control.error { border-color: var(--red); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .btn-form-submit {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); font-weight: 700; font-size: 1rem;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform .2s, box-shadow .2s;
+            margin-top: 8px;
+            box-shadow: 0 8px 24px rgba(201,151,42,.3);
+        }
+        .btn-form-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(201,151,42,.4); }
+        .btn-form-submit:active { transform: translateY(0); }
+
+        .form-divider {
+            display: flex; align-items: center; gap: 14px;
+            margin: 22px 0;
+        }
+        .form-divider::before, .form-divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(255,255,255,.1);
+        }
+        .form-divider span { font-size: .78rem; color: rgba(255,255,255,.35); }
+
+        .form-error {
+            font-size: .8rem; color: #fca5a5;
+            margin-top: 6px; display: none;
+        }
+        .form-error.show { display: block; }
+
+        .alert-success {
+            background: rgba(22,163,74,.15);
+            border: 1px solid rgba(22,163,74,.3);
+            border-radius: 8px; padding: 12px 16px;
+            font-size: .875rem; color: #86efac;
+            margin-bottom: 18px; display: none;
+        }
+        .alert-success.show { display: block; }
+        .alert-error {
+            background: rgba(220,38,38,.12);
+            border: 1px solid rgba(220,38,38,.25);
+            border-radius: 8px; padding: 12px 16px;
+            font-size: .875rem; color: #fca5a5;
+            margin-bottom: 18px; display: none;
+        }
+        .alert-error.show { display: block; }
+
+        /* ── DASHBOARD PANEL ────────────────── */
+        .dashboard-overlay {
+            position: fixed; inset: 0; z-index: 1500;
+            background: rgba(5,12,25,.88);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity .3s;
+        }
+        .dashboard-overlay.active {
+            opacity: 1; pointer-events: all;
+        }
+        .dashboard-panel {
+            background: var(--navy);
+            border: 1px solid rgba(201,151,42,.2);
+            border-radius: 20px;
+            width: 100%; max-width: 860px;
+            margin: 0 16px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(32px);
+            transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+            box-shadow: 0 40px 100px rgba(0,0,0,.6);
+        }
+        .dashboard-overlay.active .dashboard-panel {
+            transform: translateY(0);
+        }
+        .dash-header {
+            padding: 32px 40px;
+            background: linear-gradient(135deg, var(--navy2), rgba(201,151,42,.08));
+            border-bottom: 1px solid rgba(201,151,42,.15);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .dash-user {
+            display: flex; align-items: center; gap: 16px;
+        }
+        .dash-avatar {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: var(--navy); font-size: 1.3rem;
+            box-shadow: 0 0 0 4px rgba(201,151,42,.2);
+        }
+        .dash-user-info .dash-greeting { font-size: .8rem; color: rgba(255,255,255,.5); }
+        .dash-user-info .dash-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem; color: var(--white); font-weight: 700;
+        }
+        .btn-close-dash {
+            background: rgba(255,255,255,.08); border: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; color: rgba(255,255,255,.6);
+            font-size: 1.1rem; display: grid; place-items: center;
+            transition: background .2s;
+        }
+        .btn-close-dash:hover { background: rgba(255,255,255,.15); }
+
+        .dash-body { padding: 32px 40px 40px; }
+
+        .dash-status-card {
+            background: rgba(201,151,42,.08);
+            border: 1px solid rgba(201,151,42,.2);
+            border-radius: 12px; padding: 20px 24px;
+            margin-bottom: 28px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .status-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0;
+        }
+        .status-info .status-label { font-size: .75rem; color: rgba(255,255,255,.5); letter-spacing: .08em; text-transform: uppercase; }
+        .status-info .status-value { font-size: 1rem; font-weight: 600; color: var(--white); margin-top: 2px; }
+        .status-badge {
+            margin-left: auto;
+            padding: 6px 14px; border-radius: 100px;
+            background: rgba(22,163,74,.15); border: 1px solid rgba(22,163,74,.3);
+            color: #86efac; font-size: .75rem; font-weight: 600;
+            letter-spacing: .06em; text-transform: uppercase;
+        }
+        .status-badge.pending {
+            background: rgba(234,179,8,.15); border-color: rgba(234,179,8,.3);
+            color: #fde047;
+        }
+
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+        .dash-card {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 10px; padding: 20px;
+        }
+        .dash-card-title {
+            font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
+        }
+        .dash-card-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 700; color: var(--white);
+        }
+        .dash-card-sub { font-size: .82rem; color: rgba(255,255,255,.45); margin-top: 4px; }
+
+        .dash-timeline {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 10px; padding: 24px;
+            margin-bottom: 28px;
+        }
+        .dash-timeline-title {
+            font-size: .8rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
+        }
+        .dash-tl { display: flex; flex-direction: column; gap: 14px; }
+        .dash-tl-item {
+            display: flex; gap: 14px; align-items: center;
+        }
+        .dash-tl-dot {
+            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+        }
+        .dash-tl-dot.done { background: var(--gold2); }
+        .dash-tl-dot.active {
+            background: var(--gold2);
+            box-shadow: 0 0 0 3px rgba(232,184,75,.25);
+        }
+        .dash-tl-dot.upcoming { background: rgba(255,255,255,.2); }
+        .dash-tl-text { font-size: .875rem; color: rgba(255,255,255,.7); flex: 1; }
+        .dash-tl-date { font-size: .78rem; color: rgba(255,255,255,.35); }
+        .dash-tl-text.active-step { color: var(--white); font-weight: 600; }
+
+        .dash-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+        .btn-dash-action {
+            padding: 11px 24px; border-radius: 8px;
+            font-size: .875rem; font-weight: 600;
+            cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: all .2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-dash-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); border: none;
+        }
+        .btn-dash-primary:hover { opacity: .88; transform: translateY(-1px); }
+        .btn-dash-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.2);
+            color: rgba(255,255,255,.7);
+        }
+        .btn-dash-outline:hover { border-color: var(--gold2); color: var(--gold2); }
+
+        /* ── HERO ───────────────────────────── */
+        #hero {
+            position: relative; min-height: 100vh;
+            display: flex; align-items: center;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute; inset: 0; z-index: 0;
+            background:
+                linear-gradient(to bottom, rgba(10,22,40,.78) 0%, rgba(10,22,40,.55) 50%, rgba(10,22,40,.85) 100%),
+                url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80') center/cover no-repeat;
+        }
+        .hero-pattern {
+            position: absolute; inset: 0; z-index: 1; opacity: .06;
+            background-image: repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%);
+            background-size: 20px 20px;
+        }
+        .hero-content {
+            position: relative; z-index: 2;
+            max-width: 780px; padding: 0 5vw; padding-top: 80px;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(201,151,42,.18); border: 1px solid rgba(201,151,42,.4);
+            padding: 6px 16px; border-radius: 100px;
+            font-size: .78rem; font-weight: 600; color: var(--gold2);
+            letter-spacing: .1em; text-transform: uppercase;
+            margin-bottom: 28px;
+            animation: fadeUp .7s both;
+        }
+        .hero-badge::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%;
+            background: var(--gold2); animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+        h1.hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.8rem, 6vw, 5.2rem);
+            line-height: 1.08; color: var(--white); font-weight: 900;
+            margin-bottom: 24px;
+            animation: fadeUp .7s .1s both;
+        }
+        h1.hero-title em {
+            font-style: italic; color: var(--gold2);
+            display: block;
+        }
+        .hero-sub {
+            font-size: 1.1rem; color: rgba(255,255,255,.78);
+            line-height: 1.7; max-width: 540px; margin-bottom: 44px;
+            font-weight: 300;
+            animation: fadeUp .7s .2s both;
+        }
+        .hero-actions {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            animation: fadeUp .7s .3s both;
+        }
+        .btn-primary {
+            padding: 14px 36px; border-radius: 4px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            color: var(--navy); font-weight: 700; font-size: .95rem;
+            text-decoration: none; transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 8px 24px rgba(201,151,42,.4);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(201,151,42,.5); }
+        .btn-outline {
+            padding: 14px 36px; border-radius: 4px;
+            border: 1px solid rgba(255,255,255,.45);
+            color: var(--white); font-weight: 500; font-size: .95rem;
+            text-decoration: none; transition: border-color .2s, background .2s;
+        }
+        .btn-outline:hover { border-color: var(--gold2); background: rgba(201,151,42,.1); }
+
+        .hero-stats {
+            position: absolute; bottom: 48px; right: 5vw; z-index: 2;
+            display: flex; gap: 32px;
+            animation: fadeUp .7s .4s both;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px 28px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 8px;
+            backdrop-filter: blur(8px);
+        }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; font-weight: 900; color: var(--gold2);
+            display: block;
+        }
+        .stat-label { font-size: .75rem; color: rgba(255,255,255,.6); letter-spacing: .08em; text-transform: uppercase; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── COUNTDOWN ──────────────────────── */
+        #countdown {
+            background: linear-gradient(135deg, var(--navy), var(--navy2));
+            padding: 48px 5vw;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 24px;
+        }
+        .countdown-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; color: var(--white);
+        }
+        .countdown-label span { color: var(--gold2); }
+        .countdown-timer { display: flex; gap: 16px; }
+        .time-box {
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(201,151,42,.25);
+            border-radius: 8px; padding: 16px 20px; text-align: center; min-width: 72px;
+        }
+        .time-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; font-weight: 700; color: var(--gold2); display: block;
+        }
+        .time-unit { font-size: .68rem; color: rgba(255,255,255,.5); letter-spacing: .1em; text-transform: uppercase; }
+        .countdown-cta .btn-primary { font-size: .85rem; padding: 12px 28px; }
+
+        /* ── SECTION BASE ───────────────────── */
+        section { padding: 100px 5vw; }
+        .section-tag {
+            display: inline-block;
+            font-size: .72rem; font-weight: 700; letter-spacing: .14em;
+            text-transform: uppercase; color: var(--gold);
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.9rem, 4vw, 3rem);
+            line-height: 1.15; color: var(--navy); font-weight: 900;
+            margin-bottom: 16px;
+        }
+        .section-title.light { color: var(--white); }
+        .section-sub {
+            font-size: 1rem; color: var(--gray); line-height: 1.75;
+            max-width: 580px;
+        }
+        .section-sub.light { color: rgba(255,255,255,.65); }
+        .divider {
+            width: 56px; height: 3px;
+            background: linear-gradient(to right, var(--gold), var(--gold2));
+            margin: 20px 0 36px;
+        }
+
+        /* ── VISI MISI ──────────────────────── */
+        #visi-misi {
+            background: var(--white);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+            padding: 0;
+        }
+        .vm-block {
+            padding: 80px 6vw;
+            position: relative; overflow: hidden;
+        }
+        .vm-block.visi { background: var(--navy); }
+        .vm-block.misi { background: var(--cream); }
+        .vm-block.visi::before {
+            content: '"'; position: absolute; top: -20px; right: 24px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18rem; line-height: 1; color: rgba(201,151,42,.06);
+            pointer-events: none;
+        }
+        .vm-icon {
+            width: 52px; height: 52px; border-radius: 12px; margin-bottom: 28px;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: grid; place-items: center; font-size: 1.5rem;
+        }
+        .vm-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem; font-style: italic; line-height: 1.6;
+            color: var(--white); margin-bottom: 28px;
+        }
+        .vm-block.misi .vm-quote { color: var(--navy); }
+        .misi-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+        .misi-list li {
+            display: flex; gap: 14px; align-items: flex-start;
+            font-size: .93rem; line-height: 1.65; color: var(--navy);
+        }
+        .misi-list li::before {
+            content: '';
+            min-width: 20px; height: 20px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            margin-top: 2px;
+            display: grid; place-items: center;
+            font-size: .6rem; color: var(--navy); font-weight: 700;
+        }
+
+        /* ── FASILITAS ──────────────────────── */
+        #fasilitas { background: var(--cream); }
+        .fasilitas-header { max-width: 600px; margin-bottom: 60px; }
+        .fasilitas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+        }
+        .fasilitas-card {
+            background: var(--white);
+            border-radius: 12px; padding: 32px 28px;
+            border: 1px solid rgba(10,22,40,.06);
+            transition: transform .3s, box-shadow .3s;
+            position: relative; overflow: hidden;
+        }
+        .fasilitas-card::after {
+            content: ''; position: absolute;
+            bottom: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(to right, var(--gold), var(--gold2));
+            transform: scaleX(0); transform-origin: left;
+            transition: transform .3s;
+        }
+        .fasilitas-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(10,22,40,.1); }
+        .fasilitas-card:hover::after { transform: scaleX(1); }
+        .fas-icon { font-size: 2rem; margin-bottom: 18px; display: block; }
+        .fas-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 10px;
+        }
+        .fas-desc { font-size: .875rem; color: var(--gray); line-height: 1.65; }
+
+        /* ── PPDB INFO ──────────────────────── */
+        #ppdb {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+            position: relative; overflow: hidden;
+        }
+        #ppdb::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(circle at 70% 50%, rgba(201,151,42,.12) 0%, transparent 60%);
+        }
+        .ppdb-inner { position: relative; z-index: 1; }
+        .ppdb-header { margin-bottom: 60px; }
+        .ppdb-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 60px; align-items: start; }
+
+        .ppdb-timeline { display: flex; flex-direction: column; gap: 0; }
+        .tl-item {
+            display: flex; gap: 24px; padding-bottom: 36px;
+            position: relative;
+        }
+        .tl-item:not(:last-child)::before {
+            content: ''; position: absolute;
+            left: 19px; top: 40px; bottom: 0;
+            width: 2px; background: rgba(201,151,42,.2);
+        }
+        .tl-dot {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--gold), var(--gold2));
+            display: grid; place-items: center;
+            font-size: .8rem; font-weight: 700; color: var(--navy);
+        }
+        .tl-body {}
+        .tl-date { font-size: .75rem; color: var(--gold); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+        .tl-title { font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+        .tl-desc { font-size: .85rem; color: rgba(255,255,255,.55); line-height: 1.6; }
+
+        .ppdb-info-cards { display: flex; flex-direction: column; gap: 20px; }
+        .info-card {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(201,151,42,.2);
+            border-radius: 10px; padding: 24px;
+        }
+        .info-card-title {
+            font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+            color: var(--gold); margin-bottom: 12px; font-weight: 600;
+        }
+        .info-card-body { font-size: .9rem; color: rgba(255,255,255,.75); line-height: 1.65; }
+        .req-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .req-list li {
+            display: flex; gap: 10px; align-items: flex-start;
+            font-size: .875rem; color: rgba(255,255,255,.7);
+        }
+        .req-list li::before { content: '✓'; color: var(--gold2); font-weight: 700; flex-shrink: 0; }
+        .biaya-table { width: 100%; border-collapse: collapse; }
+        .biaya-table td {
+            padding: 8px 0; font-size: .875rem; color: rgba(255,255,255,.7);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .biaya-table td:last-child { text-align: right; color: var(--gold2); font-weight: 600; }
+
+        .ppdb-actions { margin-top: 48px; display: flex; gap: 16px; flex-wrap: wrap; }
+
+        /* ── GALLERY ────────────────────────── */
+        #galeri { background: var(--white); }
+        .gallery-header { margin-bottom: 48px; }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 200px 200px;
+            gap: 12px;
+        }
+        .gallery-item {
+            border-radius: 8px; overflow: hidden;
+            position: relative; cursor: pointer;
+        }
+        .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+        .gallery-item:nth-child(4) { grid-column: span 2; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+        .gallery-item:hover img { transform: scale(1.07); }
+        .gallery-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(10,22,40,.7) 0%, transparent 60%);
+            opacity: 0; transition: opacity .3s;
+            display: flex; align-items: flex-end; padding: 20px;
+        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-caption { font-size: .85rem; color: var(--white); font-weight: 500; }
+
+        /* ── MAP ────────────────────────────── */
+        #lokasi { background: var(--cream); padding-bottom: 60px; }
+        .map-container { display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; align-items: start; }
+        .map-info-cards { display: flex; flex-direction: column; gap: 20px; }
+        .loc-card {
+            background: var(--white);
+            border-radius: 10px; padding: 24px 24px 24px 20px;
+            border-left: 4px solid var(--gold);
+            box-shadow: 0 2px 12px rgba(10,22,40,.06);
+        }
+        .loc-card-label { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; font-weight: 600; }
+        .loc-card-value { font-size: .95rem; color: var(--navy); line-height: 1.6; font-weight: 500; }
+        .map-embed { border-radius: 12px; overflow: hidden; box-shadow: 0 16px 40px rgba(10,22,40,.12); height: 400px; }
+        .map-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+        /* ── FOOTER ─────────────────────────── */
+        footer { background: var(--navy); padding: 64px 5vw 32px; }
+        .footer-top {
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px; margin-bottom: 48px;
+        }
+        .footer-brand .nav-brand { margin-bottom: 16px; }
+        .footer-tagline { font-size: .875rem; color: rgba(255,255,255,.5); line-height: 1.7; }
+        .footer-col h4 {
+            font-size: .8rem; font-weight: 700; letter-spacing: .12em;
+            text-transform: uppercase; color: var(--gold2); margin-bottom: 20px;
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .footer-col ul li a {
+            font-size: .875rem; color: rgba(255,255,255,.55);
+            text-decoration: none; transition: color .2s;
+        }
+        .footer-col ul li a:hover { color: var(--gold2); }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,.08);
+            padding-top: 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 8px;
+        }
+        .footer-copy { font-size: .8rem; color: rgba(255,255,255,.35); }
+
+        /* ── RESPONSIVE ─────────────────────── */
+        @media (max-width: 900px) {
+            #visi-misi { grid-template-columns: 1fr; }
+            .ppdb-grid { grid-template-columns: 1fr; }
+            .map-container { grid-template-columns: 1fr; }
+            .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+            .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 1; height: 220px; }
+            .gallery-item:nth-child(4) { grid-column: span 1; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+            .hero-stats { position: static; flex-wrap: wrap; margin-top: 40px; }
+            .dash-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .countdown-timer { gap: 8px; }
+            .time-box { padding: 12px 14px; min-width: 58px; }
+            .gallery-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+            .gallery-item:nth-child(1),
+            .gallery-item:nth-child(4) { grid-column: span 1; }
+            .gallery-item { height: 200px; }
+            .footer-top { grid-template-columns: 1fr; }
+            .dash-header { padding: 24px; }
+            .dash-body { padding: 24px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        /* ── SCROLL REVEAL ──────────────────── */
+        .reveal {
+            opacity: 0; transform: translateY(32px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* Scrollbar for dashboard */
+        .dashboard-panel::-webkit-scrollbar { width: 6px; }
+        .dashboard-panel::-webkit-scrollbar-track { background: transparent; }
+        .dashboard-panel::-webkit-scrollbar-thumb { background: rgba(201,151,42,.3); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- NAVBAR -->
+<!-- ══════════════════════════════════════════ -->
+<nav>
+    <div class="nav-brand">
+        <div class="emblem">N</div>
+        <span>SMA Muhammadiyah 1 Purwokerto</span>
+    </div>
+    <ul class="nav-links">
+        <li><a href="#visi-misi">Visi & Misi</a></li>
+        <li><a href="#fasilitas">Fasilitas</a></li>
+        <li><a href="#ppdb">PPDB</a></li>
+        <li><a href="#galeri">Galeri</a></li>
+        <li><a href="#lokasi">Lokasi</a></li>
+    </ul>
+
+    <!-- Auth Buttons (shown when NOT logged in) -->
+    <div class="nav-auth" id="nav-auth-buttons">
+        <a href="/login" class="btn-nav-login">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Masuk
+        </a>
+        <a href="/register" class="btn-nav-register">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            Daftar
+        </a>
+    </div>
+
+    <!-- User info + Dashboard (shown when logged in) -->
+    <div class="user-nav-info" id="nav-user-info">
+        <div class="user-avatar" id="nav-avatar">–</div>
+        <span class="user-name" id="nav-username">–</span>
+        <button class="btn-dashboard" id="btn-dashboard-nav" onclick="openDashboard()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+        </button>
+        <button class="btn-logout" onclick="doLogout()">Keluar</button>
+    </div>
+
+    <div class="hamburger">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- LOGIN MODAL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-login">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('login')">✕</button>
+        <div class="modal-logo">
+            <div class="emblem">N</div>
+            <span>SMA Muhammadiyah 1 Purwokerto</span>
+        </div>
+        <h2 class="modal-title">Selamat Datang</h2>
+        <p class="modal-subtitle">Belum punya akun? <a onclick="switchModal('login','register')">Daftar sekarang →</a></p>
+
+        <div class="alert-success" id="login-success">Login berhasil! Mengalihkan…</div>
+        <div class="alert-error" id="login-error">Email atau password salah. Coba lagi.</div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" id="login-email" placeholder="nama@email.com">
+            <div class="form-error" id="err-login-email">Email tidak valid.</div>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" id="login-password" placeholder="••••••••">
+            <div class="form-error" id="err-login-pass">Password minimal 6 karakter.</div>
         </div>
 
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
-    </body>
+        <button class="btn-form-submit" onclick="doLogin()">Masuk ke Akun</button>
+
+        <div class="form-divider"><span>atau masuk sebagai demo</span></div>
+        <button class="btn-form-submit" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);box-shadow:none;" onclick="demoLogin()">
+            🎓 Demo Login (Calon Siswa)
+        </button>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- REGISTER MODAL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-register">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('register')">✕</button>
+        <div class="modal-logo">
+            <div class="emblem">N</div>
+            <span>SMA Muhammadiyah 1 Purwokerto</span>
+        </div>
+        <h2 class="modal-title">Buat Akun</h2>
+        <p class="modal-subtitle">Sudah punya akun? <a onclick="switchModal('register','login')">Masuk di sini →</a></p>
+
+        <div class="alert-success" id="register-success">Akun berhasil dibuat! Silakan masuk.</div>
+        <div class="alert-error" id="register-error">Terjadi kesalahan. Periksa data Anda.</div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nama Depan</label>
+                <input type="text" class="form-control" id="reg-firstname" placeholder="Budi">
+                <div class="form-error" id="err-reg-fname">Wajib diisi.</div>
+            </div>
+            <div class="form-group">
+                <label>Nama Belakang</label>
+                <input type="text" class="form-control" id="reg-lastname" placeholder="Santoso">
+                <div class="form-error" id="err-reg-lname">Wajib diisi.</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" id="reg-email" placeholder="nama@email.com">
+            <div class="form-error" id="err-reg-email">Email tidak valid.</div>
+        </div>
+        <div class="form-group">
+            <label>Nomor HP / WhatsApp</label>
+            <input type="tel" class="form-control" id="reg-phone" placeholder="08xxxxxxxxxx">
+            <div class="form-error" id="err-reg-phone">Nomor tidak valid.</div>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" id="reg-password" placeholder="Minimal 6 karakter">
+            <div class="form-error" id="err-reg-pass">Password minimal 6 karakter.</div>
+        </div>
+        <div class="form-group">
+            <label>Konfirmasi Password</label>
+            <input type="password" class="form-control" id="reg-confirm" placeholder="Ulangi password">
+            <div class="form-error" id="err-reg-confirm">Password tidak cocok.</div>
+        </div>
+
+        <button class="btn-form-submit" onclick="doRegister()">Buat Akun Sekarang</button>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- DASHBOARD PANEL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="dashboard-overlay" id="dashboard-overlay">
+    <div class="dashboard-panel">
+        <div class="dash-header">
+            <div class="dash-user">
+                <div class="dash-avatar" id="dash-avatar">B</div>
+                <div class="dash-user-info">
+                    <div class="dash-greeting">Selamat datang kembali 👋</div>
+                    <div class="dash-name" id="dash-fullname">Budi Santoso</div>
+                </div>
+            </div>
+            <button class="btn-close-dash" onclick="closeDashboard()">✕</button>
+        </div>
+
+        <div class="dash-body">
+            <div class="dash-status-card">
+                <div class="status-icon">📋</div>
+                <div class="status-info">
+                    <div class="status-label">Status Pendaftaran</div>
+                    <div class="status-value">PPDB SMA Muhammadiyah 1 Purwokerto – T.A. 2025/2026</div>
+                </div>
+                <span class="status-badge pending">Belum Lengkap</span>
+            </div>
+
+            <div class="dash-grid">
+                <div class="dash-card">
+                    <div class="dash-card-title">📅 Waktu Tersisa</div>
+                    <div class="dash-card-value" id="dash-countdown">–</div>
+                    <div class="dash-card-sub">Hingga penutupan pendaftaran</div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-title">📁 Berkas Terunggah</div>
+                    <div class="dash-card-value">0 / 6</div>
+                    <div class="dash-card-sub">Lengkapi segera untuk seleksi</div>
+                </div>
+            </div>
+
+            <div class="dash-timeline">
+                <div class="dash-timeline-title">📌 Progress Tahapan PPDB</div>
+                <div class="dash-tl">
+                    <div class="dash-tl-item">
+                        <div class="dash-tl-dot done"></div>
+                        <div class="dash-tl-text">Pembuatan akun pendaftaran</div>
+                        <div class="dash-tl-date">✔ Selesai</div>
+                    </div>
+                    <div class="dash-tl-item">
+                        <div class="dash-tl-dot active"></div>
+                        <div class="dash-tl-text active-step">Pengisian formulir & upload berkas</div>
+                        <div class="dash-tl-date">Aktif sekarang</div>
+                    </div>
+                    <div class="dash-tl-item">
+                        <div class="dash-tl-dot upcoming"></div>
+                        <div class="dash-tl-text">Tes seleksi & wawancara</div>
+                        <div class="dash-tl-date">1–10 Jul 2025</div>
+                    </div>
+                    <div class="dash-tl-item">
+                        <div class="dash-tl-dot upcoming"></div>
+                        <div class="dash-tl-text">Pengumuman hasil seleksi</div>
+                        <div class="dash-tl-date">20 Jul 2025</div>
+                    </div>
+                    <div class="dash-tl-item">
+                        <div class="dash-tl-dot upcoming"></div>
+                        <div class="dash-tl-text">Daftar ulang & orientasi siswa baru</div>
+                        <div class="dash-tl-date">21–30 Jul 2025</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-actions">
+                <button class="btn-dash-action btn-dash-primary" onclick="closeDashboard()">
+                    📝 Lengkapi Formulir
+                </button>
+                <button class="btn-dash-action btn-dash-outline" onclick="closeDashboard()">
+                    📂 Upload Berkas
+                </button>
+                <button class="btn-dash-action btn-dash-outline" onclick="closeDashboard()">
+                    📞 Hubungi Panitia
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ══════════════════════════════════════════ -->
+<section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-pattern"></div>
+    <div class="hero-content">
+        <div class="hero-badge">PPDB Tahun Ajaran 2025/2026</div>
+        <h1 class="hero-title">
+            Wujudkan Mimpi <em>Bersama Kami</em>
+        </h1>
+        <p class="hero-sub">
+            SMA Muhammadiyah 1 Purwokerto membuka penerimaan murid baru untuk tahun ajaran 2025/2026.
+            Bergabunglah dengan ribuan alumni berprestasi yang telah mengukir jejak di tingkat nasional dan internasional.
+        </p>
+        <div class="hero-actions">
+            <a href="#ppdb" class="btn-primary">Info Pendaftaran</a>
+            <a href="#visi-misi" class="btn-outline">Kenali Sekolah Kami</a>
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card">
+            <span class="stat-num">3.200+</span>
+            <span class="stat-label">Alumni Berprestasi</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num">98%</span>
+            <span class="stat-label">Lulus PTN</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num">40+</span>
+            <span class="stat-label">Ekstrakurikuler</span>
+        </div>
+    </div>
+</section>
+
+{{-- <!-- COUNTDOWN -->
+<div id="countdown">
+    <div class="countdown-label">Pendaftaran ditutup pada <span>30 Juli 2025</span></div>
+    <div class="countdown-timer">
+        <div class="time-box"><span class="time-num" id="cd-days">47</span><span class="time-unit">Hari</span></div>
+        <div class="time-box"><span class="time-num" id="cd-hours">12</span><span class="time-unit">Jam</span></div>
+        <div class="time-box"><span class="time-num" id="cd-mins">35</span><span class="time-unit">Menit</span></div>
+        <div class="time-box"><span class="time-num" id="cd-secs">08</span><span class="time-unit">Detik</span></div>
+    </div>
+    <div class="countdown-cta">
+        
+    </div>
+</div> --}}
+
+<!-- VISI MISI -->
+<section id="visi-misi">
+    <div class="vm-block visi reveal">
+        
+        <div class="section-tag" style="color:var(--gold2)">Visi Sekolah</div>
+        <div class="divider"></div>
+        <p class="vm-quote">
+            " Terbentuknya Pribadi Islami yang Unggul Dalam IMTAQ, Berkemajuan dan Memiliki Life Skill"
+        </p>
+    </div>
+    <div class="vm-block misi reveal">
+        
+        <div class="section-tag">Misi Sekolah</div>
+        <div class="divider"></div>
+        <ul class="misi-list">
+            <li>Meningkatkan Iman dan Takwa kepada siswa SMA Muhammadiyah 1 Purwokerto.</li>
+            <li>Meningkatan kepedulian terhadap misi da’wah persyarikatan dengan mendorong, memberdayakan warga sekolah untuk berperan aktif dalam kegiatan persyarikatan baik secara personal maupun lembagaMembeikan pembekalan kepada siswa untuk hafal Al Qur’an Minimal juz 30.</li>
+            <li>Melaksanakan kegiatan belajar mengajar yang kindusif, efektif dan efisien untuk meningkatkan perolehan Nilai UN dan US.</li>
+            <li>Meningkatkan daya saing siswauntuk dapat masuk PTN dan PTS Favorit serta berprestasi di bidang Akademi maupun Non Akademi.</li>
+            <li>Memberikan pembekalan kepada siswa dalam bidang Life Skill.</li>
+            <li>Mempersiapkan siswa menjadi kader umat Islam, Bangsa dan Persyarikatan.</li>
+        </ul>
+    </div>
+</section>
+
+<!-- FASILITAS -->
+<section id="fasilitas">
+    <div class="fasilitas-header reveal">
+        <div class="section-tag">Fasilitas Kami</div>
+        <h2 class="section-title">Lingkungan Belajar<br>Berkelas Dunia</h2>
+        <div class="divider"></div>
+        <p class="section-sub">Kami menyediakan fasilitas modern dan lengkap untuk mendukung proses belajar-mengajar yang optimal serta pengembangan bakat dan minat siswa.</p>
+    </div>
+    <div class="fasilitas-grid">
+        <div class="fasilitas-card reveal"><span class="fas-icon">🔬</span><div class="fas-name">Lab Sains Terintegrasi</div><p class="fas-desc">Laboratorium Fisika, Kimia, dan Biologi berteknologi mutakhir dengan peralatan sesuai standar internasional.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">💻</span><div class="fas-name">Lab Komputer & AI</div><p class="fas-desc">200+ unit komputer terbaru dengan koneksi internet fiber optik 1 Gbps dan perangkat lunak berlisensi penuh.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">📚</span><div class="fas-name">Perpustakaan Digital</div><p class="fas-desc">Koleksi lebih dari 15.000 judul buku fisik dan akses ke ribuan jurnal internasional secara daring.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">🏟️</span><div class="fas-name">Lapangan & Stadion</div><p class="fas-desc">Lapangan futsal, basket, voli, dan lintasan atletik berstandar nasional di lingkungan sekolah.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">🎭</span><div class="fas-name">Aula & Teater</div><p class="fas-desc">Ruang pertunjukan berkapasitas 500 orang dengan sistem tata suara dan pencahayaan profesional.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">🍽️</span><div class="fas-name">Kantin Sehat</div><p class="fas-desc">Kantin higienis dengan menu bergizi dan terjangkau, dikelola secara profesional oleh mitra bersertifikat.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">🏥</span><div class="fas-name">Klinik Sekolah</div><p class="fas-desc">Unit kesehatan sekolah dengan tenaga medis berpengalaman, siap melayani kebutuhan kesehatan siswa setiap hari.</p></div>
+        <div class="fasilitas-card reveal"><span class="fas-icon">🚌</span><div class="fas-name">Layanan Antar-Jemput</div><p class="fas-desc">Armada bus sekolah ber-AC yang melayani berbagai rute di dalam kota dengan sistem GPS real-time.</p></div>
+    </div>
+</section>
+
+<!-- PPDB INFO -->
+<section id="ppdb">
+    <div class="ppdb-inner">
+        <div class="ppdb-header reveal">
+            <div class="section-tag" style="color:var(--gold2)">Penerimaan Murid Baru</div>
+            <h2 class="section-title light">Informasi PPDB<br>2025/2026</h2>
+            <div class="divider"></div>
+            <p class="section-sub light">Ikuti alur pendaftaran berikut untuk bergabung bersama keluarga besar SMA Muhammadiyah 1 Purwokerto. Proses seleksi transparan dan berkeadilan.</p>
+        </div>
+        <div class="ppdb-grid">
+            <div class="reveal">
+                <h3 style="font-family:'Playfair Display',serif;color:var(--white);font-size:1.25rem;margin-bottom:32px;">Jadwal Pelaksanaan</h3>
+                <div class="ppdb-timeline">
+                    <div class="tl-item"><div class="tl-dot">1</div><div class="tl-body"><div class="tl-date">1 – 15 Juni 2025</div><div class="tl-title">Pembukaan Pendaftaran Online</div><div class="tl-desc">Registrasi akun dan pengisian formulir pendaftaran melalui portal resmi PPDB.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot">2</div><div class="tl-body"><div class="tl-date">16 – 25 Juni 2025</div><div class="tl-title">Pengumpulan Berkas</div><div class="tl-desc">Unggah dokumen persyaratan yang diperlukan melalui sistem pendaftaran online.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot">3</div><div class="tl-body"><div class="tl-date">1 – 10 Juli 2025</div><div class="tl-title">Tes Seleksi & Wawancara</div><div class="tl-desc">Tes tertulis (Matematika, IPA, IPS, B.Indonesia) dan sesi wawancara dengan panitia.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot">4</div><div class="tl-body"><div class="tl-date">20 Juli 2025</div><div class="tl-title">Pengumuman Hasil Seleksi</div><div class="tl-desc">Hasil seleksi diumumkan melalui portal resmi dan akan dikirim via email terdaftar.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot">5</div><div class="tl-body"><div class="tl-date">21 – 30 Juli 2025</div><div class="tl-title">Daftar Ulang & Orientasi</div><div class="tl-desc">Konfirmasi kehadiran, pembayaran, dan persiapan masa orientasi siswa baru.</div></div></div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:20px;" class="reveal">
+                <div class="info-card">
+                    <div class="info-card-title">📋 Persyaratan Dokumen</div>
+                    <ul class="req-list">
+                        <li>Fotokopi Ijazah / Surat Keterangan Lulus SMP</li>
+                        <li>Fotokopi SKHUN (Surat Keterangan Hasil Ujian Nasional)</li>
+                        <li>Fotokopi Kartu Keluarga (KK)</li>
+                        <li>Fotokopi Akta Kelahiran</li>
+                        <li>Pas foto berwarna 3×4 (4 lembar)</li>
+                        <li>Sertifikat prestasi akademik/non-akademik (jika ada)</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-title">💰 Biaya Pendidikan</div>
+                    <table class="biaya-table">
+                        <tr><td>Biaya Pendaftaran</td><td>Rp 150.000</td></tr>
+                        <tr><td>Uang Pangkal</td><td>Rp 5.000.000</td></tr>
+                        <tr><td>SPP per Bulan</td><td>Rp 750.000</td></tr>
+                        <tr><td>Seragam & Atribut</td><td>Rp 800.000</td></tr>
+                        <tr><td>Kegiatan MPLS</td><td>Rp 300.000</td></tr>
+                    </table>
+                    <p style="font-size:.78rem;color:rgba(255,255,255,.4);margin-top:12px;">*Tersedia beasiswa bagi siswa berprestasi dan kurang mampu</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-title">📞 Kontak Panitia PPDB</div>
+                    <div class="info-card-body">
+                        📱  (0281) 633373<br>
+                        🕐 Senin–Sabtu, 08.00–12.30 WIB
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ppdb-actions reveal">
+            <a href="/register" class="btn-primary">Daftar Online Sekarang</a>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY -->
+<section id="galeri">
+    <div class="gallery-header reveal">
+        <div class="section-tag">Galeri Sekolah</div>
+        <h2 class="section-title">Momen Berharga di<br>Nusantara Jaya</h2>
+        <div class="divider"></div>
+    </div>
+    <div class="gallery-grid reveal">
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80" alt="Upacara"><div class="gallery-overlay"><span class="gallery-caption">Upacara Hari Kemerdekaan</span></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=600&q=80" alt="Laboratorium"><div class="gallery-overlay"><span class="gallery-caption">Praktikum Sains</span></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&q=80" alt="Perpustakaan"><div class="gallery-overlay"><span class="gallery-caption">Ruang Perpustakaan</span></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80" alt="Olahraga"><div class="gallery-overlay"><span class="gallery-caption">Kejuaraan Basket Pelajar</span></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80" alt="Kegiatan"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan OSIS</span></div></div>
+    </div>
+</section>
+
+<!-- MAP / LOKASI -->
+<section id="lokasi">
+    <div class="reveal" style="margin-bottom:48px;">
+        <div class="section-tag">Lokasi Kami</div>
+        <h2 class="section-title">Temukan Kami di<br>Pusat Kota</h2>
+        <div class="divider"></div>
+    </div>
+    <div class="map-container">
+        <div class="map-info-cards reveal">
+            <div class="loc-card"><div class="loc-card-label">📍 Alamat</div><div class="loc-card-value">Jl. Dr. Angka No.1, Karangjengkol, Sokanegara, Kec. Purwokerto Tim., Kabupaten Banyumas, Jawa Tengah 53115</div></div>
+            <div class="loc-card"><div class="loc-card-label">🕐 Jam Operasional</div><div class="loc-card-value">Senin – Jumat: 07.30 – 16.00 WIB<br>Sabtu: 07.30 – 12.30 WIB</div></div>
+            <div class="loc-card"><div class="loc-card-label">📞 Telepon</div><div class="loc-card-value">(0281) 633373</div></div>
+            <a href="https://maps.google.com" target="_blank" class="btn-primary" style="text-align:center;margin-top:8px;">Buka di Google Maps</a>
+        </div>
+        <div class="map-embed reveal">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.443536014362!2d109.2288820747998!3d-7.416064673040172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e655e572a33a7bf%3A0x60396314bb780a46!2sSMA%20Muhammadiyah%201%20Purwokerto%20(SMAMSA%20Purwokerto)!5e0!3m2!1sid!2sid!4v1772252049348!5m2!1sid!2sid" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top">
+        <div class="footer-brand">
+            <div class="nav-brand"><div class="emblem">N</div><span>SMA Muhammadiyah 1 Purwokerto</span></div>
+            <p class="footer-tagline">Mendidik generasi penerus bangsa yang cerdas, berkarakter, dan siap menghadapi tantangan global dengan pondasi nilai Pancasila yang kuat.</p>
+        </div>
+        <div class="footer-col"><h4>Navigasi</h4><ul><li><a href="#visi-misi">Visi & Misi</a></li><li><a href="#fasilitas">Fasilitas</a></li><li><a href="#ppdb">Info PPDB</a></li><li><a href="#galeri">Galeri</a></li><li><a href="#lokasi">Lokasi</a></li></ul></div>
+        <div class="footer-col"><h4>PPDB</h4><ul><li><a href="/register">Pendaftaran Online</a></li><li><a href="#">Persyaratan</a></li><li><a href="#">Jadwal Seleksi</a></li><li><a href="#">Biaya Pendidikan</a></li></ul></div>
+        <div class="footer-col"><h4>Sosial Media</h4><ul><li><a href="#">Instagram</a></li><li><a href="#">Facebook</a></li><li><a href="#">YouTube</a></li><li><a href="#">Twitter/X</a></li><li><a href="#">TikTok</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+        <p class="footer-copy">© 2025 SMA Muhammadiyah 1 Purwokerto. Hak cipta dilindungi undang-undang.</p>
+        <p class="footer-copy">Dirancang dengan ❤ untuk generasi Indonesia</p>
+    </div>
+</footer>
+
+
+<script>
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let currentUser = null; // { name, email, initials }
+
+// Simple mock "database" stored in memory
+const users = [
+    { email: 'demo@ppdb.id', password: 'demo123', name: 'Demo Siswa' }
+];
+
+/* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+function openModal(type) {
+    clearForms();
+    document.getElementById('modal-' + type).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal(type) {
+    document.getElementById('modal-' + type).classList.remove('active');
+    document.body.style.overflow = '';
+}
+function switchModal(from, to) {
+    closeModal(from);
+    setTimeout(() => openModal(to), 180);
+}
+
+// Close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+/* ══════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════ */
+function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-password').value;
+
+    let valid = true;
+
+    // Validate
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showErr('err-login-email', true); valid = false;
+    } else { showErr('err-login-email', false); }
+
+    if (!pass || pass.length < 6) {
+        showErr('err-login-pass', true); valid = false;
+    } else { showErr('err-login-pass', false); }
+
+    if (!valid) return;
+
+    // Check credentials
+    const user = users.find(u => u.email === email && u.password === pass);
+    if (!user) {
+        document.getElementById('login-error').classList.add('show');
+        return;
+    }
+
+    document.getElementById('login-error').classList.remove('show');
+    document.getElementById('login-success').classList.add('show');
+
+    setTimeout(() => {
+        closeModal('login');
+        setLoggedIn({ name: user.name, email: user.email });
+    }, 900);
+}
+
+function demoLogin() {
+    setLoggedIn({ name: 'Demo Siswa', email: 'demo@ppdb.id' });
+    closeModal('login');
+}
+
+/* ══════════════════════════════════════════════════
+   REGISTER
+══════════════════════════════════════════════════ */
+function doRegister() {
+    const fname   = document.getElementById('reg-firstname').value.trim();
+    const lname   = document.getElementById('reg-lastname').value.trim();
+    const email   = document.getElementById('reg-email').value.trim();
+    const phone   = document.getElementById('reg-phone').value.trim();
+    const pass    = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+
+    let valid = true;
+
+    if (!fname) { showErr('err-reg-fname', true); valid = false; } else showErr('err-reg-fname', false);
+    if (!lname) { showErr('err-reg-lname', true); valid = false; } else showErr('err-reg-lname', false);
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('err-reg-email', true); valid = false; } else showErr('err-reg-email', false);
+    if (!phone || phone.length < 10) { showErr('err-reg-phone', true); valid = false; } else showErr('err-reg-phone', false);
+    if (!pass || pass.length < 6) { showErr('err-reg-pass', true); valid = false; } else showErr('err-reg-pass', false);
+    if (!confirm || confirm !== pass) { showErr('err-reg-confirm', true); valid = false; } else showErr('err-reg-confirm', false);
+
+    if (!valid) return;
+
+    // Check if email already exists
+    if (users.find(u => u.email === email)) {
+        document.getElementById('register-error').textContent = 'Email sudah terdaftar.';
+        document.getElementById('register-error').classList.add('show');
+        return;
+    }
+
+    // Register
+    const fullName = fname + ' ' + lname;
+    users.push({ email, password: pass, name: fullName });
+
+    document.getElementById('register-error').classList.remove('show');
+    document.getElementById('register-success').classList.add('show');
+
+    setTimeout(() => {
+        switchModal('register', 'login');
+        // Pre-fill email in login
+        document.getElementById('login-email').value = email;
+    }, 1200);
+}
+
+/* ══════════════════════════════════════════════════
+   AUTH STATE
+══════════════════════════════════════════════════ */
+function setLoggedIn(user) {
+    currentUser = user;
+    const initials = user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+    // Navbar
+    document.getElementById('nav-auth-buttons').style.display = 'none';
+    const userInfo = document.getElementById('nav-user-info');
+    userInfo.style.display = 'flex';
+    document.getElementById('btn-dashboard-nav').style.display = 'flex';
+    document.getElementById('nav-avatar').textContent = initials;
+    document.getElementById('nav-username').textContent = user.name.split(' ')[0];
+
+    // Dashboard data
+    document.getElementById('dash-avatar').textContent = initials;
+    document.getElementById('dash-fullname').textContent = user.name;
+}
+
+function doLogout() {
+    currentUser = null;
+    document.getElementById('nav-auth-buttons').style.display = 'flex';
+    const userInfo = document.getElementById('nav-user-info');
+    userInfo.style.display = 'none';
+    document.getElementById('btn-dashboard-nav').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════ */
+function openDashboard() {
+    if (!currentUser) { openModal('login'); return; }
+    document.getElementById('dashboard-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    updateDashCountdown();
+}
+function closeDashboard() {
+    document.getElementById('dashboard-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+document.getElementById('dashboard-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('dashboard-overlay')) closeDashboard();
+});
+
+function updateDashCountdown() {
+    const deadline = new Date('2025-07-30T23:59:59');
+    const diff = deadline - new Date();
+    if (diff <= 0) { document.getElementById('dash-countdown').textContent = 'Ditutup'; return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    document.getElementById('dash-countdown').textContent = d + 'h ' + h + 'j lagi';
+}
+
+/* ══════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════ */
+function showErr(id, show) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('show', show);
+    const input = el.previousElementSibling;
+    if (input && input.classList.contains('form-control')) {
+        input.classList.toggle('error', show);
+    }
+}
+function clearForms() {
+    document.querySelectorAll('.form-control').forEach(el => { el.value = ''; el.classList.remove('error'); });
+    document.querySelectorAll('.form-error').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.alert-success, .alert-error').forEach(el => el.classList.remove('show'));
+}
+
+/* ══════════════════════════════════════════════════
+   COUNTDOWN TIMER
+══════════════════════════════════════════════════ */
+const deadline = new Date('2025-07-30T23:59:59');
+function updateCountdown() {
+    const diff = deadline - new Date();
+    if (diff <= 0) return;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ══════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════ */
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+
+/* ══════════════════════════════════════════════════
+   ESC KEY
+══════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+        closeDashboard();
+        document.body.style.overflow = '';
+    }
+});
+</script>
+</body>
 </html>
