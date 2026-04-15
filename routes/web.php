@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\AhpResultController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportGradeController as AdminReportGradeController;
 use App\Http\Controllers\AnnouncementController;
 
@@ -163,7 +164,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('report-grades/{student}/edit', [AdminReportGradeController::class, 'edit'])->name('report-grades.edit');
         Route::put('report-grades/{student}',   [AdminReportGradeController::class, 'update']) ->name('report-grades.update');
         Route::delete('report-grades/{student}',[AdminReportGradeController::class, 'destroy'])->name('report-grades.destroy');
-    });
+    
+        //kelolapengguna
+        Route::resource('users', UserController::class);
+       
+        });
 
 });
 
