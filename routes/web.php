@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AhpMatrixController;
 use App\Http\Controllers\Admin\SpecializationQuotaController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\AhpResultController;
+use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportGradeController as AdminReportGradeController;
 use App\Http\Controllers\AnnouncementController;
@@ -68,6 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // ============================================================
 Route::middleware(['auth', 'role:admin'])->group(function () {
     
+    //monitoring
+    Route::get('/admin/monitoring', [MonitoringController::class, 'index'])->name('admin.monitoring');
+
     // Dashboard Admin
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     

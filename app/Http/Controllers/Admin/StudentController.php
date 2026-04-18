@@ -91,6 +91,7 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         $student->load('user');
+        //dd($student);
         return view('admin.students.show', compact('student'));
     }
 

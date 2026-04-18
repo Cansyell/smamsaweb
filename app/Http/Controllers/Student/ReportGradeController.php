@@ -21,7 +21,7 @@ class ReportGradeController extends Controller
 
         // Jika student belum ada, redirect ke profile
         if (!$student) {
-            return redirect()->route('student.profile.create')
+            return redirect()->route('student.profile.index')
                 ->with('error', 'Silakan lengkapi data pribadi terlebih dahulu');
         }
 
@@ -44,7 +44,7 @@ class ReportGradeController extends Controller
 
         // Jika student belum ada, redirect ke profile
         if (!$student) {
-            return redirect()->route('student.profile.create')
+            return redirect()->route('student.profile.index')
                 ->with('error', 'Silakan lengkapi data pribadi terlebih dahulu');
         }
 
@@ -70,7 +70,7 @@ class ReportGradeController extends Controller
 
         // Jika student belum ada, redirect ke profile
         if (!$student) {
-            return redirect()->route('student.profile.create')
+            return redirect()->route('student.profile.index')
                 ->with('error', 'Silakan lengkapi data pribadi terlebih dahulu');
         }
 

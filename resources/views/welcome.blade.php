@@ -410,7 +410,7 @@
             position: absolute; inset: 0; z-index: 0;
             background:
                 linear-gradient(to bottom, rgba(10,22,40,.78) 0%, rgba(10,22,40,.55) 50%, rgba(10,22,40,.85) 100%),
-                url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80') center/cover no-repeat;
+                url('{{ asset('images/Logo-smamsa2.jpeg') }}') center/cover no-repeat;
         }
         .hero-pattern {
             position: absolute; inset: 0; z-index: 1; opacity: .06;
@@ -795,7 +795,9 @@
 <!-- ══════════════════════════════════════════ -->
 <nav>
     <div class="nav-brand">
-        <div class="emblem">N</div>
+        <div class="emblem" style="overflow: hidden; padding: 0;">
+            <img src="{{ asset('images/logo-smamsa1.jpeg') }}" alt="Logo SMAMSA" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
         <span>SMA Muhammadiyah 1 Purwokerto</span>
     </div>
     <ul class="nav-links">
@@ -1169,15 +1171,14 @@
 <section id="galeri">
     <div class="gallery-header reveal">
         <div class="section-tag">Galeri Sekolah</div>
-        <h2 class="section-title">Momen Berharga di<br>Nusantara Jaya</h2>
+        <h2 class="section-title">Momen Berharga di<br>SMA Muhammadiyah 1 Purwokerto</h2>
         <div class="divider"></div>
     </div>
     <div class="gallery-grid reveal">
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80" alt="Upacara"><div class="gallery-overlay"><span class="gallery-caption">Upacara Hari Kemerdekaan</span></div></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=600&q=80" alt="Laboratorium"><div class="gallery-overlay"><span class="gallery-caption">Praktikum Sains</span></div></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&q=80" alt="Perpustakaan"><div class="gallery-overlay"><span class="gallery-caption">Ruang Perpustakaan</span></div></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80" alt="Olahraga"><div class="gallery-overlay"><span class="gallery-caption">Kejuaraan Basket Pelajar</span></div></div>
-        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80" alt="Kegiatan"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan OSIS</span></div></div>
+        <div class="gallery-item"><img src="{{ asset('images/image1-smamsa.jpeg') }}" alt="Galeri 1"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
+        <div class="gallery-item"><img src="{{ asset('images/image2-smamsa.jpeg') }}" alt="Galeri 2"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
+        <div class="gallery-item"><img src="{{ asset('images/image3-smamsa.jpeg') }}" alt="Galeri 3"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
+
     </div>
 </section>
 
