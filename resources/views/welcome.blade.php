@@ -708,6 +708,16 @@
         .gallery-item:hover .gallery-overlay { opacity: 1; }
         .gallery-caption { font-size: .85rem; color: var(--white); font-weight: 500; }
 
+        .video-item iframe {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .video-item .gallery-overlay {
+            pointer-events: none;
+        }
+
         /* ── MAP ────────────────────────────── */
         #lokasi { background: var(--cream); padding-bottom: 60px; }
         .map-container { display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; align-items: start; }
@@ -1014,55 +1024,180 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════ -->
-<!-- HERO -->
-<!-- ══════════════════════════════════════════ -->
+{{-- ══════════════════════════════════════════ --}}
+{{-- HERO SECTION (dinamis)                    --}}
+{{-- ══════════════════════════════════════════ --}}
+@if ($hero)
 <section id="hero">
-    <div class="hero-bg"></div>
+    <div class="hero-bg" style="
+        background:
+            linear-gradient(to bottom, rgba(10,22,40,.78) 0%, rgba(10,22,40,.55) 50%, rgba(10,22,40,.85) 100%),
+            url('{{ $hero->background_image ? Storage::url($hero->background_image) : asset('images/Logo-smamsa2.jpeg') }}')
+            center/cover no-repeat;
+    "></div>
     <div class="hero-pattern"></div>
     <div class="hero-content">
-        <div class="hero-badge">PPDB Tahun Ajaran 2025/2026</div>
+        <div class="hero-badge">{{ $hero->badge_text }}</div>
         <h1 class="hero-title">
-            Wujudkan Mimpi <em>Bersama Kami</em>
+            {{ $hero->title_main }}
+            <em>{{ $hero->title_italic }}</em>
         </h1>
-        <p class="hero-sub">
-            SMA Muhammadiyah 1 Purwokerto membuka penerimaan murid baru untuk tahun ajaran 2025/2026.
-            Bergabunglah dengan ribuan alumni berprestasi yang telah mengukir jejak di tingkat nasional dan internasional.
-        </p>
+        <p class="hero-sub">{{ $hero->subtitle }}</p>
         <div class="hero-actions">
-            <a href="#ppdb" class="btn-primary">Info Pendaftaran</a>
-            <a href="#visi-misi" class="btn-outline">Kenali Sekolah Kami</a>
+            <a href="{{ $hero->btn_primary_url }}" class="btn-primary">{{ $hero->btn_primary_label }}</a>
+            <a href="{{ $hero->btn_outline_url }}" class="btn-outline">{{ $hero->btn_outline_label }}</a>
         </div>
     </div>
+ 
+    @if ($hero->stats->isNotEmpty())
     <div class="hero-stats">
+        @foreach ($hero->stats as $stat)
         <div class="stat-card">
-            <span class="stat-num">3.200+</span>
-            <span class="stat-label">Alumni Berprestasi</span>
+            <span class="stat-num">{{ $stat->number }}</span>
+            <span class="stat-label">{{ $stat->label }}</span>
         </div>
-        <div class="stat-card">
-            <span class="stat-num">98%</span>
-            <span class="stat-label">Lulus PTN</span>
+        @endforeach
+    </div>
+    @endif
+</section>
+@endif
+ 
+ 
+{{-- ══════════════════════════════════════════ --}}
+{{-- GALERI SECTION (dinamis)                  --}}
+{{-- ══════════════════════════════════════════ --}}
+<section id="galeri">
+    <div class="gallery-header reveal">
+        <div class="section-tag">Galeri Sekolah</div>
+        <h2 class="section-title">Momen Berharga di<br>SMA Muhammadiyah 1 Purwokerto</h2>
+        <div class="divider"></div>
+    </div>
+ 
+    @if ($galeri->isNotEmpty())
+    <div class="gallery-grid reveal">
+        @foreach ($galeri as $item)
+        <div class="gallery-item {{ $item->tipe === 'video' ? 'video-item' : '' }}">
+            @if ($item->tipe === 'video')
+                <iframe
+                    src="{{ $item->embed_url }}"
+                    title="{{ $item->judul }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            @else
+                <img
+                    src="{{ $item->gambar_url ?? asset($item->gambar_path) }}"
+                    alt="{{ $item->alt_text ?? $item->judul }}">
+            @endif
+            <div class="gallery-overlay">
+                <span class="gallery-caption">{{ $item->caption ?? $item->judul }}</span>
+            </div>
         </div>
-        <div class="stat-card">
-            <span class="stat-num">40+</span>
-            <span class="stat-label">Ekstrakurikuler</span>
+        @endforeach
+    </div>
+    @endif
+</section>
+ 
+ 
+{{-- ══════════════════════════════════════════ --}}
+{{-- PPDB SECTION (dinamis)                    --}}
+{{-- ══════════════════════════════════════════ --}}
+<section id="ppdb">
+    <div class="ppdb-inner">
+        <div class="ppdb-header reveal">
+            <div class="section-tag" style="color:var(--gold2)">Penerimaan Murid Baru</div>
+            <h2 class="section-title light">Informasi PPDB<br>{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}</h2>
+            <div class="divider"></div>
+            <p class="section-sub light">
+                Ikuti alur pendaftaran berikut untuk bergabung bersama keluarga besar SMA Muhammadiyah 1 Purwokerto.
+                Proses seleksi transparan dan berkeadilan.
+            </p>
+        </div>
+ 
+        <div class="ppdb-grid">
+ 
+            {{-- JADWAL --}}
+            <div class="reveal">
+                <h3 style="font-family:'Playfair Display',serif;color:var(--white);font-size:1.25rem;margin-bottom:32px;">
+                    Jadwal Pelaksanaan
+                </h3>
+                <div class="ppdb-timeline">
+                    @foreach ($jadwals as $jadwal)
+                    <div class="tl-item">
+                        <div class="tl-dot">{{ $jadwal->nomor_urut }}</div>
+                        <div class="tl-body">
+                            <div class="tl-date">{{ $jadwal->tanggal_label }}</div>
+                            <div class="tl-title">{{ $jadwal->judul }}</div>
+                            @if ($jadwal->deskripsi)
+                            <div class="tl-desc">{{ $jadwal->deskripsi }}</div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+ 
+            {{-- PERSYARATAN, BIAYA, KONTAK --}}
+            <div style="display:flex;flex-direction:column;gap:20px;" class="reveal">
+ 
+                {{-- Persyaratan --}}
+                @if ($persyaratan->isNotEmpty())
+                <div class="info-card">
+                    <div class="info-card-title">📋 Persyaratan Dokumen</div>
+                    <ul class="req-list">
+                        @foreach ($persyaratan as $p)
+                        <li>{{ $p->dokumen }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
+ 
+                {{-- Biaya --}}
+                @if ($biaya->isNotEmpty())
+                <div class="info-card">
+                    <div class="info-card-title">💰 Biaya Pendidikan</div>
+                    <table class="biaya-table">
+                        @foreach ($biaya as $b)
+                        <tr>
+                            <td>{{ $b->nama_biaya }}</td>
+                            <td>{{ $b->nominal_rupiah }}</td>
+                        </tr>
+                        @endforeach
+                    </table>
+                    @if ($ppdbSetting?->catatan_beasiswa)
+                    <p style="font-size:.78rem;color:rgba(255,255,255,.4);margin-top:12px;">
+                        {{ $ppdbSetting->catatan_beasiswa }}
+                    </p>
+                    @endif
+                </div>
+                @endif
+ 
+                {{-- Kontak --}}
+                @if ($ppdbSetting)
+                <div class="info-card">
+                    <div class="info-card-title">📞 Kontak Panitia PPDB</div>
+                    <div class="info-card-body">
+                        @if ($ppdbSetting->telepon)
+                        📱 {{ $ppdbSetting->telepon }}<br>
+                        @endif
+                        @if ($ppdbSetting->jam_operasional)
+                        🕐 {{ $ppdbSetting->jam_operasional }}
+                        @endif
+                    </div>
+                </div>
+                @endif
+ 
+            </div>
+        </div>
+ 
+        <div class="ppdb-actions reveal">
+            <a href="{{ $ppdbSetting?->link_pendaftaran ?? '/register' }}" class="btn-primary">
+                Daftar Online Sekarang
+            </a>
         </div>
     </div>
 </section>
-
-{{-- <!-- COUNTDOWN -->
-<div id="countdown">
-    <div class="countdown-label">Pendaftaran ditutup pada <span>30 Juli 2025</span></div>
-    <div class="countdown-timer">
-        <div class="time-box"><span class="time-num" id="cd-days">47</span><span class="time-unit">Hari</span></div>
-        <div class="time-box"><span class="time-num" id="cd-hours">12</span><span class="time-unit">Jam</span></div>
-        <div class="time-box"><span class="time-num" id="cd-mins">35</span><span class="time-unit">Menit</span></div>
-        <div class="time-box"><span class="time-num" id="cd-secs">08</span><span class="time-unit">Detik</span></div>
-    </div>
-    <div class="countdown-cta">
-        
-    </div>
-</div> --}}
 
 <!-- VISI MISI -->
 <section id="visi-misi">
@@ -1106,79 +1241,6 @@
         <div class="fasilitas-card reveal"><span class="fas-icon">🍽️</span><div class="fas-name">Kantin Sehat</div><p class="fas-desc">Kantin higienis dengan menu bergizi dan terjangkau, dikelola secara profesional oleh mitra bersertifikat.</p></div>
         <div class="fasilitas-card reveal"><span class="fas-icon">🏥</span><div class="fas-name">Klinik Sekolah</div><p class="fas-desc">Unit kesehatan sekolah dengan tenaga medis berpengalaman, siap melayani kebutuhan kesehatan siswa setiap hari.</p></div>
         <div class="fasilitas-card reveal"><span class="fas-icon">🚌</span><div class="fas-name">Layanan Antar-Jemput</div><p class="fas-desc">Armada bus sekolah ber-AC yang melayani berbagai rute di dalam kota dengan sistem GPS real-time.</p></div>
-    </div>
-</section>
-
-<!-- PPDB INFO -->
-<section id="ppdb">
-    <div class="ppdb-inner">
-        <div class="ppdb-header reveal">
-            <div class="section-tag" style="color:var(--gold2)">Penerimaan Murid Baru</div>
-            <h2 class="section-title light">Informasi PPDB<br>2025/2026</h2>
-            <div class="divider"></div>
-            <p class="section-sub light">Ikuti alur pendaftaran berikut untuk bergabung bersama keluarga besar SMA Muhammadiyah 1 Purwokerto. Proses seleksi transparan dan berkeadilan.</p>
-        </div>
-        <div class="ppdb-grid">
-            <div class="reveal">
-                <h3 style="font-family:'Playfair Display',serif;color:var(--white);font-size:1.25rem;margin-bottom:32px;">Jadwal Pelaksanaan</h3>
-                <div class="ppdb-timeline">
-                    <div class="tl-item"><div class="tl-dot">1</div><div class="tl-body"><div class="tl-date">1 – 15 Juni 2025</div><div class="tl-title">Pembukaan Pendaftaran Online</div><div class="tl-desc">Registrasi akun dan pengisian formulir pendaftaran melalui portal resmi PPDB.</div></div></div>
-                    <div class="tl-item"><div class="tl-dot">2</div><div class="tl-body"><div class="tl-date">16 – 25 Juni 2025</div><div class="tl-title">Pengumpulan Berkas</div><div class="tl-desc">Unggah dokumen persyaratan yang diperlukan melalui sistem pendaftaran online.</div></div></div>
-                    <div class="tl-item"><div class="tl-dot">3</div><div class="tl-body"><div class="tl-date">1 – 10 Juli 2025</div><div class="tl-title">Tes Seleksi & Wawancara</div><div class="tl-desc">Tes tertulis (Matematika, IPA, IPS, B.Indonesia) dan sesi wawancara dengan panitia.</div></div></div>
-                    <div class="tl-item"><div class="tl-dot">4</div><div class="tl-body"><div class="tl-date">20 Juli 2025</div><div class="tl-title">Pengumuman Hasil Seleksi</div><div class="tl-desc">Hasil seleksi diumumkan melalui portal resmi dan akan dikirim via email terdaftar.</div></div></div>
-                    <div class="tl-item"><div class="tl-dot">5</div><div class="tl-body"><div class="tl-date">21 – 30 Juli 2025</div><div class="tl-title">Daftar Ulang & Orientasi</div><div class="tl-desc">Konfirmasi kehadiran, pembayaran, dan persiapan masa orientasi siswa baru.</div></div></div>
-                </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:20px;" class="reveal">
-                <div class="info-card">
-                    <div class="info-card-title">📋 Persyaratan Dokumen</div>
-                    <ul class="req-list">
-                        <li>Fotokopi Ijazah / Surat Keterangan Lulus SMP</li>
-                        <li>Fotokopi SKHUN (Surat Keterangan Hasil Ujian Nasional)</li>
-                        <li>Fotokopi Kartu Keluarga (KK)</li>
-                        <li>Fotokopi Akta Kelahiran</li>
-                        <li>Pas foto berwarna 3×4 (4 lembar)</li>
-                        <li>Sertifikat prestasi akademik/non-akademik (jika ada)</li>
-                    </ul>
-                </div>
-                <div class="info-card">
-                    <div class="info-card-title">💰 Biaya Pendidikan</div>
-                    <table class="biaya-table">
-                        <tr><td>Biaya Pendaftaran</td><td>Rp 150.000</td></tr>
-                        <tr><td>Uang Pangkal</td><td>Rp 5.000.000</td></tr>
-                        <tr><td>SPP per Bulan</td><td>Rp 750.000</td></tr>
-                        <tr><td>Seragam & Atribut</td><td>Rp 800.000</td></tr>
-                        <tr><td>Kegiatan MPLS</td><td>Rp 300.000</td></tr>
-                    </table>
-                    <p style="font-size:.78rem;color:rgba(255,255,255,.4);margin-top:12px;">*Tersedia beasiswa bagi siswa berprestasi dan kurang mampu</p>
-                </div>
-                <div class="info-card">
-                    <div class="info-card-title">📞 Kontak Panitia PPDB</div>
-                    <div class="info-card-body">
-                        📱  (0281) 633373<br>
-                        🕐 Senin–Sabtu, 08.00–12.30 WIB
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ppdb-actions reveal">
-            <a href="/register" class="btn-primary">Daftar Online Sekarang</a>
-        </div>
-    </div>
-</section>
-
-<!-- GALLERY -->
-<section id="galeri">
-    <div class="gallery-header reveal">
-        <div class="section-tag">Galeri Sekolah</div>
-        <h2 class="section-title">Momen Berharga di<br>SMA Muhammadiyah 1 Purwokerto</h2>
-        <div class="divider"></div>
-    </div>
-    <div class="gallery-grid reveal">
-        <div class="gallery-item"><img src="{{ asset('images/image1-smamsa.jpeg') }}" alt="Galeri 1"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
-        <div class="gallery-item"><img src="{{ asset('images/image2-smamsa.jpeg') }}" alt="Galeri 2"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
-        <div class="gallery-item"><img src="{{ asset('images/image3-smamsa.jpeg') }}" alt="Galeri 3"><div class="gallery-overlay"><span class="gallery-caption">Kegiatan Sekolah</span></div></div>
-
     </div>
 </section>
 

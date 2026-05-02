@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WelcomeController;
 
 // Admin Controllers
 use App\Http\Controllers\DashboardController;
@@ -15,6 +16,11 @@ use App\Http\Controllers\Admin\MonitoringController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportGradeController as AdminReportGradeController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\Admin\GaleriController;
+use App\Http\Controllers\Admin\HeroSectionController;
+use App\Http\Controllers\Admin\JadwalPpdbController;
+use App\Http\Controllers\Admin\WelcomeSettingController;
+
 
 // Panitia Controllers
 use App\Http\Controllers\Committee\CommitteeDashboardController;
@@ -39,9 +45,9 @@ use App\Http\Controllers\Student\ResubmissionController;
 // ============================================================
 // PUBLIC ROUTES
 // ============================================================
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [WelcomeController::class, 'index'])->name('home');
+
+
 
 // ============================================================
 // AUTHENTICATED ROUTES - Redirect to appropriate dashboard
@@ -171,7 +177,55 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     
         //kelolapengguna
         Route::resource('users', UserController::class);
+
+        // ── Welcome Setting (halaman utama tab) ────────────────
+        Route::get('welcome/settings', [WelcomeSettingController::class, 'index']) ->name('welcome.setting');
        
+        // ── HERO SECTION ──────────────────────────────────────────────
+        Route::get   ('hero',                  [HeroSectionController::class, 'index'])        ->name('hero.index');
+        Route::get   ('hero/create',           [HeroSectionController::class, 'create'])       ->name('hero.create');
+        Route::post  ('hero',                  [HeroSectionController::class, 'store'])        ->name('hero.store');
+        Route::get   ('hero/{hero}/edit',      [HeroSectionController::class, 'edit'])         ->name('hero.edit');
+        Route::put   ('hero/{hero}',           [HeroSectionController::class, 'update'])       ->name('hero.update');
+        Route::delete('hero/{hero}',           [HeroSectionController::class, 'destroy'])      ->name('hero.destroy');
+        Route::patch ('hero/{hero}/toggle',    [HeroSectionController::class, 'toggleActive']) ->name('hero.toggle');
+    
+        // ── GALERI ────────────────────────────────────────────────────
+        Route::get   ('galeri',                  [GaleriController::class, 'index'])        ->name('galeri.index');
+        Route::get   ('galeri/create',           [GaleriController::class, 'create'])       ->name('galeri.create');
+        Route::post  ('galeri',                  [GaleriController::class, 'store'])        ->name('galeri.store');
+        Route::get   ('galeri/{galeri}/edit',    [GaleriController::class, 'edit'])         ->name('galeri.edit');
+        Route::put   ('galeri/{galeri}',         [GaleriController::class, 'update'])       ->name('galeri.update');
+        Route::delete('galeri/{galeri}',         [GaleriController::class, 'destroy'])      ->name('galeri.destroy');
+        Route::patch ('galeri/{galeri}/toggle',  [GaleriController::class, 'toggleActive']) ->name('galeri.toggle');
+        Route::post  ('galeri/urutan',           [GaleriController::class, 'updateUrutan']) ->name('galeri.urutan');  // AJAX
+    
+        // ── PPDB (Jadwal, Setting, Biaya, Persyaratan) ────────────────
+        Route::get('ppdb', [JadwalPpdbController::class, 'index'])->name('ppdb.index');
+    
+        // Jadwal
+        Route::get   ('ppdb/jadwal/create',           [JadwalPpdbController::class, 'createJadwal'])  ->name('ppdb.jadwal.create');
+        Route::post  ('ppdb/jadwal',                  [JadwalPpdbController::class, 'storeJadwal'])   ->name('ppdb.jadwal.store');
+        Route::get   ('ppdb/jadwal/{jadwal}/edit',    [JadwalPpdbController::class, 'editJadwal'])    ->name('ppdb.jadwal.edit');
+        Route::put   ('ppdb/jadwal/{jadwal}',         [JadwalPpdbController::class, 'updateJadwal'])  ->name('ppdb.jadwal.update');
+        Route::delete('ppdb/jadwal/{jadwal}',         [JadwalPpdbController::class, 'destroyJadwal']) ->name('ppdb.jadwal.destroy');
+        Route::post  ('ppdb/jadwal/sync-status',      [JadwalPpdbController::class, 'syncStatusJadwal'])->name('ppdb.jadwal.sync');
+    
+        // Setting
+        Route::get   ('ppdb/setting/create',          [JadwalPpdbController::class, 'createSetting']) ->name('ppdb.setting.create');
+        Route::post  ('ppdb/setting',                 [JadwalPpdbController::class, 'storeSetting'])  ->name('ppdb.setting.store');
+        Route::get   ('ppdb/setting/{setting}/edit',  [JadwalPpdbController::class, 'editSetting'])   ->name('ppdb.setting.edit');
+        Route::put   ('ppdb/setting/{setting}',       [JadwalPpdbController::class, 'updateSetting']) ->name('ppdb.setting.update');
+    
+        // Biaya
+        Route::post  ('ppdb/biaya',            [JadwalPpdbController::class, 'storeBiaya'])   ->name('ppdb.biaya.store');
+        Route::put   ('ppdb/biaya/{biaya}',    [JadwalPpdbController::class, 'updateBiaya'])  ->name('ppdb.biaya.update');
+        Route::delete('ppdb/biaya/{biaya}',    [JadwalPpdbController::class, 'destroyBiaya']) ->name('ppdb.biaya.destroy');
+    
+        // Persyaratan
+        Route::post  ('ppdb/persyaratan',                 [JadwalPpdbController::class, 'storePersyaratan'])   ->name('ppdb.persyaratan.store');
+        Route::put   ('ppdb/persyaratan/{persyaratan}',   [JadwalPpdbController::class, 'updatePersyaratan'])  ->name('ppdb.persyaratan.update');
+        Route::delete('ppdb/persyaratan/{persyaratan}',   [JadwalPpdbController::class, 'destroyPersyaratan']) ->name('ppdb.persyaratan.destroy');
         });
 
 });
