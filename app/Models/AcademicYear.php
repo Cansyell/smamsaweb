@@ -19,12 +19,18 @@ class AcademicYear extends Model
         'end_date',
         'is_active',
         'description',
+        'result_status',
+        'published_at',
+        'published_by',
+        'publish_notes',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'is_active' => 'boolean',
+        'published_at'      => 'datetime',
+        
     ];
 
     /* =======================

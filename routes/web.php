@@ -30,6 +30,7 @@ use App\Http\Controllers\Committee\CriterionValueController;
 use App\Http\Controllers\Committee\SawResultController;
 use App\Http\Controllers\Committee\CommitteeStudentController;
 use App\Http\Controllers\Committee\SelectionResultController;
+use App\Http\Controllers\Committee\PublishResultController;
 
 
 // Student Controllers
@@ -255,25 +256,6 @@ Route::middleware(['auth', 'role:committee'])
         ->name('profile.update');
 
 
-    /* =====================================================
-     | Validation (Verifikasi Berkas & Data Siswa)
-     ===================================================== */
-    // Route::prefix('validation')->name('validation.')->group(function () {
-    //     Route::get('/', [ValidationController::class, 'index'])->name('index');
-    //     Route::get('/{student}', [ValidationController::class, 'show'])->name('show');
-
-    //     Route::post('/{student}/approve', [ValidationController::class, 'approve'])->name('approve');
-    //     Route::post('/{student}/reject', [ValidationController::class, 'reject'])->name('reject');
-
-    //     Route::post('/batch/approve', [ValidationController::class, 'batchApprove'])->name('batch.approve');
-
-    //     Route::get('/{student}/check-completeness', [ValidationController::class, 'check-completeness'])
-    //         ->name('check-completeness');
-
-    //     Route::post('/documents/{document}/validate', [ValidationController::class, 'validateDocument'])
-    //         ->name('documents.validate');
-    // });
-
     Route::prefix('validation')->name('validation.')->group(function () {
         Route::get('/',                           [ValidationController::class, 'index'])             ->name('index');
         Route::get('/{student}',                  [ValidationController::class, 'show'])              ->name('show');
@@ -336,6 +318,28 @@ Route::middleware(['auth', 'role:committee'])
             Route::get('students/export', [CommitteeStudentController::class, 'export'])->name('export');
         });
     /* =====================================================
+    | Publish Result (Pengumuman Hasil Seleksi)
+    ===================================================== */
+    Route::prefix('publish-result')->name('publish-result.')->group(function () {
+
+        // Halaman preview sebelum publish
+        Route::get('/preview', [PublishResultController::class, 'preview'])
+            ->name('preview');
+
+        // Set status ke reviewing
+        Route::post('/set-reviewing', [PublishResultController::class, 'setReviewing'])
+            ->name('set-reviewing');
+
+        // Publish hasil
+        Route::post('/publish', [PublishResultController::class, 'publish'])
+            ->name('publish');
+
+        // Unpublish (tarik kembali)
+        Route::post('/unpublish', [PublishResultController::class, 'unpublish'])
+            ->name('unpublish');
+    });
+    
+     /* =====================================================
      | Announcements (View Only)
      ===================================================== */
     Route::get('announcements/{announcement}', [AnnouncementController::class, 'show'])

@@ -141,9 +141,13 @@ class AhpService
     {
         return [
             1 => 'Sama penting',
+            2 => 'Antara sama dan lebih penting',
             3 => 'Lebih penting',
+            4 => 'Antara lebih dan sangat penting',
             5 => 'Sangat lebih penting',
+            6 => 'Antara sangat dan jelas lebih penting',
             7 => 'Jelas lebih penting',
+            8 => 'Antara jelas dan mutlak lebih penting',
             9 => 'Mutlak lebih penting',
         ];
     }

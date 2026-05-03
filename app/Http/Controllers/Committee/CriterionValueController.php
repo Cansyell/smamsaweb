@@ -489,8 +489,8 @@ class CriterionValueController extends Controller
             $message .= "• Regular: {$data['regular']['accepted']}/{$data['regular']['quota']}\n";
             $message .= "• Ditolak: {$data['rejected']['total']}";
 
-            return redirect()->route('committee.acceptance.index')
-                ->with('success', $message);
+            return redirect()->route('committee.saw-results.index')
+                    ->with('success', $message);
 
         } catch (\Exception $e) {
             Log::error('Determine Acceptance Exception', ['error' => $e->getMessage()]);

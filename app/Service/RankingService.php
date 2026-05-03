@@ -2,304 +2,349 @@
 
 namespace App\Service;
 
-use App\Models\Student;
+use App\Models\AcademicYear;
 use App\Models\SawResult;
 use App\Models\SpecializationQuota;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RankingService
 {
     /**
-     * Tentukan status penerimaan untuk semua siswa dengan 3 jalur:
-     * 1. Tahfiz Ranking (berdasarkan SAW Tahfiz) - untuk siswa yang pilih tahfiz/language
-     * 2. Language Ranking (berdasarkan SAW Language) - untuk siswa yang pilih tahfiz/language & tidak lolos jalur 1
-     * 3. Regular Ranking (FCFS berdasarkan validated_at) - untuk:
-     *    - Siswa yang memilih 'regular' dari awal (langsung masuk sini)
-     *    - Siswa yang pilih tahfiz/language tapi tidak lolos jalur 1 & 2
+     * Tentukan status penerimaan untuk SEMUA siswa.
      *
-     * @param int $academicYearId
-     * @return array
+     * Logika yang benar:
+     *  - Tahfiz  → siswa yg MEMILIH tahfiz bersaing di quota tahfiz berdasarkan SAW rank tahfiz
+     *  - Bahasa  → siswa yg MEMILIH bahasa bersaing di quota bahasa berdasarkan SAW rank bahasa
+     *  - Regular → FCFS (urutan validated_at) vs quota regular
+     *
+     *  CROSS-ACCEPTED:
+     *  Jika quota tahfiz belum penuh setelah siswa tahfiz selesai, sisa slot bisa diisi
+     *  oleh siswa bahasa dengan rank tahfiz terbaik (dan sebaliknya). Ini opsional.
+     *
+     *  DUAL PASS:
+     *  Siswa yang lulus di KEDUA spesialisasi (karena cross-accepted) mendapat saran
+     *  pindah ke spesialisasi dengan skor SAW lebih tinggi.
      */
     public function determineAcceptanceStatus(int $academicYearId): array
     {
         try {
+            $quota = SpecializationQuota::where('academic_year_id', $academicYearId)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$quota) {
+                return ['success' => false, 'message' => 'Quota spesialisasi belum dikonfigurasi.'];
+            }
+
+            $tahfizQuota   = $quota->tahfiz_quota   ?? 0;
+            $languageQuota = $quota->language_quota ?? 0;
+            $regularQuota  = $quota->regular_quota  ?? 0;
+
             DB::beginTransaction();
 
-            // Get quota
-            $quota = SpecializationQuota::getActiveByAcademicYear($academicYearId);
-            
-            if (!$quota) {
-                throw new \Exception('Kuota belum diatur untuk tahun ajaran ini');
-            }
-
-            $tahfizQuota = $quota->tahfiz_quota;
-            $languageQuota = $quota->language_quota;
-            $regularQuota = $quota->regular_quota;
-
-            // Get all valid students
-            $allStudents = Student::where('academic_year_id', $academicYearId)
+            // --------------------------------------------------
+            // RESET semua status agar tidak ada data stale
+            // --------------------------------------------------
+            Student::where('academic_year_id', $academicYearId)
                 ->where('validation_status', 'valid')
-                ->get();
+                ->update([
+                    'final_status'               => 'rejected',
+                    'dual_pass'                  => false,
+                    'recommended_specialization' => null,
+                    'accepted_specialization'    => null,
+                    'cross_accepted'             => false,
+                ]);
 
-            $acceptedTahfiz = [];
-            $acceptedLanguage = [];
-            $acceptedRegular = [];
-            $rejected = [];
-
-            // JALUR 1: Tahfiz Acceptance (berdasarkan ranking SAW Tahfiz)
-            // HANYA untuk siswa yang pilih tahfiz atau language
-            $tahfizResults = SawResult::where('academic_year_id', $academicYearId)
+            // --------------------------------------------------
+            // A. TAHFIZ — hanya siswa yang MEMILIH tahfiz
+            //    Ranking berdasarkan SAW tahfiz mereka
+            // --------------------------------------------------
+            $tahfizStudents = SawResult::where('academic_year_id', $academicYearId)
                 ->where('specialization', 'tahfiz')
+                ->whereHas('student', fn($q) => $q
+                    ->where('validation_status', 'valid')
+                    ->where('specialization', 'tahfiz') // <-- HANYA yg memilih tahfiz
+                )
+                ->with('student')
                 ->orderBy('rank')
                 ->get();
 
-            foreach ($tahfizResults as $result) {
-                if ($result->rank <= $tahfizQuota) {
-                    $acceptedTahfiz[] = $result->student_id;
-                    
-                    // Update student
-                    Student::where('id', $result->student_id)->update([
-                        'final_class_type' => 'tahfiz',
-                        'final_status' => 'accepted',
-                        'ranking' => $result->rank,
+            $tahfizAccepted      = 0;
+            $tahfizSlotRemaining = $tahfizQuota;
+
+            foreach ($tahfizStudents as $result) {
+                $student    = $result->student;
+                $isAccepted = $tahfizAccepted < $tahfizQuota;
+
+                if ($isAccepted) {
+                    Student::where('id', $student->id)->update([
+                        'final_status'               => 'accepted',
+                        'dual_pass'                  => false,
+                        'recommended_specialization' => null,
+                        'accepted_specialization'    => 'tahfiz',
+                        'cross_accepted'             => false,
                     ]);
+                    $tahfizAccepted++;
+                    $tahfizSlotRemaining--;
                 }
+                // else: tetap rejected (sudah di-reset di atas)
             }
 
-            // JALUR 2: Language Acceptance (berdasarkan ranking SAW Language)
-            // HANYA untuk siswa yang pilih tahfiz/language DAN TIDAK LOLOS Tahfiz
-            $languageResults = SawResult::where('academic_year_id', $academicYearId)
+            // --------------------------------------------------
+            // B. BAHASA — hanya siswa yang MEMILIH bahasa
+            //    Ranking berdasarkan SAW bahasa mereka
+            // --------------------------------------------------
+            $languageStudents = SawResult::where('academic_year_id', $academicYearId)
                 ->where('specialization', 'language')
-                ->whereNotIn('student_id', $acceptedTahfiz) // Exclude yang sudah diterima di Tahfiz
+                ->whereHas('student', fn($q) => $q
+                    ->where('validation_status', 'valid')
+                    ->where('specialization', 'language') // <-- HANYA yg memilih bahasa
+                )
+                ->with('student')
                 ->orderBy('rank')
                 ->get();
 
-            $languageRank = 1;
-            foreach ($languageResults as $result) {
-                if ($languageRank <= $languageQuota) {
-                    $acceptedLanguage[] = $result->student_id;
-                    
-                    // Update student
-                    Student::where('id', $result->student_id)->update([
-                        'final_class_type' => 'language',
-                        'final_status' => 'accepted',
-                        'ranking' => $languageRank,
+            $languageAccepted      = 0;
+            $languageSlotRemaining = $languageQuota;
+
+            foreach ($languageStudents as $result) {
+                $student    = $result->student;
+                $isAccepted = $languageAccepted < $languageQuota;
+
+                if ($isAccepted) {
+                    Student::where('id', $student->id)->update([
+                        'final_status'               => 'accepted',
+                        'dual_pass'                  => false,
+                        'recommended_specialization' => null,
+                        'accepted_specialization'    => 'language',
+                        'cross_accepted'             => false,
                     ]);
-                    
-                    $languageRank++;
+                    $languageAccepted++;
+                    $languageSlotRemaining--;
                 }
             }
 
-            // JALUR 3: Regular Acceptance (FCFS berdasarkan validated_at)
-            // Untuk:
-            // A. Siswa yang memilih 'regular' dari awal (prioritas PERTAMA karena pilihan mereka)
-            // B. Siswa yang pilih tahfiz/language tapi tidak lolos jalur 1 & 2
-            $acceptedStudentIds = array_merge($acceptedTahfiz, $acceptedLanguage);
-            
-            // Ambil kandidat regular: semua siswa yang belum diterima
-            $regularCandidates = Student::where('academic_year_id', $academicYearId)
-                ->where('validation_status', 'valid')
-                ->whereNotIn('id', $acceptedStudentIds)
-                ->orderByRaw("CASE WHEN specialization = 'regular' THEN 0 ELSE 1 END") // Regular choice FIRST
-                ->orderBy('validated_at') // Then FCFS
-                ->orderBy('created_at')   // Backup: registration time
-                ->take($regularQuota)
-                ->get();
+            // --------------------------------------------------
+            // C. CROSS-ACCEPTED (opsional — isi sisa slot)
+            //    Jika quota tahfiz belum penuh, isi dgn siswa bahasa
+            //    yg punya rank tahfiz terbaik (sudah lulus bahasa maupun belum).
+            //    Begitu pula sebaliknya untuk quota bahasa.
+            //
+            //    FIX: filter `final_status = 'rejected'` DIHAPUS dari query
+            //    agar siswa yang sudah lulus di spesialisasi utamanya tetap
+            //    terdeteksi dan ditandai sebagai Dual Pass.
+            //    Pengecekan `$alreadyPassed*` di dalam loop yang menentukan
+            //    apakah slot berkurang atau hanya ditandai dual_pass.
+            // --------------------------------------------------
+            $dualPassCount = 0;
 
-            $regularRank = 1;
-            foreach ($regularCandidates as $student) {
-                $acceptedRegular[] = $student->id;
-                
-                $student->update([
-                    'final_class_type' => 'regular',
-                    'final_status' => 'accepted',
-                    'ranking' => $regularRank,
-                ]);
-                
-                $regularRank++;
+            // C1. Sisa slot tahfiz → cari siswa BAHASA yang lolos rank tahfiz
+            if ($tahfizSlotRemaining > 0) {
+                $crossForTahfiz = SawResult::where('academic_year_id', $academicYearId)
+                    ->where('specialization', 'tahfiz')
+                    ->whereHas('student', fn($q) => $q
+                        ->where('validation_status', 'valid')
+                        ->where('specialization', 'language') // siswa bahasa di ranking tahfiz
+                        // TIDAK filter final_status — biarkan loop yang cek
+                    )
+                    ->with('student')
+                    ->orderBy('rank')
+                    ->get(); // ambil semua, slot dikelola manual di loop
+
+                foreach ($crossForTahfiz as $result) {
+                    // Hentikan jika slot sudah habis
+                    if ($tahfizSlotRemaining <= 0) {
+                        break;
+                    }
+
+                    // Refresh agar data final_status terbaru dari DB
+                    $student = $result->student->fresh();
+
+                    $alreadyPassedLanguage = $student->final_status === 'accepted';
+
+                    if ($alreadyPassedLanguage) {
+                        // Dual pass: lulus bahasa (primary) DAN tahfiz (cross)
+                        $tahfizScore    = $result->final_score;
+                        $languageResult = SawResult::where('student_id', $student->id)
+                            ->where('academic_year_id', $academicYearId)
+                            ->where('specialization', 'language')
+                            ->first();
+                        $languageScore = $languageResult?->final_score ?? 0;
+                        $recommended   = $tahfizScore >= $languageScore ? 'tahfiz' : 'language';
+
+                        Student::where('id', $student->id)->update([
+                            'final_status'               => 'accepted',
+                            'dual_pass'                  => true,
+                            'recommended_specialization' => $recommended,
+                            'accepted_specialization'    => 'language', // pilihan utamanya bahasa
+                            'cross_accepted'             => true,
+                        ]);
+                        $dualPassCount++;
+                        // Slot TIDAK berkurang — siswa ini sudah terhitung di quota bahasa
+                    } else {
+                        // Belum lulus di mana pun → cross-accepted ke tahfiz
+                        Student::where('id', $student->id)->update([
+                            'final_status'               => 'accepted',
+                            'dual_pass'                  => false,
+                            'recommended_specialization' => null,
+                            'accepted_specialization'    => 'tahfiz',
+                            'cross_accepted'             => true,
+                        ]);
+                        $tahfizAccepted++;
+                        $tahfizSlotRemaining--;
+                    }
+                }
             }
 
-            // REJECTED: Siswa yang tidak lolos di semua jalur
-            $allAccepted = array_merge($acceptedTahfiz, $acceptedLanguage, $acceptedRegular);
-            
-            $rejectedStudents = Student::where('academic_year_id', $academicYearId)
+            // C2. Sisa slot bahasa → cari siswa TAHFIZ yang lolos rank bahasa
+            if ($languageSlotRemaining > 0) {
+                $crossForLanguage = SawResult::where('academic_year_id', $academicYearId)
+                    ->where('specialization', 'language')
+                    ->whereHas('student', fn($q) => $q
+                        ->where('validation_status', 'valid')
+                        ->where('specialization', 'tahfiz') // siswa tahfiz di ranking bahasa
+                        // TIDAK filter final_status — biarkan loop yang cek
+                    )
+                    ->with('student')
+                    ->orderBy('rank')
+                    ->get(); // ambil semua, slot dikelola manual di loop
+
+                foreach ($crossForLanguage as $result) {
+                    // Hentikan jika slot sudah habis
+                    if ($languageSlotRemaining <= 0) {
+                        break;
+                    }
+
+                    // Refresh agar data final_status terbaru dari DB
+                    $student = $result->student->fresh();
+
+                    $alreadyPassedTahfiz = $student->final_status === 'accepted';
+
+                    if ($alreadyPassedTahfiz) {
+                        // Dual pass: lulus tahfiz (primary) DAN bahasa (cross)
+                        $languageScore = $result->final_score;
+                        $tahfizResult  = SawResult::where('student_id', $student->id)
+                            ->where('academic_year_id', $academicYearId)
+                            ->where('specialization', 'tahfiz')
+                            ->first();
+                        $tahfizScore = $tahfizResult?->final_score ?? 0;
+                        $recommended = $tahfizScore >= $languageScore ? 'tahfiz' : 'language';
+
+                        Student::where('id', $student->id)->update([
+                            'final_status'               => 'accepted',
+                            'dual_pass'                  => true,
+                            'recommended_specialization' => $recommended,
+                            'accepted_specialization'    => 'tahfiz', // pilihan utamanya tahfiz
+                            'cross_accepted'             => true,
+                        ]);
+                        $dualPassCount++;
+                        // Slot TIDAK berkurang — siswa ini sudah terhitung di quota tahfiz
+                    } else {
+                        // Belum lulus di mana pun → cross-accepted ke bahasa
+                        Student::where('id', $student->id)->update([
+                            'final_status'               => 'accepted',
+                            'dual_pass'                  => false,
+                            'recommended_specialization' => null,
+                            'accepted_specialization'    => 'language',
+                            'cross_accepted'             => true,
+                        ]);
+                        $languageAccepted++;
+                        $languageSlotRemaining--;
+                    }
+                }
+            }
+
+            // --------------------------------------------------
+            // D. REGULAR — berdasarkan FCFS (urutan validated_at)
+            // --------------------------------------------------
+            $regularStudents = Student::where('academic_year_id', $academicYearId)
                 ->where('validation_status', 'valid')
-                ->whereNotIn('id', $allAccepted)
+                ->where('specialization', 'regular')
+                ->orderBy('validated_at', 'asc')
                 ->get();
 
-            foreach ($rejectedStudents as $student) {
-                $rejected[] = $student->id;
-                
+            $regularAccepted = 0;
+            $regularRejected = 0;
+
+            foreach ($regularStudents as $index => $student) {
+                $isAccepted = ($index + 1) <= $regularQuota;
+
                 $student->update([
-                    'final_class_type' => null,
-                    'final_status' => 'rejected',
-                    'ranking' => null,
+                    'final_status'            => $isAccepted ? 'accepted' : 'rejected',
+                    'accepted_specialization' => $isAccepted ? 'regular' : null,
+                    'cross_accepted'          => false,
+                    'dual_pass'               => false,
                 ]);
+
+                $isAccepted ? $regularAccepted++ : $regularRejected++;
             }
 
             DB::commit();
 
-            // Count students by original choice
-            $regularChoiceAccepted = Student::whereIn('id', $acceptedRegular)
-                ->where('specialization', 'regular')
+            $totalRejected = Student::where('academic_year_id', $academicYearId)
+                ->where('validation_status', 'valid')
+                ->where('final_status', 'rejected')
                 ->count();
-            
-            $tahfizLanguageToRegular = count($acceptedRegular) - $regularChoiceAccepted;
+
+            Log::info('Acceptance determined', [
+                'academic_year_id'  => $academicYearId,
+                'tahfiz_accepted'   => $tahfizAccepted,
+                'language_accepted' => $languageAccepted,
+                'regular_accepted'  => $regularAccepted,
+                'dual_pass_count'   => $dualPassCount,
+                'total_rejected'    => $totalRejected,
+            ]);
 
             return [
                 'success' => true,
-                'data' => [
-                    'tahfiz' => [
-                        'quota' => $tahfizQuota,
-                        'accepted' => count($acceptedTahfiz),
-                        'students' => $acceptedTahfiz,
-                    ],
-                    'language' => [
-                        'quota' => $languageQuota,
-                        'accepted' => count($acceptedLanguage),
-                        'students' => $acceptedLanguage,
-                    ],
-                    'regular' => [
-                        'quota' => $regularQuota,
-                        'accepted' => count($acceptedRegular),
-                        'from_regular_choice' => $regularChoiceAccepted,
-                        'from_tahfiz_language' => $tahfizLanguageToRegular,
-                        'students' => $acceptedRegular,
-                    ],
-                    'rejected' => [
-                        'total' => count($rejected),
-                        'students' => $rejected,
-                    ],
+                'message' => 'Status penerimaan berhasil ditentukan.',
+                'data'    => [
+                    'tahfiz'    => ['accepted' => $tahfizAccepted,   'quota' => $tahfizQuota],
+                    'language'  => ['accepted' => $languageAccepted, 'quota' => $languageQuota],
+                    'regular'   => ['accepted' => $regularAccepted,  'quota' => $regularQuota],
+                    'dual_pass' => ['total' => $dualPassCount],
+                    'rejected'  => ['total' => $totalRejected],
                 ],
-                'message' => 'Status penerimaan berhasil ditentukan',
             ];
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Determine Acceptance Error: ' . $e->getMessage());
+            Log::error('RankingService::determineAcceptanceStatus error', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
+
+            return ['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Ambil ringkasan dual-pass untuk ditampilkan di dashboard panitia.
+     */
+    public function getDualPassSummary(int $academicYearId): array
+    {
+        $students = Student::with(['sawResults'])
+            ->where('academic_year_id', $academicYearId)
+            ->where('validation_status', 'valid')
+            ->where('dual_pass', true)
+            ->get();
+
+        return $students->map(function (Student $student) use ($academicYearId) {
+            $tahfizResult   = $student->sawResults->firstWhere('specialization', 'tahfiz');
+            $languageResult = $student->sawResults->firstWhere('specialization', 'language');
 
             return [
-                'success' => false,
-                'message' => 'Gagal menentukan status penerimaan: ' . $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Get acceptance summary untuk dashboard
-     */
-    public function getAcceptanceSummary(int $academicYearId): array
-    {
-        $quota = SpecializationQuota::getActiveByAcademicYear($academicYearId);
-
-        $summary = [
-            'tahfiz' => [
-                'quota' => $quota->tahfiz_quota ?? 0,
-                'accepted' => Student::where('academic_year_id', $academicYearId)
-                    ->where('final_class_type', 'tahfiz')
-                    ->where('final_status', 'accepted')
-                    ->count(),
-            ],
-            'language' => [
-                'quota' => $quota->language_quota ?? 0,
-                'accepted' => Student::where('academic_year_id', $academicYearId)
-                    ->where('final_class_type', 'language')
-                    ->where('final_status', 'accepted')
-                    ->count(),
-            ],
-            'regular' => [
-                'quota' => $quota->regular_quota ?? 0,
-                'accepted' => Student::where('academic_year_id', $academicYearId)
-                    ->where('final_class_type', 'regular')
-                    ->where('final_status', 'accepted')
-                    ->count(),
-            ],
-            'rejected' => Student::where('academic_year_id', $academicYearId)
-                ->where('validation_status', 'valid')
-                ->where('final_status', 'rejected')
-                ->count(),
-            'total_valid' => Student::where('academic_year_id', $academicYearId)
-                ->where('validation_status', 'valid')
-                ->count(),
-        ];
-
-        // Calculate percentages
-        foreach (['tahfiz', 'language', 'regular'] as $type) {
-            $summary[$type]['percentage'] = $summary[$type]['quota'] > 0
-                ? round(($summary[$type]['accepted'] / $summary[$type]['quota']) * 100, 1)
-                : 0;
-            $summary[$type]['available'] = max(0, $summary[$type]['quota'] - $summary[$type]['accepted']);
-        }
-
-        return $summary;
-    }
-
-    /**
-     * Get detailed student acceptance info
-     */
-    public function getStudentAcceptanceInfo(Student $student): array
-    {
-        $quota = SpecializationQuota::getActiveByAcademicYear($student->academic_year_id);
-
-        // Get SAW results untuk kedua spesialisasi
-        $tahfizResult = SawResult::where('student_id', $student->id)
-            ->where('academic_year_id', $student->academic_year_id)
-            ->where('specialization', 'tahfiz')
-            ->first();
-
-        $languageResult = SawResult::where('student_id', $student->id)
-            ->where('academic_year_id', $student->academic_year_id)
-            ->where('specialization', 'language')
-            ->first();
-
-        return [
-            'student' => $student,
-            'final_status' => $student->final_status,
-            'final_class_type' => $student->final_class_type,
-            'final_ranking' => $student->ranking,
-            'tahfiz' => [
-                'rank' => $tahfizResult->rank ?? null,
-                'score' => $tahfizResult->final_score ?? null,
-                'quota' => $quota->tahfiz_quota ?? 0,
-                'is_eligible' => $tahfizResult && $tahfizResult->rank <= ($quota->tahfiz_quota ?? 0),
-            ],
-            'language' => [
-                'rank' => $languageResult->rank ?? null,
-                'score' => $languageResult->final_score ?? null,
-                'quota' => $quota->language_quota ?? 0,
-                'is_eligible' => $languageResult && $languageResult->rank <= ($quota->language_quota ?? 0),
-            ],
-            'validated_at' => $student->validated_at,
-            'registered_at' => $student->created_at,
-        ];
-    }
-
-    /**
-     * Get ranking list untuk specific class type
-     */
-    public function getRankingList(int $academicYearId, string $classType, int $limit = null): array
-    {
-        $query = Student::where('academic_year_id', $academicYearId)
-            ->where('final_class_type', $classType)
-            ->where('final_status', 'accepted')
-            ->with(['user', 'sawResult' => function($q) use ($classType) {
-                // Untuk Regular, tidak perlu SAW result
-                if ($classType !== 'regular') {
-                    $q->where('specialization', $classType);
-                }
-            }])
-            ->orderBy('ranking');
-
-        if ($limit) {
-            $query->limit($limit);
-        }
-
-        return $query->get()->map(function($student) {
-            return [
-                'student' => $student,
-                'rank' => $student->ranking,
-                'final_score' => $student->sawResult->final_score ?? null,
+                'student'                => $student,
+                'tahfiz_score'           => $tahfizResult?->final_score,
+                'tahfiz_rank'            => $tahfizResult?->rank,
+                'language_score'         => $languageResult?->final_score,
+                'language_rank'          => $languageResult?->rank,
+                'recommended'            => $student->recommended_specialization,
+                'chosen'                 => $student->specialization,
+                'already_at_recommended' => $student->specialization === $student->recommended_specialization,
             ];
         })->toArray();
     }
