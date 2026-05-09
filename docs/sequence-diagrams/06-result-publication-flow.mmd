@@ -1,0 +1,134 @@
+sequenceDiagram
+    participant Committee
+    participant Browser
+    participant PublishController
+    participant RankingService
+    participant Database
+    participant NotificationJob
+    participant Student
+
+    Note over Committee,Student: Result Publication Flow
+
+    %% Preview Results
+    rect rgb(200, 220, 255)
+        Note right of Committee: Step 1: Preview Results
+        Committee->>Browser: Access /committee/publish-result/preview
+        Browser->>PublishController: GET preview
+        PublishController->>Database: Get SAW results
+        PublishController->>Database: Get acceptance status
+        PublishController->>Database: Get specialization quotas
+        Database-->>PublishController: Complete results data
+        PublishController->>PublishController: Calculate statistics
+        PublishController-->>Browser: Show preview page
+        Browser-->>Committee: Display results summary
+        Note right of Browser: Shows:<br/>- Total accepted/rejected<br/>- Ranking per specialization<br/>- Quota usage
+    end
+
+    %% Set to Reviewing
+    rect rgb(255, 220, 200)
+        Note right of Committee: Step 2: Set to Reviewing (Optional)
+        Committee->>Browser: Click "Set to Reviewing"
+        Browser->>PublishController: POST set-reviewing
+        PublishController->>Database: Update result_status = 'reviewing'
+        Database-->>PublishController: Status updated
+        PublishController-->>Browser: Success message
+        Browser-->>Committee: Show "Under Review" status
+        Note right of Committee: Results locked for review<br/>Students cannot see yet
+    end
+
+    %% Publish Results
+    rect rgb(220, 255, 200)
+        Note right of Committee: Step 3: Publish Results
+        Committee->>Browser: Click "Publish Results"
+        Browser->>PublishController: POST publish
+        PublishController->>Database: Check if SAW calculated
+        
+        alt SAW not calculated
+            Database-->>PublishController: No SAW results
+            PublishController-->>Browser: Error: Calculate SAW first
+        else SAW calculated
+            PublishController->>Database: Update result_status = 'published'
+            PublishController->>Database: Set published_at = now()
+            PublishController->>Database: Log publication action
+            Database-->>PublishController: Results published
+            
+            PublishController->>NotificationJob: Dispatch notification job
+            NotificationJob->>Database: Get all students
+            
+            loop For each student
+                NotificationJob->>Student: Send email notification
+                Note right of Student: Email contains:<br/>- Acceptance status<br/>- Ranking<br/>- Specialization<br/>- Next steps
+            end
+            
+            PublishController-->>Browser: Success message
+            Browser-->>Committee: Show "Published" status
+        end
+    end
+
+    %% Students View Results
+    rect rgb(255, 255, 200)
+        Note right of Student: Step 4: Students View Results
+        Student->>Browser: Access /student/result
+        Browser->>Database: Get student SAW result
+        
+        alt Results not published
+            Database-->>Browser: result_status != 'published'
+            Browser-->>Student: Show "Results not available yet"
+        else Results published
+            Database-->>Browser: SAW result data
+            Browser-->>Student: Show acceptance status
+            
+            alt Student accepted
+                Browser-->>Student: Show congratulations message
+                Browser-->>Student: Display ranking & score
+                Browser-->>Student: Show specialization assigned
+                Browser-->>Student: Show next steps
+            else Student rejected
+                Browser-->>Student: Show rejection message
+                Browser-->>Student: Display ranking & score
+                Browser-->>Student: Show improvement suggestions
+            end
+        end
+    end
+
+    %% View Detailed Results
+    rect rgb(200, 255, 255)
+        Note right of Student: Step 5: View Detailed Results
+        Student->>Browser: Click "Lihat Detail"
+        Browser->>Database: GET result.show
+        Database-->>Browser: Detailed SAW calculation
+        Browser-->>Student: Show breakdown:
+        Note right of Student: - Criterion values<br/>- Normalized scores<br/>- Weighted scores<br/>- Final SAW score<br/>- Ranking position
+        
+        Student->>Browser: Click "Lihat Perbandingan"
+        Browser->>Database: GET result.comparison
+        Database-->>Browser: Comparison data
+        Browser-->>Student: Show comparison with other students
+        Note right of Student: - Average scores<br/>- Percentile rank<br/>- Score distribution
+    end
+
+    %% Download Result Card
+    rect rgb(255, 200, 255)
+        Note right of Student: Step 6: Download Result Card
+        Student->>Browser: Click "Download Kartu Hasil"
+        Browser->>Database: GET result.card
+        Database-->>Browser: Generate PDF
+        Browser-->>Student: Download result card PDF
+        Note right of Student: PDF contains:<br/>- Student info<br/>- Acceptance status<br/>- Ranking<br/>- Scores<br/>- Official stamp
+    end
+
+    %% Unpublish Results (if needed)
+    rect rgb(255, 200, 200)
+        Note right of Committee: Optional: Unpublish Results
+        Committee->>Browser: Click "Unpublish"
+        Browser->>PublishController: POST unpublish
+        PublishController->>Database: Update result_status = 'draft'
+        PublishController->>Database: Clear published_at
+        PublishController->>Database: Log unpublish action
+        Database-->>PublishController: Results unpublished
+        PublishController-->>Browser: Success message
+        Browser-->>Committee: Show "Draft" status
+        Note right of Committee: Students can no longer<br/>view results
+    end
+
+    Note over Committee,Student: Publication Process Complete

@@ -53,6 +53,15 @@ class AhpMatrixController extends Controller
             'specialization' => 'required',
         ]);
 
+        // Check if there are any pending students
+        $pendingCount = \App\Models\Student::where('academic_year_id', $request->academic_year_id)
+            ->where('validation_status', 'pending')
+            ->count();
+
+        if ($pendingCount > 0) {
+            return back()->with('error', "Tidak dapat menghitung bobot AHP. Masih ada {$pendingCount} siswa dengan status validasi 'pending'. Silakan validasi semua siswa terlebih dahulu.");
+        }
+
         $consistency = $this->ahpService->validateConsistency(
             $request->academic_year_id,
             $request->specialization

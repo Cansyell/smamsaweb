@@ -414,6 +414,16 @@ class CriterionValueController extends Controller
                 ->with('error', 'Tidak ada tahun ajaran aktif');
         }
 
+        // Check if there are any pending students
+        $pendingCount = Student::where('academic_year_id', $activeYear->id)
+            ->where('validation_status', 'pending')
+            ->count();
+
+        if ($pendingCount > 0) {
+            return redirect()->back()
+                ->with('error', "Tidak dapat menghitung nilai SAW. Masih ada {$pendingCount} siswa dengan status validasi 'pending'. Silakan validasi semua siswa terlebih dahulu.");
+        }
+
         try {
             Log::info('SAW Calculation Started for All Specializations', [
                 'academic_year_id' => $activeYear->id,

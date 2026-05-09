@@ -232,12 +232,65 @@
 
     <!-- Documents -->
     <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            Dokumen Pendukung
-        </h3>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                Dokumen Pendukung
+            </h3>
+            @php
+                $totalDocs = count($validationData['documents']);
+                $validDocs = collect($validationData['documents'])->where('validation_status', 'valid')->count();
+                $invalidDocs = collect($validationData['documents'])->where('validation_status', 'invalid')->count();
+                $pendingDocs = collect($validationData['documents'])->where('validation_status', 'pending')->count();
+            @endphp
+            <div class="flex items-center gap-2">
+                @if($validDocs === $totalDocs && $totalDocs > 0)
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Semua Diterima
+                    </span>
+                @else
+                    <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                        {{ $validDocs }}/{{ $totalDocs }} Diterima
+                    </span>
+                    @if($invalidDocs > 0)
+                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">
+                            {{ $invalidDocs }} Ditolak
+                        </span>
+                    @endif
+                    @if($pendingDocs > 0)
+                        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold">
+                            {{ $pendingDocs }} Pending
+                        </span>
+                    @endif
+                @endif
+            </div>
+        </div>
+
+        <!-- Document Status Alert -->
+        @if($invalidDocs > 0 || $pendingDocs > 0)
+        <div class="mb-4 p-3 {{ $invalidDocs > 0 ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200' }} border rounded-lg">
+            <div class="flex items-start gap-2">
+                <svg class="w-5 h-5 {{ $invalidDocs > 0 ? 'text-red-600' : 'text-yellow-600' }} flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <div class="text-sm">
+                    @if($invalidDocs > 0)
+                        <p class="font-semibold text-red-800">{{ $invalidDocs }} dokumen ditolak</p>
+                        <p class="text-red-700 mt-1">Siswa tidak dapat divalidasi sampai semua dokumen yang ditolak diperbaiki dan diterima.</p>
+                    @elseif($pendingDocs > 0)
+                        <p class="font-semibold text-yellow-800">{{ $pendingDocs }} dokumen belum divalidasi</p>
+                        <p class="text-yellow-700 mt-1">Validasi semua dokumen terlebih dahulu sebelum memvalidasi data siswa.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+
         @if(count($validationData['documents']) > 0)
             <div class="space-y-4">
                 @foreach($validationData['documents'] as $doc)
@@ -325,14 +378,50 @@
                 <span class="text-sm font-normal text-blue-600 ml-2">(Validasi Ulang — Pengajuan ke-{{ $student->resubmission_count }})</span>
             @endif
         </h3>
+
+        <!-- Warning if cannot approve -->
+        @if(!$validationData['can_approve'])
+        <div class="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-yellow-600 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold text-yellow-800 mb-1">Tombol Validasi Tidak Dapat Diklik</p>
+                    <p class="text-sm text-yellow-700">Pastikan kondisi berikut terpenuhi:</p>
+                    <ul class="mt-2 text-sm text-yellow-700 space-y-1 list-disc list-inside">
+                        @if(!$validationData['validation_check']['is_complete'])
+                            <li>Data siswa harus lengkap ({{ number_format($validationData['validation_check']['completeness_percentage'], 0) }}% saat ini)</li>
+                        @endif
+                        @php
+                            $rejectedDocs = collect($validationData['documents'])->where('validation_status', 'invalid');
+                            $pendingDocs = collect($validationData['documents'])->where('validation_status', 'pending');
+                        @endphp
+                        @if($rejectedDocs->count() > 0)
+                            <li class="font-semibold">Semua dokumen yang ditolak harus diterima ({{ $rejectedDocs->count() }} dokumen ditolak)</li>
+                        @endif
+                        @if($pendingDocs->count() > 0)
+                            <li class="font-semibold">Semua dokumen harus divalidasi ({{ $pendingDocs->count() }} dokumen belum divalidasi)</li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button onclick="showApproveModal()"
                     {{ !$validationData['can_approve'] ? 'disabled' : '' }}
-                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 disabled:opacity-60">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Validasi Data Siswa
+                @if(!$validationData['can_approve'])
+                    <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                    </svg>
+                @endif
             </button>
             <button onclick="showRejectModal()"
                     class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center gap-2">

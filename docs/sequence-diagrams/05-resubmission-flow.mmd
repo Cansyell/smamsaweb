@@ -1,0 +1,137 @@
+sequenceDiagram
+    participant Student
+    participant Browser
+    participant ResubmissionController
+    participant ValidationController
+    participant ValidationService
+    participant Database
+    participant Committee
+
+    Note over Student,Committee: Data Resubmission Flow (After Rejection)
+
+    %% Student Rejected
+    rect rgb(255, 200, 200)
+        Note right of Student: Student Data Rejected
+        Committee->>ValidationController: POST validation.reject
+        ValidationController->>ValidationService: rejectStudent()
+        ValidationService->>Database: Update status to 'invalid'
+        ValidationService->>Database: Save rejection notes
+        Database-->>ValidationService: Student rejected
+        ValidationService-->>Student: Email notification with notes
+    end
+
+    %% Student Views Rejection
+    rect rgb(255, 220, 200)
+        Note right of Student: View Rejection Details
+        Student->>Browser: Access /student/dashboard
+        Browser->>Database: Get student status
+        Database-->>Browser: Status: 'invalid'
+        Browser-->>Student: Show rejection alert with notes
+        Student->>Browser: Click "Perbaiki Data"
+        Browser->>ResubmissionController: GET resubmission.show
+        ResubmissionController->>Database: Get student data & rejection notes
+        Database-->>ResubmissionController: Student data
+        ResubmissionController-->>Browser: Show resubmission form
+        Browser-->>Student: Display editable form with notes
+    end
+
+    %% Update Personal Data
+    rect rgb(220, 255, 200)
+        Note right of Student: Update Personal Data (if needed)
+        Student->>Browser: Edit personal data
+        Browser->>ResubmissionController: PUT update-personal-data
+        ResubmissionController->>ResubmissionController: Validate data
+        ResubmissionController->>Database: Update student data
+        Database-->>ResubmissionController: Data updated
+        ResubmissionController-->>Browser: Success message
+    end
+
+    %% Update Report Grades
+    rect rgb(200, 220, 255)
+        Note right of Student: Update Report Grades (if needed)
+        Student->>Browser: Edit report grades
+        Browser->>ResubmissionController: PUT update-report-grade
+        ResubmissionController->>ResubmissionController: Validate grades
+        ResubmissionController->>Database: Update grades
+        Database-->>ResubmissionController: Grades updated
+        ResubmissionController-->>Browser: Success message
+    end
+
+    %% Replace Documents
+    rect rgb(255, 255, 200)
+        Note right of Student: Replace Rejected Documents
+        loop For each rejected document
+            Student->>Browser: Upload new document
+            Browser->>ResubmissionController: POST replace-document
+            ResubmissionController->>ResubmissionController: Validate file
+            ResubmissionController->>Database: Delete old document
+            ResubmissionController->>Database: Save new document
+            ResubmissionController->>Database: Set status to 'pending'
+            Database-->>ResubmissionController: Document replaced
+            ResubmissionController-->>Browser: Success message
+        end
+    end
+
+    %% Submit Resubmission
+    rect rgb(200, 255, 255)
+        Note right of Student: Submit Resubmission
+        Student->>Browser: Click "Submit Perbaikan"
+        Browser->>ResubmissionController: POST resubmission.submit
+        ResubmissionController->>Database: Check data completeness
+        
+        alt Data incomplete
+            Database-->>ResubmissionController: Missing data
+            ResubmissionController-->>Browser: Error: Complete all data
+        else Data complete
+            ResubmissionController->>Database: Update student status to 'pending'
+            ResubmissionController->>Database: Set has_pending_resubmission = true
+            ResubmissionController->>Database: Increment resubmission_count
+            ResubmissionController->>Database: Set resubmitted_at = now()
+            ResubmissionController->>Database: Save resubmission_notes
+            ResubmissionController->>Database: Log resubmission action
+            Database-->>ResubmissionController: Resubmission submitted
+            ResubmissionController-->>Browser: Success message
+            Browser-->>Student: Show success & waiting status
+            ResubmissionController-->>Committee: Notification (optional)
+        end
+    end
+
+    %% Committee Re-validates
+    rect rgb(255, 200, 255)
+        Note right of Committee: Re-validate Resubmitted Data
+        Committee->>Browser: Access /committee/validation
+        Browser->>ValidationController: GET validation.index
+        ValidationController->>Database: Get pending students
+        Database-->>ValidationController: Students (resubmitted flagged)
+        ValidationController-->>Browser: Show list (resubmitted on top)
+        Browser-->>Committee: Display with "Data Diperbaiki" badge
+        
+        Committee->>Browser: Click resubmitted student
+        Browser->>ValidationController: GET validation.show
+        ValidationController->>ValidationService: getValidationDetails()
+        ValidationService->>Database: Get updated data
+        Database-->>ValidationService: Complete data
+        ValidationService-->>ValidationController: Validation data
+        ValidationController-->>Browser: Show with resubmission banner
+        Browser-->>Committee: Display "Pengajuan ke-X" info
+        
+        alt Data now valid
+            Committee->>ValidationController: POST validation.approve
+            ValidationController->>ValidationService: approveStudent()
+            ValidationService->>Database: Update status to 'valid'
+            ValidationService->>Database: Set has_pending_resubmission = false
+            ValidationService->>Database: Log approval (resubmission)
+            Database-->>ValidationService: Student approved
+            ValidationService-->>Student: Email: Data approved
+        else Still has issues
+            Committee->>ValidationController: POST validation.reject
+            ValidationController->>ValidationService: rejectStudent()
+            ValidationService->>Database: Update status to 'invalid'
+            ValidationService->>Database: Increment resubmission_count
+            ValidationService->>Database: Save new rejection notes
+            Database-->>ValidationService: Student rejected again
+            ValidationService-->>Student: Email: Still rejected
+        end
+    end
+
+    Note over Student,Committee: Resubmission Process Complete

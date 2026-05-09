@@ -23,6 +23,7 @@ class StoreSpecializationQuotaRequest extends FormRequest
             'academic_year_id' => 'required|exists:academic_years,id',
             'tahfiz_quota' => 'required|integer|min:0|max:1000',
             'language_quota' => 'required|integer|min:0|max:1000',
+            'regular_quota' => 'required|integer|min:0|max:1000',
             'is_active' => 'boolean',
         ];
     }
@@ -36,6 +37,7 @@ class StoreSpecializationQuotaRequest extends FormRequest
             'academic_year_id' => 'tahun ajaran',
             'tahfiz_quota' => 'kuota tahfiz',
             'language_quota' => 'kuota bahasa',
+            'regular_quota' => 'kuota reguler',
             'is_active' => 'status aktif',
         ];
     }
@@ -56,6 +58,10 @@ class StoreSpecializationQuotaRequest extends FormRequest
             'language_quota.integer' => 'Kuota bahasa harus berupa angka',
             'language_quota.min' => 'Kuota bahasa minimal 0',
             'language_quota.max' => 'Kuota bahasa maksimal 1000',
+            'regular_quota.required' => 'Kuota reguler harus diisi',
+            'regular_quota.integer' => 'Kuota reguler harus berupa angka',
+            'regular_quota.min' => 'Kuota reguler minimal 0',
+            'regular_quota.max' => 'Kuota reguler maksimal 1000',
         ];
     }
 

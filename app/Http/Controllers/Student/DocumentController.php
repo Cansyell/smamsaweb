@@ -44,8 +44,9 @@ class DocumentController extends Controller
         
         // GUNAKAN METHOD DARI MODEL
         $progress = $student->getRegistrationProgress();
+        $canEdit = $student->canEditData();
 
-        return view('student.documents.index', compact('documents', 'statistics', 'filter', 'type', 'progress'));
+        return view('student.documents.index', compact('documents', 'statistics', 'filter', 'type', 'progress', 'canEdit'));
     }
 
     public function create()
@@ -141,8 +142,9 @@ class DocumentController extends Controller
 
         // GUNAKAN METHOD DARI MODEL
         $progress = $student->getRegistrationProgress();
+        $canEdit = $student->canEditData();
 
-        return view('student.documents.edit', compact('document', 'progress'));
+        return view('student.documents.edit', compact('document', 'progress', 'canEdit'));
     }
 
     public function update(UpdateDocumentRequest $request, Document $document)
@@ -161,6 +163,14 @@ class DocumentController extends Controller
             return redirect()
                 ->route('student.documents.show', $document)
                 ->with('warning', 'Dokumen yang sudah tervalidasi tidak dapat diedit.');
+        }
+
+        // Check if student can edit data
+        $canEdit = $student->canEditData();
+        if (!$canEdit['can_edit']) {
+            return redirect()
+                ->route('student.documents.index')
+                ->with('error', $canEdit['reason']);
         }
 
         try {
@@ -197,6 +207,14 @@ class DocumentController extends Controller
             return redirect()
                 ->back()
                 ->with('warning', 'Dokumen yang sudah tervalidasi tidak dapat dihapus.');
+        }
+
+        // Check if student can edit data
+        $canEdit = $student->canEditData();
+        if (!$canEdit['can_edit']) {
+            return redirect()
+                ->route('student.documents.index')
+                ->with('error', $canEdit['reason']);
         }
 
         try {

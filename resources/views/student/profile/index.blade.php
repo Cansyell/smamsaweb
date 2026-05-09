@@ -22,6 +22,20 @@
     </div>
 
     <!-- Alert Messages -->
+    @if(!$canEdit['can_edit'])
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+        <div class="flex items-start">
+            <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div>
+                <h3 class="text-yellow-800 font-semibold mb-1">Data Terkunci</h3>
+                <p class="text-yellow-700">{{ $canEdit['reason'] }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @if(session('success'))
     <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded">
         <div class="flex items-center">
@@ -65,9 +79,12 @@
     <!-- Profile Form -->
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">
-                {{ $student ? 'Edit Data Pribadi' : 'Lengkapi Data Pribadi' }}
-            </h2>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">
+                    {{ $student ? 'Edit Data Pribadi' : 'Lengkapi Data Pribadi' }}
+                </h2>
+                <p class="text-gray-600 mt-1">Lengkapi informasi data pribadi Anda</p>
+            </div>
             @if($student)
             <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                 ID: {{ $student->student_id }}
@@ -77,6 +94,7 @@
 
         <form action="{{ $student ? route('student.profile.update', $student) : route('student.profile.store') }}" 
               method="POST" 
+              id="profileForm"
               class="space-y-6">
             @csrf
             @if($student)
@@ -325,20 +343,42 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center justify-end gap-4">
+            <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                 <a href="{{ route('student.dashboard') }}" 
                    class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
                     Kembali
                 </a>
+                @if($canEdit['can_edit'])
                 <button type="submit" 
-                        class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition">
-                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition inline-flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     {{ $student ? 'Perbarui Data' : 'Simpan Data' }}
                 </button>
+                @endif
             </div>
         </form>
     </div>
 </div>
+
+@if(!$canEdit['can_edit'])
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profileForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.classList.add('bg-gray-100', 'cursor-not-allowed', 'opacity-60');
+        });
+    }
+});
+</script>
+@endpush
+@endif
 @endsection

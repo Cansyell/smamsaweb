@@ -120,13 +120,15 @@ class SpecializationService
      * Store student specialization choice
      * 
      * @param Student $student
-     * @param string $specialization
+     * @param array $data
      * @return array
      */
-    public function storeSpecialization(Student $student, string $specialization): array
+    public function storeSpecialization(Student $student, array $data): array
     {
         try {
             DB::beginTransaction();
+
+            $specialization = $data['specialization'];
 
             // Validasi quota
             if (in_array($specialization, ['tahfiz', 'language'])) {
@@ -140,10 +142,26 @@ class SpecializationService
                 }
             }
 
-            // Update specialization
-            $student->update([
+            // Prepare update data
+            $updateData = [
                 'specialization' => $specialization,
-            ]);
+            ];
+
+            // Add optional fields if present
+            if (isset($data['preference_reason'])) {
+                $updateData['preference_reason'] = $data['preference_reason'];
+            }
+
+            if (isset($data['quran_memorization'])) {
+                $updateData['quran_memorization'] = $data['quran_memorization'];
+            }
+
+            if (isset($data['language_interest'])) {
+                $updateData['language_interest'] = $data['language_interest'];
+            }
+
+            // Update specialization
+            $student->update($updateData);
 
             DB::commit();
 
@@ -166,10 +184,10 @@ class SpecializationService
      * Update student specialization choice
      * 
      * @param Student $student
-     * @param string $specialization
+     * @param array $data
      * @return array
      */
-    public function updateSpecialization(Student $student, string $specialization): array
+    public function updateSpecialization(Student $student, array $data): array
     {
         try {
             DB::beginTransaction();
@@ -181,6 +199,8 @@ class SpecializationService
                     'message' => 'Peminatan tidak dapat diubah setelah mengikuti tes interview.',
                 ];
             }
+
+            $specialization = $data['specialization'];
 
             // Validasi quota
             if (in_array($specialization, ['tahfiz', 'language']) && $student->specialization !== $specialization) {
@@ -194,9 +214,25 @@ class SpecializationService
                 }
             }
 
-            $student->update([
+            // Prepare update data
+            $updateData = [
                 'specialization' => $specialization,
-            ]);
+            ];
+
+            // Add optional fields if present
+            if (isset($data['preference_reason'])) {
+                $updateData['preference_reason'] = $data['preference_reason'];
+            }
+
+            if (isset($data['quran_memorization'])) {
+                $updateData['quran_memorization'] = $data['quran_memorization'];
+            }
+
+            if (isset($data['language_interest'])) {
+                $updateData['language_interest'] = $data['language_interest'];
+            }
+
+            $student->update($updateData);
 
             DB::commit();
 

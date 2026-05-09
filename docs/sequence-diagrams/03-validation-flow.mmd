@@ -1,0 +1,116 @@
+sequenceDiagram
+    participant Committee
+    participant Browser
+    participant ValidationController
+    participant ValidationService
+    participant DocumentController
+    participant Database
+    participant Student
+
+    Note over Committee,Student: Document & Student Validation Flow
+
+    %% View Students List
+    rect rgb(200, 220, 255)
+        Note right of Committee: View Pending Students
+        Committee->>Browser: Access /committee/validation
+        Browser->>ValidationController: GET validation.index
+        ValidationController->>ValidationService: getValidationStatistics()
+        ValidationService->>Database: Query students by status
+        Database-->>ValidationService: Students data
+        ValidationService-->>ValidationController: Statistics & list
+        ValidationController-->>Browser: Show students list
+        Browser-->>Committee: Display pending students
+    end
+
+    %% View Student Detail
+    rect rgb(255, 220, 200)
+        Note right of Committee: View Student Detail
+        Committee->>Browser: Click student
+        Browser->>ValidationController: GET validation.show
+        ValidationController->>ValidationService: getValidationDetails()
+        ValidationService->>Database: Get student, documents, grades
+        Database-->>ValidationService: Complete student data
+        ValidationService->>ValidationService: validateStudentCompleteness()
+        ValidationService->>ValidationService: canApprove() - Check all conditions
+        ValidationService-->>ValidationController: Validation data
+        ValidationController-->>Browser: Show student detail
+        Browser-->>Committee: Display all data & documents
+    end
+
+    %% Validate Documents
+    rect rgb(220, 255, 200)
+        Note right of Committee: Validate Each Document
+        loop For each document
+            Committee->>Browser: Click "Terima" or "Tolak"
+            Browser->>ValidationController: POST document.validate
+            ValidationController->>ValidationService: validateDocument()
+            ValidationService->>Database: Update document status
+            Database-->>ValidationService: Document updated
+            ValidationService->>Database: Log validation action
+            ValidationService-->>ValidationController: Success
+            ValidationController-->>Browser: Refresh page
+            Browser-->>Committee: Show updated status
+        end
+    end
+
+    %% Check Approval Conditions
+    rect rgb(255, 255, 200)
+        Note right of Committee: Check if Can Approve
+        Browser->>ValidationService: canApprove()
+        
+        ValidationService->>ValidationService: Check data completeness
+        alt Data incomplete
+            ValidationService-->>Browser: Button DISABLED
+            Note right of Browser: Reason: Data not complete
+        end
+        
+        ValidationService->>Database: Check rejected documents
+        alt Has rejected documents
+            ValidationService-->>Browser: Button DISABLED
+            Note right of Browser: Reason: Has rejected docs
+        end
+        
+        ValidationService->>Database: Check pending documents
+        alt Has pending documents
+            ValidationService-->>Browser: Button DISABLED
+            Note right of Browser: Reason: Has pending docs
+        end
+        
+        ValidationService-->>Browser: Button ENABLED
+        Note right of Browser: All conditions met
+    end
+
+    %% Approve Student
+    rect rgb(200, 255, 200)
+        Note right of Committee: Approve Student
+        Committee->>Browser: Click "Validasi Data Siswa"
+        Browser->>ValidationController: POST validation.approve
+        ValidationController->>ValidationService: approveStudent()
+        ValidationService->>ValidationService: validateStudentCompleteness()
+        ValidationService->>Database: Update student status to 'valid'
+        ValidationService->>Database: Auto-approve pending documents
+        ValidationService->>Database: Log approval action
+        Database-->>ValidationService: Student approved
+        ValidationService-->>ValidationController: Success
+        ValidationController-->>Browser: Redirect with success
+        Browser-->>Committee: Show success message
+        Browser->>Student: Email notification (optional)
+    end
+
+    %% Reject Student
+    rect rgb(255, 200, 200)
+        Note right of Committee: Reject Student
+        Committee->>Browser: Click "Tolak Data Siswa"
+        Browser->>ValidationController: POST validation.reject
+        ValidationController->>ValidationService: rejectStudent()
+        ValidationService->>Database: Update student status to 'invalid'
+        ValidationService->>Database: Save rejection notes
+        ValidationService->>Database: Log rejection action
+        Database-->>ValidationService: Student rejected
+        ValidationService-->>ValidationController: Success
+        ValidationController-->>Browser: Redirect with success
+        Browser-->>Committee: Show success message
+        Browser->>Student: Email notification with notes
+    end
+
+    Note over Committee,Student: Validation Process Complete

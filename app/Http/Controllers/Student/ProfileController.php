@@ -15,11 +15,15 @@ class ProfileController extends Controller
         $student = Student::where('user_id', auth()->id())->first();
         $academicYears = AcademicYear::where('is_active', true)->get();
 
+        // Check if student can edit data
+        $canEdit = $student ? $student->canEditData() : ['can_edit' => true, 'reason' => null];
+
         return view('student.profile.index', [
             'page' => 'profile',
             'student' => $student,
             'academicYears' => $academicYears,
             'progress' => $this->calculateProgress($student),
+            'canEdit' => $canEdit,
         ]);
     }
 
@@ -50,6 +54,14 @@ class ProfileController extends Controller
     {
         if ($student->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki akses untuk mengubah data ini.');
+        }
+
+        // Check if student can edit data
+        $canEdit = $student->canEditData();
+        if (!$canEdit['can_edit']) {
+            return redirect()
+                ->route('student.profile.index')
+                ->with('error', $canEdit['reason']);
         }
 
         try {

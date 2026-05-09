@@ -28,6 +28,9 @@ class Student extends Model
         'graduation_year',
         'kip_number',
         'specialization',
+        'preference_reason',
+        'quran_memorization',
+        'language_interest',
         'validation_status',
         'validation_notes',
         'validated_at',
@@ -687,5 +690,37 @@ class Student extends Model
             ->where('specialization', $specialization)
             ->where('rank', '<=', $quota)
             ->count();
+    }
+
+
+    /**
+     * Check if SAW calculation has been done for this student
+     * 
+     * @return bool
+     */
+    public function hasSawCalculation(): bool
+    {
+        return $this->sawResults()->exists();
+    }
+
+    /**
+     * Check if student can edit their data (biodata, grades, specialization, documents)
+     * Student cannot edit if SAW calculation has been done
+     * 
+     * @return array
+     */
+    public function canEditData(): array
+    {
+        if ($this->hasSawCalculation()) {
+            return [
+                'can_edit' => false,
+                'reason' => 'Data tidak dapat diubah karena perhitungan nilai SAW sudah dilakukan oleh panitia.',
+            ];
+        }
+
+        return [
+            'can_edit' => true,
+            'reason' => null,
+        ];
     }
 }

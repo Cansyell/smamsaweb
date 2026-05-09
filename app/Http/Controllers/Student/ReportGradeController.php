@@ -31,7 +31,10 @@ class ReportGradeController extends Controller
         // Hitung progress
         $progress = $this->calculateProgress($student);
 
-        return view('student.report-grades.index', compact('student', 'reportGrade', 'progress'));
+        // Check if student can edit data
+        $canEdit = $student->canEditData();
+
+        return view('student.report-grades.index', compact('student', 'reportGrade', 'progress', 'canEdit'));
     }
 
     /**
@@ -124,8 +127,9 @@ class ReportGradeController extends Controller
 
         $student = $reportGrade->student;
         $progress = $this->calculateProgress($student);
+        $canEdit = $student->canEditData();
 
-        return view('student.report-grades.edit', compact('reportGrade', 'student', 'progress'));
+        return view('student.report-grades.edit', compact('reportGrade', 'student', 'progress', 'canEdit'));
     }
 
     /**
@@ -136,6 +140,14 @@ class ReportGradeController extends Controller
         // Pastikan report grade milik user yang login
         if ($reportGrade->student->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
+        }
+
+        // Check if student can edit data
+        $canEdit = $reportGrade->student->canEditData();
+        if (!$canEdit['can_edit']) {
+            return redirect()
+                ->route('student.report-grades.index')
+                ->with('error', $canEdit['reason']);
         }
 
         try {

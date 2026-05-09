@@ -1,0 +1,83 @@
+sequenceDiagram
+    participant Student
+    participant Browser
+    participant ProfileController
+    participant ReportGradeController
+    participant DocumentController
+    participant SpecializationController
+    participant Database
+    participant Storage
+
+    Note over Student,Storage: Student Registration Flow (PPDB)
+
+    %% Step 1: Personal Data
+    rect rgb(200, 220, 255)
+        Note right of Student: Step 1: Input Personal Data
+        Student->>Browser: Access /student/profile
+        Browser->>ProfileController: GET profile.index
+        ProfileController->>Database: Get student data
+        Database-->>ProfileController: Student data (if exists)
+        ProfileController-->>Browser: Show profile form
+        Student->>Browser: Fill personal data
+        Browser->>ProfileController: POST/PUT profile
+        ProfileController->>ProfileController: Validate data
+        ProfileController->>Database: Save student data
+        Database-->>ProfileController: Data saved
+        ProfileController-->>Browser: Success message
+        Browser-->>Student: Show success & progress (25%)
+    end
+
+    %% Step 2: Report Grades
+    rect rgb(255, 220, 200)
+        Note right of Student: Step 2: Input Report Grades
+        Student->>Browser: Access /student/report-grades
+        Browser->>ReportGradeController: GET report-grades.index
+        ReportGradeController->>Database: Get report grades
+        Database-->>ReportGradeController: Report grades data
+        ReportGradeController-->>Browser: Show grades form
+        Student->>Browser: Input grades (PAI, B.Indo, B.Inggris)
+        Browser->>ReportGradeController: POST report-grades
+        ReportGradeController->>ReportGradeController: Validate grades
+        ReportGradeController->>Database: Save grades
+        Database-->>ReportGradeController: Grades saved
+        ReportGradeController-->>Browser: Success message
+        Browser-->>Student: Show success & progress (50%)
+    end
+
+    %% Step 3: Upload Documents
+    rect rgb(220, 255, 200)
+        Note right of Student: Step 3: Upload Documents
+        Student->>Browser: Access /student/documents
+        Browser->>DocumentController: GET documents.index
+        DocumentController->>Database: Get uploaded documents
+        Database-->>DocumentController: Documents list
+        DocumentController-->>Browser: Show documents page
+        Student->>Browser: Upload document (KTP, Ijazah, etc)
+        Browser->>DocumentController: POST documents
+        DocumentController->>DocumentController: Validate file
+        DocumentController->>Storage: Save file
+        Storage-->>DocumentController: File path
+        DocumentController->>Database: Save document record
+        Database-->>DocumentController: Document saved
+        DocumentController-->>Browser: Success message
+        Browser-->>Student: Show success & progress (75%)
+    end
+
+    %% Step 4: Choose Specialization
+    rect rgb(255, 255, 200)
+        Note right of Student: Step 4: Choose Specialization
+        Student->>Browser: Access /student/specialization
+        Browser->>SpecializationController: GET specialization.index
+        SpecializationController->>Database: Get specialization data
+        Database-->>SpecializationController: Current specialization
+        SpecializationController-->>Browser: Show specialization form
+        Student->>Browser: Choose specialization (Tahfiz/Language)
+        Browser->>SpecializationController: POST specialization
+        SpecializationController->>SpecializationController: Validate choice
+        SpecializationController->>Database: Save specialization
+        Database-->>SpecializationController: Specialization saved
+        SpecializationController-->>Browser: Success message
+        Browser-->>Student: Show success & progress (100%)
+    end
+
+    Note over Student,Storage: Registration Complete - Waiting for Validation

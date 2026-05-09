@@ -1062,44 +1062,6 @@
 </section>
 @endif
  
- 
-{{-- ══════════════════════════════════════════ --}}
-{{-- GALERI SECTION (dinamis)                  --}}
-{{-- ══════════════════════════════════════════ --}}
-<section id="galeri">
-    <div class="gallery-header reveal">
-        <div class="section-tag">Galeri Sekolah</div>
-        <h2 class="section-title">Momen Berharga di<br>SMA Muhammadiyah 1 Purwokerto</h2>
-        <div class="divider"></div>
-    </div>
- 
-    @if ($galeri->isNotEmpty())
-    <div class="gallery-grid reveal">
-        @foreach ($galeri as $item)
-        <div class="gallery-item {{ $item->tipe === 'video' ? 'video-item' : '' }}">
-            @if ($item->tipe === 'video')
-                <iframe
-                    src="{{ $item->embed_url }}"
-                    title="{{ $item->judul }}"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
-            @else
-                <img
-                    src="{{ $item->gambar_url ?? asset($item->gambar_path) }}"
-                    alt="{{ $item->alt_text ?? $item->judul }}">
-            @endif
-            <div class="gallery-overlay">
-                <span class="gallery-caption">{{ $item->caption ?? $item->judul }}</span>
-            </div>
-        </div>
-        @endforeach
-    </div>
-    @endif
-</section>
- 
- 
 {{-- ══════════════════════════════════════════ --}}
 {{-- PPDB SECTION (dinamis)                    --}}
 {{-- ══════════════════════════════════════════ --}}
@@ -1242,6 +1204,42 @@
         <div class="fasilitas-card reveal"><span class="fas-icon">🏥</span><div class="fas-name">Klinik Sekolah</div><p class="fas-desc">Unit kesehatan sekolah dengan tenaga medis berpengalaman, siap melayani kebutuhan kesehatan siswa setiap hari.</p></div>
         <div class="fasilitas-card reveal"><span class="fas-icon">🚌</span><div class="fas-name">Layanan Antar-Jemput</div><p class="fas-desc">Armada bus sekolah ber-AC yang melayani berbagai rute di dalam kota dengan sistem GPS real-time.</p></div>
     </div>
+</section>
+
+{{-- ══════════════════════════════════════════ --}}
+{{-- GALERI SECTION (dinamis)                  --}}
+{{-- ══════════════════════════════════════════ --}}
+<section id="galeri">
+    <div class="gallery-header reveal">
+        <div class="section-tag">Galeri Sekolah</div>
+        <h2 class="section-title">Momen Berharga di<br>SMA Muhammadiyah 1 Purwokerto</h2>
+        <div class="divider"></div>
+    </div>
+ 
+    @if ($galeri->isNotEmpty())
+    <div class="gallery-grid reveal">
+        @foreach ($galeri as $item)
+        <div class="gallery-item {{ $item->tipe === 'video' ? 'video-item' : '' }}">
+            @if ($item->tipe === 'video')
+                <iframe
+                    src="{{ $item->embed_url }}"
+                    title="{{ $item->judul }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            @else
+                <img
+                    src="{{ $item->gambar_url ?? asset($item->gambar_path) }}"
+                    alt="{{ $item->alt_text ?? $item->judul }}">
+            @endif
+            <div class="gallery-overlay">
+                <span class="gallery-caption">{{ $item->caption ?? $item->judul }}</span>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @endif
 </section>
 
 <!-- MAP / LOKASI -->

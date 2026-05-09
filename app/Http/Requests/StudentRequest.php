@@ -19,7 +19,9 @@ class StudentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $studentId = $this->route('student'); // Untuk update
+        // Ambil ID dari route parameter (bisa berupa object atau ID)
+        $student = $this->route('student');
+        $studentId = $student instanceof \App\Models\Student ? $student->id : $student;
 
         return [
             'academic_year_id' => 'required|exists:academic_years,id',

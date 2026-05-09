@@ -72,7 +72,7 @@
         <div class="flex items-center justify-between">
             <div class="flex-1">
                 <h2 class="text-xl font-semibold mb-3">
-                    {{ $student->specialization === 'regular' ? 'Posisi Anda (FCFS)' : 'Peringkat Anda (SAW)' }}
+                    {{ $student->specialization === 'regular' ? 'Posisi Anda (FCFS)' : 'Peringkat Anda' }}
                 </h2>
                 <div class="flex items-baseline space-x-3 mb-4">
                     <span class="text-5xl font-bold">{{ $myRanking['rank'] }}</span>

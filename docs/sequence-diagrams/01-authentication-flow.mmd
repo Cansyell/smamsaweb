@@ -1,0 +1,59 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant AuthController
+    participant Middleware
+    participant Database
+    participant Dashboard
+
+    Note over User,Dashboard: Authentication Flow
+
+    %% Registration
+    rect rgb(200, 220, 255)
+        Note right of User: Registration Process
+        User->>Browser: Access /register
+        Browser->>AuthController: GET register
+        AuthController-->>Browser: Show registration form
+        User->>Browser: Fill form & submit
+        Browser->>AuthController: POST register
+        AuthController->>Database: Create user (role: student)
+        Database-->>AuthController: User created
+        AuthController->>AuthController: Auto login
+        AuthController-->>Browser: Redirect to /dashboard
+        Browser->>Middleware: Check role
+        Middleware-->>Browser: Redirect to student.dashboard
+    end
+
+    %% Login
+    rect rgb(255, 220, 200)
+        Note right of User: Login Process
+        User->>Browser: Access /login
+        Browser->>AuthController: GET login
+        AuthController-->>Browser: Show login form
+        User->>Browser: Enter credentials
+        Browser->>AuthController: POST login
+        AuthController->>Database: Verify credentials
+        Database-->>AuthController: User authenticated
+        AuthController->>AuthController: Create session
+        AuthController-->>Browser: Redirect to /dashboard
+        Browser->>Middleware: Check user role
+        
+        alt Role: Admin
+            Middleware-->>Dashboard: Redirect to admin dashboard
+        else Role: Committee
+            Middleware-->>Dashboard: Redirect to committee dashboard
+        else Role: Student
+            Middleware-->>Dashboard: Redirect to student dashboard
+        end
+    end
+
+    %% Logout
+    rect rgb(220, 255, 200)
+        Note right of User: Logout Process
+        User->>Browser: Click logout
+        Browser->>AuthController: POST logout
+        AuthController->>AuthController: Destroy session
+        AuthController->>AuthController: Invalidate token
+        AuthController-->>Browser: Redirect to home
+        Browser-->>User: Show homepage
+    end

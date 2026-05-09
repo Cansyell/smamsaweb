@@ -51,7 +51,7 @@
             </div>
 
             <!-- Quota Fields -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <!-- Tahfiz Quota -->
                 <div>
                     <label for="tahfiz_quota" class="block text-sm font-medium text-gray-700 mb-2">
@@ -107,6 +107,34 @@
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">Jumlah siswa program Bahasa</p>
                 </div>
+
+                <!-- Regular Quota -->
+                <div>
+                    <label for="regular_quota" class="block text-sm font-medium text-gray-700 mb-2">
+                        <svg class="w-4 h-4 inline text-green-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Kuota Reguler <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input type="number" 
+                            name="regular_quota" 
+                            id="regular_quota" 
+                            value="{{ old('regular_quota', $specializationQuota->regular_quota) }}"
+                            min="0" 
+                            max="1000"
+                            placeholder="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('regular_quota') border-red-500 @enderror"
+                            required>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span class="text-gray-500 text-sm">siswa</span>
+                        </div>
+                    </div>
+                    @error('regular_quota')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-1 text-xs text-gray-500">Jumlah siswa program Reguler</p>
+                </div>
             </div>
 
             <!-- Total Preview -->
@@ -124,6 +152,7 @@
                     <div class="flex justify-between text-xs text-indigo-700">
                         <span>Tahfiz: <span id="tahfiz-percentage">{{ $specializationQuota->tahfiz_percentage }}</span>%</span>
                         <span>Bahasa: <span id="language-percentage">{{ $specializationQuota->language_percentage }}</span>%</span>
+                        <span>Reguler: <span id="regular-percentage">{{ $specializationQuota->regular_percentage }}</span>%</span>
                     </div>
                 </div>
             </div>
@@ -154,7 +183,7 @@
                     </svg>
                     <span class="text-sm font-medium text-gray-700">Statistik Saat Ini</span>
                 </div>
-                <div class="grid grid-cols-3 gap-4 text-sm">
+                <div class="grid grid-cols-4 gap-4 text-sm">
                     <div>
                         <span class="text-gray-600">Tahfiz:</span>
                         <p class="font-semibold text-blue-600">{{ $specializationQuota->tahfiz_quota }} siswa</p>
@@ -162,6 +191,10 @@
                     <div>
                         <span class="text-gray-600">Bahasa:</span>
                         <p class="font-semibold text-purple-600">{{ $specializationQuota->language_quota }} siswa</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Reguler:</span>
+                        <p class="font-semibold text-green-600">{{ $specializationQuota->regular_quota }} siswa</p>
                     </div>
                     <div>
                         <span class="text-gray-600">Total:</span>
@@ -193,31 +226,38 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tahfizInput = document.getElementById('tahfiz_quota');
     const languageInput = document.getElementById('language_quota');
+    const regularInput = document.getElementById('regular_quota');
     const totalDisplay = document.getElementById('total-quota');
     const tahfizPercentageDisplay = document.getElementById('tahfiz-percentage');
     const languagePercentageDisplay = document.getElementById('language-percentage');
+    const regularPercentageDisplay = document.getElementById('regular-percentage');
 
     function updateTotal() {
         const tahfiz = parseInt(tahfizInput.value) || 0;
         const language = parseInt(languageInput.value) || 0;
-        const total = tahfiz + language;
+        const regular = parseInt(regularInput.value) || 0;
+        const total = tahfiz + language + regular;
         
         totalDisplay.textContent = total + ' siswa';
         
         if (total > 0) {
             const tahfizPercentage = ((tahfiz / total) * 100).toFixed(2);
             const languagePercentage = ((language / total) * 100).toFixed(2);
+            const regularPercentage = ((regular / total) * 100).toFixed(2);
             
             tahfizPercentageDisplay.textContent = tahfizPercentage;
             languagePercentageDisplay.textContent = languagePercentage;
+            regularPercentageDisplay.textContent = regularPercentage;
         } else {
             tahfizPercentageDisplay.textContent = '0';
             languagePercentageDisplay.textContent = '0';
+            regularPercentageDisplay.textContent = '0';
         }
     }
 
     tahfizInput.addEventListener('input', updateTotal);
     languageInput.addEventListener('input', updateTotal);
+    regularInput.addEventListener('input', updateTotal);
     
     // Initial calculation
     updateTotal();

@@ -542,7 +542,30 @@ class ValidationService
 
     private function canApprove(Student $student): bool
     {
-        return $this->validateStudentCompleteness($student)['is_complete'];
+        // Check if student data is complete
+        if (!$this->validateStudentCompleteness($student)['is_complete']) {
+            return false;
+        }
+
+        // Check if all documents are valid (no rejected documents)
+        $hasRejectedDocuments = $student->documents()
+            ->where('validation_status', 'invalid')
+            ->exists();
+
+        if ($hasRejectedDocuments) {
+            return false;
+        }
+
+        // Check if all documents are validated (no pending documents)
+        $hasPendingDocuments = $student->documents()
+            ->where('validation_status', 'pending')
+            ->exists();
+
+        if ($hasPendingDocuments) {
+            return false;
+        }
+
+        return true;
     }
 
     private function autoApproveDocuments(Student $student): void

@@ -46,6 +46,7 @@ class SpecializationController extends Controller
         }
 
         $progress = $student->getRegistrationProgress();
+        $canEdit = $student->canEditData();
 
         return view('student.specialization.index', compact(
             'student',
@@ -53,7 +54,8 @@ class SpecializationController extends Controller
             'quotaInfo',
             'recommendation',
             'ranking',
-            'progress'
+            'progress',
+            'canEdit'
         ));
     }
 
@@ -119,7 +121,7 @@ class SpecializationController extends Controller
         }
 
         // Store menggunakan service
-        $result = $this->specializationService->storeSpecialization($student, $request->specialization);
+        $result = $this->specializationService->storeSpecialization($student, $request->validated());
 
         if (!$result['success']) {
             return redirect()->back()
@@ -199,12 +201,14 @@ class SpecializationController extends Controller
         $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
 
         $progress = $student->getRegistrationProgress();
+        $canEditData = $student->canEditData();
 
         return view('student.specialization.edit', compact(
             'student',
             'recommendation',
             'quotaInfo',
-            'progress'
+            'progress',
+            'canEditData'
         ));
     }
 
@@ -225,8 +229,16 @@ class SpecializationController extends Controller
                 ->with('error', 'Anda belum memilih peminatan');
         }
 
+        // Check if student can edit data
+        $canEdit = $student->canEditData();
+        if (!$canEdit['can_edit']) {
+            return redirect()
+                ->route('student.specialization.index')
+                ->with('error', $canEdit['reason']);
+        }
+
         // Update menggunakan service
-        $result = $this->specializationService->updateSpecialization($student, $request->specialization);
+        $result = $this->specializationService->updateSpecialization($student, $request->validated());
 
         if (!$result['success']) {
             return redirect()->back()
