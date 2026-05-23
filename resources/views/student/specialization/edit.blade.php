@@ -10,12 +10,12 @@
             <h3 class="text-lg font-semibold text-gray-800">Progress Pendaftaran</h3>
             <span class="text-2xl font-bold text-indigo-600">{{ number_format($progress['percentage'], 0) }}%</span>
         </div>
-        
+
         <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500" 
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-500"
                  style="width: {{ $progress['percentage'] }}%"></div>
         </div>
-        
+
         <p class="text-sm text-gray-600">
             {{ $progress['completed'] }} dari {{ $progress['total'] }} langkah telah diselesaikan
         </p>
@@ -24,13 +24,13 @@
     <!-- Warning Alert -->
     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
         <div class="flex items-start">
-            <svg class="w-6 h-6 text-yellow-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-6 h-6 text-yellow-600 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
             </svg>
             <div>
                 <h3 class="font-semibold text-yellow-800 mb-1">Perhatian!</h3>
                 <p class="text-sm text-yellow-700">
-                    Anda akan mengubah pilihan peminatan. Pastikan pilihan baru sudah tepat karena 
+                    Anda akan mengubah pilihan peminatan. Pastikan pilihan baru sudah tepat karena
                     pilihan tidak dapat diubah lagi setelah mengikuti tes interview.
                 </p>
             </div>
@@ -70,7 +70,7 @@
             <div>
                 <h3 class="font-semibold text-blue-800 mb-1">Rekomendasi Sistem</h3>
                 <p class="text-sm text-blue-700">
-                    Berdasarkan nilai rapor Anda, sistem merekomendasikan kelas 
+                    Berdasarkan nilai rapor Anda, sistem merekomendasikan kelas
                     <strong>{{ ucfirst($recommendation['recommended']) }}</strong>.
                     <br>
                     <span class="text-xs mt-1 block">{{ $recommendation['reason'] }}</span>
@@ -87,7 +87,7 @@
                 <h2 class="text-2xl font-bold text-gray-800">Ubah Kelas Peminatan</h2>
                 <p class="text-sm text-gray-600 mt-1">Pilih peminatan baru sesuai minat dan kemampuan Anda</p>
             </div>
-            <a href="{{ route('student.specialization.index') }}" 
+            <a href="{{ route('student.specialization.index') }}"
                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                 <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -104,8 +104,8 @@
             <div class="space-y-4 mb-6">
                 <!-- Tahfiz Option -->
                 <label class="relative block cursor-pointer">
-                    <input type="radio" name="specialization" value="tahfiz" 
-                           class="peer sr-only" 
+                    <input type="radio" name="specialization" value="tahfiz"
+                           class="peer sr-only"
                            {{ old('specialization', $student->specialization) === 'tahfiz' ? 'checked' : '' }}>
                     <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-400 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
                         <div class="flex items-start">
@@ -121,7 +121,8 @@
                                 </div>
                                 <div class="mt-3">
                                     <span class="text-xs text-gray-600">
-                                        Kuota: {{ $quotaInfo['tahfiz']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['tahfiz']['accepted'] ?? 0 }}/{{ $quotaInfo['tahfiz']['quota'] ?? 0 }} diterima)
+                                        Kuota: {{ $quotaInfo['tahfiz']['available'] ?? 0 }} tempat tersisa
+                                        ({{ $quotaInfo['tahfiz']['accepted'] ?? 0 }}/{{ $quotaInfo['tahfiz']['quota'] ?? 0 }} diterima)
                                     </span>
                                 </div>
                             </div>
@@ -131,7 +132,7 @@
 
                 <!-- Language Option -->
                 <label class="relative block cursor-pointer">
-                    <input type="radio" name="specialization" value="language" 
+                    <input type="radio" name="specialization" value="language"
                            class="peer sr-only"
                            {{ old('specialization', $student->specialization) === 'language' ? 'checked' : '' }}>
                     <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-400 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
@@ -148,7 +149,8 @@
                                 </div>
                                 <div class="mt-3">
                                     <span class="text-xs text-gray-600">
-                                        Kuota: {{ $quotaInfo['language']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['language']['accepted'] ?? 0 }}/{{ $quotaInfo['language']['quota'] ?? 0 }} diterima)
+                                        Kuota: {{ $quotaInfo['language']['available'] ?? 0 }} tempat tersisa
+                                        ({{ $quotaInfo['language']['accepted'] ?? 0 }}/{{ $quotaInfo['language']['quota'] ?? 0 }} diterima)
                                     </span>
                                 </div>
                             </div>
@@ -158,7 +160,7 @@
 
                 <!-- Regular Option -->
                 <label class="relative block cursor-pointer">
-                    <input type="radio" name="specialization" value="regular" 
+                    <input type="radio" name="specialization" value="regular"
                            class="peer sr-only"
                            {{ old('specialization', $student->specialization) === 'regular' ? 'checked' : '' }}>
                     <div class="border-2 border-gray-200 rounded-lg p-6 hover:border-blue-400 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition-all">
@@ -175,7 +177,8 @@
                                 </div>
                                 <div class="mt-3">
                                     <span class="text-xs text-gray-600">
-                                        Kuota: {{ $quotaInfo['regular']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['regular']['accepted'] ?? 0 }}/{{ $quotaInfo['regular']['quota'] ?? 0 }} diterima)
+                                        Kuota: {{ $quotaInfo['regular']['available'] ?? 0 }} tempat tersisa
+                                        ({{ $quotaInfo['regular']['accepted'] ?? 0 }}/{{ $quotaInfo['regular']['quota'] ?? 0 }} diterima)
                                     </span>
                                 </div>
                             </div>
@@ -187,6 +190,56 @@
             @error('specialization')
                 <p class="text-sm text-red-600 mb-4">{{ $message }}</p>
             @enderror
+
+            <!-- Additional Info Section -->
+            <div id="additionalInfo" class="mb-6 hidden">
+                <!-- Tahfiz Info -->
+                <div id="tahfizInfo" class="hidden border-t border-gray-200 pt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Hafalan Al-Quran Saat Ini (Juz)
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" name="quran_memorization" min="0" max="30"
+                           value="{{ old('quran_memorization', $student->quran_memorization) }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Masukkan jumlah juz (0-30)">
+                    @error('quran_memorization')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-1 text-xs text-gray-500">Masukkan jumlah juz Al-Quran yang sudah Anda hafal</p>
+                </div>
+
+                <!-- Language Info -->
+                <div id="languageInfo" class="hidden border-t border-gray-200 pt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Minat Bahasa <span class="text-red-500">*</span>
+                    </label>
+                    <select name="language_interest"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Pilih minat bahasa</option>
+                        <option value="arabic"  {{ old('language_interest', $student->language_interest) === 'arabic'  ? 'selected' : '' }}>Bahasa Arab</option>
+                        <option value="english" {{ old('language_interest', $student->language_interest) === 'english' ? 'selected' : '' }}>Bahasa Inggris</option>
+                        <option value="both"    {{ old('language_interest', $student->language_interest) === 'both'    ? 'selected' : '' }}>Keduanya (Arab & Inggris)</option>
+                    </select>
+                    @error('language_interest')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <!-- Reason (Optional) -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Alasan Memilih (Opsional)
+                </label>
+                <textarea name="preference_reason" rows="3"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ceritakan alasan Anda memilih peminatan ini...">{{ old('preference_reason', $student->preference_reason) }}</textarea>
+                <p class="mt-1 text-xs text-gray-500">Maksimal 1000 karakter</p>
+                @error('preference_reason')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
 
             <!-- Your Grades Summary -->
             @if($student->reportGrade)
@@ -232,14 +285,14 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-between border-t border-gray-200 pt-6">
-                <a href="{{ route('student.specialization.index') }}" 
+                <a href="{{ route('student.specialization.index') }}"
                    class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                     Kembali
                 </a>
-                <button type="submit" 
+                <button type="submit"
                         class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition font-medium">
                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -250,4 +303,34 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const radioButtons   = document.querySelectorAll('input[name="specialization"]');
+    const additionalInfo = document.getElementById('additionalInfo');
+    const tahfizInfo     = document.getElementById('tahfizInfo');
+    const languageInfo   = document.getElementById('languageInfo');
+
+    function updateAdditionalInfo() {
+        const selected = document.querySelector('input[name="specialization"]:checked')?.value;
+
+        additionalInfo.classList.add('hidden');
+        tahfizInfo.classList.add('hidden');
+        languageInfo.classList.add('hidden');
+
+        if (selected === 'tahfiz') {
+            additionalInfo.classList.remove('hidden');
+            tahfizInfo.classList.remove('hidden');
+        } else if (selected === 'language') {
+            additionalInfo.classList.remove('hidden');
+            languageInfo.classList.remove('hidden');
+        }
+    }
+
+    radioButtons.forEach(r => r.addEventListener('change', updateAdditionalInfo));
+    updateAdditionalInfo();
+});
+</script>
+@endpush
 @endsection

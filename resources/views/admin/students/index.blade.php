@@ -44,7 +44,7 @@
             <p class="text-gray-600 mt-1">Kelola data siswa yang terdaftar</p>
         </div>
         <div class="mt-4 md:mt-0 flex gap-2">
-            <a href="{{ route('admin.students.export', request()->only(['search', 'status', 'gender', 'specialization'])) }}"
+            <a href="{{ route('admin.students.export', request()->only(['search', 'status', 'gender', 'specialization', 'academic_year_id'])) }}"
             class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,6 +66,22 @@
 <div class="bg-white rounded-lg shadow-md p-4 mb-6">
     <form method="GET" action="{{ route('admin.students.index') }}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Search -->
+        <!-- Academic Year Filter -->
+        <div class="lg:col-span-5">
+            <select 
+                name="academic_year_id" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                onchange="this.form.submit()"
+            >
+                <option value="">Semua Tahun Ajaran</option>
+                @foreach($academicYears as $year)
+                    <option value="{{ $year->id }}" {{ $selectedYearId == $year->id ? 'selected' : '' }}>
+                        {{ $year->year }}
+                        @if($year->is_active) (Aktif) @endif
+                    </option>
+                @endforeach
+            </select>
+        </div>
         <div class="lg:col-span-2">
             <input 
                 type="text" 
@@ -268,7 +284,7 @@
                 <span class="font-medium">{{ $students->total() }}</span> data
             </div>
             <div>
-                {{ $students->links() }}
+                {{ $students->appends(request()->query())->links() }}
             </div>
         </div>
     </div>

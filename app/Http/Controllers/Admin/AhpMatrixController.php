@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAhpMatrixRequest;
 use App\Models\AcademicYear;
 use App\Models\AhpMatrix;
+use App\Models\CriterionWeight;
 use App\Service\AhpService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class AhpMatrixController extends Controller
 {
@@ -16,77 +18,128 @@ class AhpMatrixController extends Controller
         protected AhpService $ahpService
     ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $academicYears = AcademicYear::orderBy('year', 'desc')->get();
-        $activeYear = AcademicYear::where('is_active', true)->first();
+        $activeYear    = AcademicYear::where('is_active', true)->first();
 
-        $yearId = $request->academic_year_id ?? $activeYear?->id;
+        $yearId         = (int) ($request->academic_year_id ?? $activeYear?->id);
         $specialization = $request->specialization ?? 'tahfiz';
 
-        if (!$yearId) {
-            return view('admin.ahp-matrices.index', compact('academicYears'));
+        if (! $yearId) {
+            return view('admin.ahp-matrices.index', [
+                'academicYears'          => $academicYears,
+                'message'                => 'Belum ada tahun ajaran aktif. Silakan aktifkan tahun ajaran terlebih dahulu sebelum menggunakan fitur AHP.',
+                'selectedYearId'         => null,
+                'selectedSpecialization' => null,
+                'comparisonScale'        => $this->ahpService->getComparisonScale(),
+            ]);
         }
 
-        return view('admin.ahp-matrices.index', array_merge(
-            $this->ahpService->getMatrixForDisplay($yearId, $specialization),
-            [
-                'academicYears' => $academicYears,
-                'selectedYearId' => $yearId,
-                'selectedSpecialization' => $specialization,
-                'comparisonScale' => $this->ahpService->getComparisonScale(),
-            ]
-        ));
+        $rawData     = $this->ahpService->getMatrixRawData($yearId, $specialization);
+        $savedResult = $this->ahpService->getSavedResult($yearId, $specialization);
+
+        // Hitung metrik hanya jika hasil sudah pernah disimpan
+        $metrics = null;
+        if ($savedResult) {
+            $ahpMetrics = AhpMatrix::calculateAhpMetrics($yearId, $specialization);
+
+            if ($ahpMetrics) {
+                // Bangun matrix desimal dan colSum untuk Tabel 2
+                // matrix[i][j] dibangun dari matrixArray yang sudah tersimpan di DB
+                $criterias   = $rawData['criterias'];
+                $matrixArray = $rawData['matrixArray'];
+                $n           = $criterias->count();
+
+                // Susun matrix 2D berindeks integer (0..n-1)
+                $matrix = [];
+                $colSum = array_fill(0, $n, 0.0);
+
+                foreach ($criterias as $i => $row) {
+                    foreach ($criterias as $j => $col) {
+                        if ($row->id === $col->id) {
+                            $val = 1.0;
+                        } elseif ($row->id < $col->id) {
+                            $val = (float) ($matrixArray[$row->id][$col->id] ?? 0);
+                        } else {
+                            $orig = (float) ($matrixArray[$col->id][$row->id] ?? 0);
+                            $val  = $orig > 0 ? 1 / $orig : 0;
+                        }
+                        $matrix[$i][$j] = $val;
+                        $colSum[$j]    += $val;
+                    }
+                }
+
+                // Gabungkan ke dalam array metrics
+                $metrics = array_merge($ahpMetrics, [
+                    'matrix' => $matrix,
+                    'colSum' => $colSum,
+                ]);
+            }
+        }
+
+        return view('admin.ahp-matrices.index', [
+            'academicYears'          => $academicYears,
+            'selectedYearId'         => $yearId,
+            'selectedSpecialization' => $specialization,
+            'comparisonScale'        => $this->ahpService->getComparisonScale(),
+
+            // Data mentah tabel input
+            'criterias'              => $rawData['criterias'],
+            'matrixArray'            => $rawData['matrixArray'],
+            'isComplete'             => $rawData['isComplete'],
+            'filledCount'            => $rawData['filledCount'],
+            'requiredCount'          => $rawData['requiredCount'],
+
+            // Hasil kalkulasi (null = belum pernah hitung)
+            'savedResult'            => $savedResult,
+            'metrics'                => $metrics,
+        ]);
     }
 
-    public function store(StoreAhpMatrixRequest $request)
+    public function store(StoreAhpMatrixRequest $request): RedirectResponse
     {
         return $this->ahpService->saveComparison($request->validated())
-            ? back()->with('success', 'Perbandingan disimpan')
-            : back()->with('error', 'Gagal menyimpan');
+            ? back()->with('success', 'Nilai perbandingan berhasil disimpan.')
+            : back()->with('error', 'Gagal menyimpan nilai perbandingan.');
     }
 
-    public function calculateWeights(Request $request)
+    public function calculateWeights(Request $request): RedirectResponse
     {
         $request->validate([
             'academic_year_id' => 'required|exists:academic_years,id',
-            'specialization' => 'required',
+            'specialization'   => 'required|in:tahfiz,language',
         ]);
 
-        // Check if there are any pending students
-        $pendingCount = \App\Models\Student::where('academic_year_id', $request->academic_year_id)
-            ->where('validation_status', 'pending')
-            ->count();
+        $yearId         = (int) $request->academic_year_id;
+        $specialization = $request->specialization;
 
-        if ($pendingCount > 0) {
-            return back()->with('error', "Tidak dapat menghitung bobot AHP. Masih ada {$pendingCount} siswa dengan status validasi 'pending'. Silakan validasi semua siswa terlebih dahulu.");
+        $result = $this->ahpService->calculateAndSaveWeights($yearId, $specialization);
+
+        if ($result === false) {
+            return back()->with('error', 'Gagal menghitung bobot. Periksa log untuk detail.');
         }
 
-        $consistency = $this->ahpService->validateConsistency(
-            $request->academic_year_id,
-            $request->specialization
-        );
-
-        if (!$consistency['valid']) {
-            return back()->with('warning', 'CR tidak valid: ' . $consistency['cr']);
+        if (is_array($result) && isset($result['error'])) {
+            return back()->with('error', $result['error']);
         }
 
-        return $this->ahpService->calculateAndSaveWeights(
-            $request->academic_year_id,
-            $request->specialization
-        )
-            ? back()->with('success', 'Bobot disimpan')
-            : back()->with('error', 'Gagal hitung bobot');
+        return back()->with('success', 'Bobot prioritas berhasil dihitung dan disimpan.');
     }
 
-    public function reset(Request $request)
+    public function reset(Request $request): RedirectResponse
     {
+        $request->validate([
+            'academic_year_id' => 'required|exists:academic_years,id',
+            'specialization'   => 'required|in:tahfiz,language',
+        ]);
+
         $this->ahpService->resetMatrix(
-            $request->academic_year_id,
+            (int) $request->academic_year_id,
             $request->specialization
         );
 
-        return back()->with('success', 'Matrix direset');
+        return back()->with('success', 'Matriks perbandingan berhasil direset.');
     }
 
     public function show(Request $request)
@@ -95,7 +148,7 @@ class AhpMatrixController extends Controller
             'academic_year_id',
             'specialization',
             'criteria_row_id',
-            'criteria_col_id'
+            'criteria_col_id',
         ]))->first();
 
         return response()->json($comparison);

@@ -71,28 +71,24 @@ class SpecializationController extends Controller
                 ->with('error', 'Silakan lengkapi data pribadi terlebih dahulu');
         }
 
-        // Cek apakah sudah ada peminatan
         if (!empty($student->specialization)) {
             return redirect()->route('student.specialization.index')
                 ->with('info', 'Anda sudah memilih peminatan. Silakan edit jika ingin mengubah.');
         }
 
-        // Cek apakah data lain sudah lengkap
         $canChoose = $this->specializationService->canChooseSpecialization($student);
-        
+
         if (!$canChoose['can_choose']) {
             $errorMessage = 'Silakan lengkapi data berikut: ' . implode(', ', $canChoose['errors']);
-            return redirect()->route('student.profile.index')
+
+            return redirect()
+                ->route($this->getFirstIncompleteStepRoute($student))
                 ->with('error', $errorMessage);
         }
 
-        // Ambil rekomendasi
         $recommendation = $this->specializationService->getRecommendation($student);
-
-        // Ambil informasi kuota
-        $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
-
-        $progress = $student->getRegistrationProgress();
+        $quotaInfo      = $this->specializationService->getQuotaInformation($student->academic_year_id);
+        $progress       = $student->getRegistrationProgress();
 
         return view('student.specialization.create', compact(
             'student',
@@ -101,7 +97,6 @@ class SpecializationController extends Controller
             'progress'
         ));
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -248,5 +243,22 @@ class SpecializationController extends Controller
 
         return redirect()->route('student.specialization.index')
             ->with('success', $result['message']);
+    }
+
+    private function getFirstIncompleteStepRoute(Student $student): string
+    {
+        if (!$student->isPersonalDataCompleted()) {
+            return 'student.profile.index';
+        }
+
+        if (!$student->isReportGradeCompleted()) {
+            return 'student.report-grades.index';
+        }
+
+        if (!$student->isDocumentsCompleted()) {
+            return 'student.documents.index';
+        }
+
+        return 'student.profile.index';
     }
 }

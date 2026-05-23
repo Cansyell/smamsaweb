@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Committee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Models\AcademicYear;
 use App\Http\Requests\StudentRequest;
 use Illuminate\Http\Request;
 use App\Export\StudentExport;
@@ -16,7 +17,17 @@ class CommitteeStudentController extends Controller
      */
     public function index(Request $request)
     {
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        $activeYear    = AcademicYear::where('is_active', true)->first();  
         $query = Student::with('user');
+        // Filter by academic year
+            $selectedYearId = $request->filled('academic_year_id')
+                ? (int) $request->academic_year_id
+                : $activeYear?->id;
+
+            if ($selectedYearId) {
+                $query->byAcademicYear($selectedYearId);
+            }
 
         // Filter by validation status
         if ($request->filled('status')) {
@@ -50,9 +61,9 @@ class CommitteeStudentController extends Controller
             });
         }
 
-        $students = $query->latest()->paginate(10);
+        $students = $query->latest()->paginate(10)->withQueryString();
 
-        return view('committee.students.index', compact('students'));
+        return view('committee.students.index', compact('students', 'academicYears', 'selectedYearId'));
     }
 
     /**
@@ -237,9 +248,9 @@ class CommitteeStudentController extends Controller
         return response()->json($stats);
     }
 
-    public function export(Request $request)
+     public function export(Request $request)
     {
-        $filters  = $request->only(['status', 'gender', 'specialization', 'search']);
+        $filters  = $request->only(['status', 'gender', 'specialization', 'search', 'academic_year_id']); // ← tambah academic_year_id
         $filename = 'data-siswa-' . now()->format('Ymd-His') . '.xlsx';
 
         return (new StudentExport($filters))->download($filename);

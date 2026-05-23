@@ -13,9 +13,40 @@ class StudentExport
 {
     private const LAST_COL = 'R';
 
+    public function __construct(private array $filters = []) {}  // ← tambah ini
+
     public function collection()
     {
-        return Student::all();
+        $query = Student::query();
+
+        if (!empty($this->filters['academic_year_id'])) {
+            $query->byAcademicYear((int) $this->filters['academic_year_id']);
+        }
+
+        if (!empty($this->filters['status'])) {
+            $query->where('validation_status', $this->filters['status']);
+        }
+
+        if (!empty($this->filters['gender'])) {
+            $query->byGender($this->filters['gender']);
+        }
+
+        if (!empty($this->filters['specialization'])) {
+            $query->bySpecialization($this->filters['specialization']);
+        }
+
+        if (!empty($this->filters['search'])) {
+            $search = $this->filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%")
+                  ->orWhere('student_id', 'like', "%{$search}%")
+                  ->orWhere('father_name', 'like', "%{$search}%")
+                  ->orWhere('mother_name', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->get();
     }
 
     public function headings()

@@ -21,59 +21,75 @@ class AhpMatrix extends Model
     ];
 
     protected $casts = [
-        'comparison_value' => 'decimal:6',
+        'comparison_value' => 'decimal:10',
     ];
 
     /**
-     * Relasi ke Academic Year
+     * Tabel Random Index (RI) — n = 1..15
+     * Sumber: Saaty (sesuai gambar referensi)
      */
+    private static array $riTable = [
+        1  => 0.00,
+        2  => 0.00,
+        3  => 0.58,
+        4  => 0.90,
+        5  => 1.12,
+        6  => 1.24,
+        7  => 1.32,
+        8  => 1.41,
+        9  => 1.45,
+        10 => 1.49,
+        11 => 1.51,
+        12 => 1.48,
+        13 => 1.56,
+        14 => 1.57,
+        15 => 1.59,
+    ];
+
+    // =========================================================================
+    // RELATIONS
+    // =========================================================================
+
     public function academicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);
     }
 
-    /**
-     * Relasi ke Criteria (Row)
-     */
     public function criteriaRow(): BelongsTo
     {
         return $this->belongsTo(Criteria::class, 'criteria_row_id');
     }
 
-    /**
-     * Relasi ke Criteria (Column)
-     */
     public function criteriaCol(): BelongsTo
     {
         return $this->belongsTo(Criteria::class, 'criteria_col_id');
     }
 
-    /**
-     * Scope: Filter by academic year
-     */
+    // =========================================================================
+    // SCOPES
+    // =========================================================================
+
     public function scopeForAcademicYear(Builder $query, int $academicYearId): Builder
     {
         return $query->where('academic_year_id', $academicYearId);
     }
 
-    /**
-     * Scope: Filter by specialization
-     */
     public function scopeForSpecialization(Builder $query, string $specialization): Builder
     {
         return $query->where('specialization', $specialization);
     }
 
-    /**
-     * Scope: With all relations
-     */
     public function scopeWithRelations(Builder $query): Builder
     {
         return $query->with(['criteriaRow', 'criteriaCol', 'academicYear']);
     }
 
+    // =========================================================================
+    // MATRIX DATA
+    // =========================================================================
+
     /**
-     * Get matrix for specific academic year and specialization
+     * Ambil data mentah matriks + daftar kriteria.
      */
     public static function getMatrixData(int $academicYearId, string $specialization): array
     {
@@ -85,29 +101,25 @@ class AhpMatrix extends Model
         $matrices = self::forAcademicYear($academicYearId)
             ->forSpecialization($specialization)
             ->get()
-            ->keyBy(function ($item) {
-                return $item->criteria_row_id . '-' . $item->criteria_col_id;
-            });
+            ->keyBy(fn($item) => $item->criteria_row_id . '-' . $item->criteria_col_id);
 
         $matrixArray = [];
         foreach ($criterias as $row) {
-            $matrixRow = [];
             foreach ($criterias as $col) {
                 $key = $row->id . '-' . $col->id;
-                $matrixRow[$col->id] = $matrices->get($key)?->comparison_value ?? null;
+                $matrixArray[$row->id][$col->id] = $matrices->get($key)?->comparison_value ?? null;
             }
-            $matrixArray[$row->id] = $matrixRow;
         }
 
         return [
-            'criterias' => $criterias,
-            'matrices' => $matrices,
+            'criterias'   => $criterias,
+            'matrices'    => $matrices,
             'matrixArray' => $matrixArray,
         ];
     }
 
     /**
-     * Check if matrix is complete
+     * Cek apakah semua sel upper-triangle sudah terisi.
      */
     public static function isMatrixComplete(int $academicYearId, string $specialization): bool
     {
@@ -119,163 +131,196 @@ class AhpMatrix extends Model
             return false;
         }
 
-        $requiredComparisons = ($criteriaCount * ($criteriaCount - 1)) / 2;
-        
-        $existingComparisons = self::forAcademicYear($academicYearId)
+        $required = ($criteriaCount * ($criteriaCount - 1)) / 2;
+
+        $existing = self::forAcademicYear($academicYearId)
             ->forSpecialization($specialization)
             ->where('criteria_row_id', '<', \DB::raw('criteria_col_id'))
             ->count();
 
-        return $existingComparisons >= $requiredComparisons;
+        return $existing >= $required;
     }
 
+    // =========================================================================
+    // CORE CALCULATION
+    // =========================================================================
+
     /**
-     * Calculate consistency ratio for the matrix
-     * 
-     * FIXED: Corrected lambda max calculation
+     * Hitung semua metrik AHP — logika PERSIS sesuai Excel:
+     *
+     * MATRIKS PERBANDINGAN
+     *   • Diagonal = 1
+     *   • Upper-triangle = nilai input
+     *   • Lower-triangle = 1 / upper
+     *   • Baris "Jumlah" = total tiap kolom
+     *
+     * NORMALISASI
+     *   • normalizedMatrix[i][j] = matrix[i][j] / colSum[j]
+     *   • rowSum[i]  = Σ_j normalizedMatrix[i][j]
+     *   • Prioritas[i] = rowSum[i] / n       ← bobot/priority vector
+     *
+     * EIGEN (sesuai Excel: =Prioritas * colSum tiap kolom, dijumlahkan)
+     *   • eigen[i] = Σ_j ( prioritas[i] * colSum[j] )   ← baris i
+     *     Ini ekuivalen dengan =I44*C40 + I44*D40 + ... untuk baris yg sama,
+     *     tapi karena prioritas[i] adalah konstanta per baris:
+     *     eigen[i] = prioritas[i] * Σ_j colSum[j]
+     *
+     *   NAMUN melihat Excel lebih teliti: kolom Eigen = Prioritas_baris × colSum_kolom
+     *   dijumlahkan PER BARIS, sehingga:
+     *     eigen[i] = Σ_j ( matrix[i][j] * prioritas[j] )  ← weighted sum (standard AHP)
+     *   Dan λmax = SUM(eigen[0..n-1])  ← bukan rata-rata, tapi TOTAL
+     *
+     *   Verifikasi dengan data Excel:
+     *     λmax = 5.198023725  (SUM J44:J48)
+     *     CI   = (5.198 - 5) / (5-1) = 0.04950...  ✓
+     *
+     * CI  = (λmax - n) / (n - 1)
+     * CR  = CI / RI[n]
+     *
+     * @return array{
+     *   n: int,
+     *   criterias: \Illuminate\Support\Collection,
+     *   matrix: array,          — matriks n×n lengkap (0-indexed)
+     *   colSum: array,          — total tiap kolom (0-indexed)
+     *   normalized: array,      — matriks normalisasi (0-indexed)
+     *   rowSum: array,          — jumlah baris normalisasi (0-indexed)
+     *   prioritas: array,       — priority vector / bobot (0-indexed)
+     *   eigen: array,           — eigen per baris (0-indexed)
+     *   lambdaMax: float,       — SUM eigen (λmax)
+     *   ci: float,
+     *   ri: float,
+     *   cr: float,
+     *   consistent: bool,
+     *   weights: array,         — keyed by criteria_id, untuk backward-compat
+     * }|null
      */
-    public static function calculateConsistencyRatio(int $academicYearId, string $specialization): ?float
+    public static function calculateAhpMetrics(int $academicYearId, string $specialization): ?array
     {
-        $data = self::getMatrixData($academicYearId, $specialization);
+        $data      = self::getMatrixData($academicYearId, $specialization);
         $criterias = $data['criterias'];
-        $matrix = $data['matrixArray'];
+        $rawMatrix = $data['matrixArray'];
 
         if ($criterias->isEmpty()) {
             return null;
         }
 
-        $n = $criterias->count();
-        
-        // Random Index (RI) values for n=1 to n=10
-        $ri = [0, 0, 0.58, 0.90, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
+        $n           = $criterias->count();
+        $ri          = self::$riTable[$n] ?? null;
+        $critArr     = $criterias->values(); // reindex 0..n-1
 
-        if ($n < 3 || $n > 10 || !isset($ri[$n - 1])) {
-            return null;
+        if ($ri === null) {
+            return null; // n di luar rentang tabel
         }
 
-        // Build complete matrix with reciprocal values
-        $completeMatrix = [];
-        foreach ($criterias as $i => $rowCriteria) {
-            foreach ($criterias as $j => $colCriteria) {
-                if ($rowCriteria->id === $colCriteria->id) {
-                    $completeMatrix[$i][$j] = 1;
-                } elseif (isset($matrix[$rowCriteria->id][$colCriteria->id])) {
-                    $completeMatrix[$i][$j] = $matrix[$rowCriteria->id][$colCriteria->id];
-                } elseif (isset($matrix[$colCriteria->id][$rowCriteria->id])) {
-                    $completeMatrix[$i][$j] = 1 / $matrix[$colCriteria->id][$rowCriteria->id];
+        // ── Step 1: Bangun matriks n×n lengkap ───────────────────────────────
+        $matrix = [];
+        for ($i = 0; $i < $n; $i++) {
+            for ($j = 0; $j < $n; $j++) {
+                $rid = $critArr[$i]->id;
+                $cid = $critArr[$j]->id;
+
+                if ($rid === $cid) {
+                    $matrix[$i][$j] = 1.0;
+                } elseif (isset($rawMatrix[$rid][$cid]) && $rawMatrix[$rid][$cid] !== null) {
+                    $matrix[$i][$j] = (float) $rawMatrix[$rid][$cid];
+                } elseif (isset($rawMatrix[$cid][$rid]) && $rawMatrix[$cid][$rid] !== null) {
+                    $val = (float) $rawMatrix[$cid][$rid];
+                    $matrix[$i][$j] = ($val != 0) ? 1.0 / $val : 0.0;
                 } else {
-                    return null; // Matrix incomplete
+                    return null; // belum lengkap
                 }
             }
         }
 
-        // Calculate column sums
-        $columnSums = array_fill(0, $n, 0);
+        // ── Step 2: Total tiap kolom (baris "Jumlah") ────────────────────────
+        $colSum = array_fill(0, $n, 0.0);
         for ($j = 0; $j < $n; $j++) {
             for ($i = 0; $i < $n; $i++) {
-                $columnSums[$j] += $completeMatrix[$i][$j];
+                $colSum[$j] += $matrix[$i][$j];
             }
         }
 
-        // Normalize matrix
-        $normalizedMatrix = [];
+        // ── Step 3: Normalisasi ───────────────────────────────────────────────
+        $normalized = [];
+        $rowSum     = array_fill(0, $n, 0.0);
+
         for ($i = 0; $i < $n; $i++) {
             for ($j = 0; $j < $n; $j++) {
-                $normalizedMatrix[$i][$j] = $completeMatrix[$i][$j] / $columnSums[$j];
+                $normalized[$i][$j] = ($colSum[$j] != 0)
+                    ? $matrix[$i][$j] / $colSum[$j]
+                    : 0.0;
+                $rowSum[$i] += $normalized[$i][$j];
             }
         }
 
-        // Calculate priority vector (average of each row in normalized matrix)
-        $priorityVector = [];
+        // ── Step 4: Prioritas = rowSum / n ───────────────────────────────────
+        $prioritas = [];
         for ($i = 0; $i < $n; $i++) {
-            $sum = 0;
+            $prioritas[$i] = $rowSum[$i] / $n;
+        }
+
+        // ── Step 5: Eigen per baris ───────────────────────────────────────────
+        // Sesuai Excel: eigen[i] = Σ_j ( matrix[i][j] × prioritas[j] )
+        // Ini adalah weighted sum vector; λmax = SUM semua eigen (bukan rata-rata)
+        //
+        // Verifikasi: SUM(J44:J48) = 5.198023725 = λmax  ✓
+        $eigen = array_fill(0, $n, 0.0);
+        for ($i = 0; $i < $n; $i++) {
             for ($j = 0; $j < $n; $j++) {
-                $sum += $normalizedMatrix[$i][$j];
-            }
-            $priorityVector[$i] = $sum / $n;
-        }
-
-        // ✅ FIXED: Calculate lambda max correctly
-        // Step 1: Calculate weighted sum vector (original matrix × priority vector)
-        $weightedSum = [];
-        for ($i = 0; $i < $n; $i++) {
-            $sum = 0;
-            for ($j = 0; $j < $n; $j++) {
-                // Multiply each row of matrix by priority vector
-                $sum += $completeMatrix[$i][$j] * $priorityVector[$j];
-            }
-            $weightedSum[$i] = $sum;
-        }
-
-        // Step 2: Calculate consistency vector (weighted sum ÷ priority vector)
-        $consistencyVector = [];
-        for ($i = 0; $i < $n; $i++) {
-            $consistencyVector[$i] = $weightedSum[$i] / $priorityVector[$i];
-        }
-
-        // Step 3: Lambda max is the average of consistency vector
-        $lambdaMax = array_sum($consistencyVector) / $n;
-
-        // Calculate Consistency Index (CI) and Consistency Ratio (CR)
-        $ci = ($lambdaMax - $n) / ($n - 1);
-        $cr = $ci / $ri[$n - 1];
-
-        return round($cr, 4);
-    }
-
-    /**
-     * Get priority weights from matrix
-     */
-    public static function getPriorityWeights(int $academicYearId, string $specialization): ?array
-    {
-        $data = self::getMatrixData($academicYearId, $specialization);
-        $criterias = $data['criterias'];
-        $matrix = $data['matrixArray'];
-
-        if ($criterias->isEmpty()) {
-            return null;
-        }
-
-        $n = $criterias->count();
-
-        // Build complete matrix
-        $completeMatrix = [];
-        foreach ($criterias as $i => $rowCriteria) {
-            foreach ($criterias as $j => $colCriteria) {
-                if ($rowCriteria->id === $colCriteria->id) {
-                    $completeMatrix[$i][$j] = 1;
-                } elseif (isset($matrix[$rowCriteria->id][$colCriteria->id])) {
-                    $completeMatrix[$i][$j] = $matrix[$rowCriteria->id][$colCriteria->id];
-                } elseif (isset($matrix[$colCriteria->id][$rowCriteria->id])) {
-                    $completeMatrix[$i][$j] = 1 / $matrix[$colCriteria->id][$rowCriteria->id];
-                } else {
-                    return null;
-                }
+                $eigen[$i] += $matrix[$i][$j] * $prioritas[$j];
             }
         }
 
-        // Calculate column sums
-        $columnSums = array_fill(0, $n, 0);
-        for ($j = 0; $j < $n; $j++) {
-            for ($i = 0; $i < $n; $i++) {
-                $columnSums[$j] += $completeMatrix[$i][$j];
-            }
-        }
+        // ── Step 6: λmax = SUM semua eigen ───────────────────────────────────
+        $lambdaMax = array_sum($eigen);
 
-        // Normalize and calculate priority vector
+        // ── Step 7: CI = (λmax - n) / (n - 1) ───────────────────────────────
+        $ci = ($n > 1) ? ($lambdaMax - $n) / ($n - 1) : 0.0;
+
+        // ── Step 8: CR = CI / RI ─────────────────────────────────────────────
+        $cr = ($ri > 0) ? $ci / $ri : 0.0;
+
+        // ── Susun weights keyed by criteria_id (backward-compat) ─────────────
         $weights = [];
-        $criteriasArray = $criterias->values();
         for ($i = 0; $i < $n; $i++) {
-            $sum = 0;
-            for ($j = 0; $j < $n; $j++) {
-                $sum += $completeMatrix[$i][$j] / $columnSums[$j];
-            }
-            $weights[$criteriasArray[$i]->id] = [
-                'criteria' => $criteriasArray[$i],
-                'weight' => round($sum / $n, 4),
+            $weights[$critArr[$i]->id] = [
+                'criteria' => $critArr[$i],
+                'weight'   => $prioritas[$i],
+                'eigen'    => $eigen[$i],
             ];
         }
 
-        return $weights;
+        return [
+            'n'          => $n,
+            'criterias'  => $critArr,
+            'matrix'     => $matrix,
+            'colSum'     => $colSum,
+            'normalized' => $normalized,
+            'rowSum'     => $rowSum,
+            'prioritas'  => $prioritas,
+            'eigen'      => $eigen,
+            'lambdaMax'  => $lambdaMax,
+            'ci'         => $ci,
+            'ri'         => $ri,
+            'cr'         => $cr,
+            'consistent' => $cr <= 0.1,
+            'weights'    => $weights,
+        ];
+    }
+
+    // =========================================================================
+    // BACKWARD-COMPATIBLE WRAPPERS
+    // =========================================================================
+
+    public static function calculateConsistencyRatio(int $academicYearId, string $specialization): ?float
+    {
+        $m = self::calculateAhpMetrics($academicYearId, $specialization);
+        return $m ? round($m['cr'], 6) : null;
+    }
+
+    public static function getPriorityWeights(int $academicYearId, string $specialization): ?array
+    {
+        $m = self::calculateAhpMetrics($academicYearId, $specialization);
+        return $m ? $m['weights'] : null;
     }
 }

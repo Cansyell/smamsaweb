@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6">
     <!-- Progress Bar Section -->
-    <div class="bg-white rounded-lg shadow-md p-6">
+    <div data-flash class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">Progress Pendaftaran</h3>
             <span class="text-2xl font-bold text-indigo-600">{{ number_format($progress['percentage'], 0) }}%</span>
