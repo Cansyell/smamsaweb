@@ -1,0 +1,610 @@
+@startuml
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam nodesep 60
+skinparam ranksep 80
+skinparam packageStyle rectangle
+skinparam class {
+  BackgroundColor White
+  BorderColor #999999
+  ArrowColor #555555
+  FontSize 12
+}
+
+top to bottom direction
+
+' ============================================================================
+' AUTHENTICATION & USER MANAGEMENT
+' ============================================================================
+package "Authentication & User Management" {
+  class User <<entity>> {
+    - id : bigint
+    - name : string
+    - email : string
+    - email_verified_at : timestamp
+    - password : string
+    - role : enum
+    - remember_token : string
+    + isAdmin() : bool
+    + isCommittee() : bool
+    + isStudent() : bool
+    + hasRole(role : string) : bool
+  }
+}
+
+' ============================================================================
+' STUDENT REGISTRATION & PROFILE
+' ============================================================================
+package "Student Registration & Profile" {
+  class Student <<entity>> {
+    - id : bigint
+    - user_id : bigint
+    - academic_year_id : bigint
+    - student_id : string
+    - nisn : string
+    - full_name : string
+    - father_name : string
+    - mother_name : string
+    - gender : enum
+    - place_of_birth : string
+    - date_of_birth : date
+    - address : text
+    - phone_number : string
+    - previous_school : string
+    - graduation_year : year
+    - kip_number : string
+    - specialization : enum
+    - validation_status : enum
+    - final_status : enum
+    - dual_pass : boolean
+    - cross_accepted : boolean
+    - recommended_specialization : string
+    - accepted_specialization : string
+    - has_pending_resubmission : boolean
+    - validated_at : timestamp
+    - validated_by : bigint
+    + isPersonalDataCompleted() : bool
+    + isReportGradeCompleted() : bool
+    + isDocumentsCompleted() : bool
+    + canResubmit() : bool
+  }
+
+  class ReportGrade <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - semester_1_avg : decimal
+    - semester_2_avg : decimal
+    - semester_3_avg : decimal
+    - semester_4_avg : decimal
+    - semester_5_avg : decimal
+    - pai_grade : decimal
+    - indonesian_grade : decimal
+    - english_grade : decimal
+    - average_grade : decimal
+    + calculateAverage() : bool
+    + isComplete() : bool
+  }
+
+  class Document <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - document_type : enum
+    - file_name : string
+    - file_path : string
+    - validation_status : enum
+    - notes : text
+    - validated_at : timestamp
+    - validated_by : bigint
+    + createDocument(data : array) : Document
+    + updateDocument(data : array) : bool
+    + deleteDocument() : bool
+  }
+
+  class TestScore <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - quran_achievement : decimal
+    - quran_reading : decimal
+    - interview : decimal
+    - public_speaking : decimal
+    - dialogue : decimal
+    - average_score : decimal
+    - input_by : bigint
+    + createTestScore(data : array) : TestScore
+    + updateTestScore(data : array) : bool
+    + calculateAverage() : bool
+    + isComplete() : bool
+    + isPassing(passingGrade : float) : bool
+  }
+
+  class ValidationLog <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - actor_id : bigint
+    - action : string
+    - previous_status : string
+    - new_status : string
+    - notes : text
+    - resubmission_count : integer
+    - metadata : json
+  }
+
+  class DocumentService <<service>> {
+    + getStudentDocuments() : Collection
+    + getDocumentsByStatus(status : string) : Collection
+    + getDocumentsByType(type : string) : Collection
+    + createDocument(data : array, file : UploadedFile) : Document
+    + updateDocument(document : Document, data : array, file : UploadedFile) : bool
+    + deleteDocument(document : Document) : bool
+    + canUploadDocument(documentType : string) : array
+    + getDocumentStatistics() : array
+  }
+
+  class ValidationService <<service>> {
+    + getValidationStatistics(academicYearId : int) : array
+    + getValidationDetails(student : Student) : array
+    + validateStudentCompleteness(student : Student) : array
+    + approveStudent(student : Student, validatorId : int, notes : string) : array
+    + rejectStudent(student : Student, validatorId : int, notes : string) : array
+    + validateDocument(document : Document, status : string, notes : string) : array
+    + batchApproveStudents(studentIds : array, validatorId : int) : array
+  }
+}
+
+' ============================================================================
+' ACADEMIC YEAR & CONFIGURATION
+' ============================================================================
+package "Academic Year & Configuration" {
+  class AcademicYear <<entity>> {
+    - id : bigint
+    - year : string
+    - start_date : date
+    - end_date : date
+    - is_active : boolean
+    - result_status : enum
+    - published_at : timestamp
+    - published_by : bigint
+    - publish_notes : text
+    + activate() : bool
+    + deactivate() : bool
+  }
+
+  class SpecializationQuota <<entity>> {
+    - id : bigint
+    - academic_year_id : bigint
+    - tahfiz_quota : integer
+    - language_quota : integer
+    - regular_quota : integer
+    + getQuotaInformation(academicYearId : int) : array
+    + updateQuota(data : array) : bool
+  }
+}
+
+' ============================================================================
+' CRITERIA & AHP CALCULATION
+' ============================================================================
+package "Criteria & AHP Calculation" {
+  class Criteria <<entity>> {
+    - id : bigint
+    - code : string
+    - name : string
+    - specialization : enum
+    - attribute_type : enum
+    - data_source : string
+    - description : text
+    - order : integer
+    - is_active : boolean
+    + scopeForSpecialization(specialization : string)
+    + scopeActive()
+    + scopeOrdered()
+  }
+
+  class AhpMatrix <<entity>> {
+    - id : bigint
+    - academic_year_id : bigint
+    - specialization : enum
+    - criteria_row_id : bigint
+    - criteria_col_id : bigint
+    - comparison_value : decimal
+    - notes : text
+    + getMatrixData(academicYearId : int, specialization : string) : array
+    + isMatrixComplete(academicYearId : int, specialization : string) : bool
+    + calculateAhpMetrics(academicYearId : int, specialization : string) : array
+    + calculateConsistencyRatio(academicYearId : int, specialization : string) : float
+    + getPriorityWeights(academicYearId : int, specialization : string) : array
+  }
+
+  class CriterionWeight <<entity>> {
+    - id : bigint
+    - academic_year_id : bigint
+    - criteria_id : bigint
+    - specialization : enum
+    - weight : decimal
+    - priority_vector : decimal
+    - lambda_max : decimal
+    - consistency_index : decimal
+    - consistency_ratio : decimal
+    - is_consistent : boolean
+    - calculation_detail : json
+    - calculated_at : timestamp
+    - calculated_by : bigint
+  }
+
+  class StudentCriterionValue <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - criteria_id : bigint
+    - raw_value : decimal
+    - normalized_value : decimal
+    - notes : text
+  }
+
+  class AhpService <<service>> {
+    + getMatrixRawData(academicYearId : int, specialization : string) : array
+    + getSavedResult(academicYearId : int, specialization : string) : Collection
+    + saveComparison(data : array) : bool
+    + calculateAndSaveWeights(academicYearId : int, specialization : string) : mixed
+    + resetMatrix(academicYearId : int, specialization : string) : void
+    + getComparisonScale() : array
+  }
+
+  class CriteriaValueSyncService <<service>> {
+    + syncReportGradeToValues(student : Student) : array
+    + batchSyncReportGrades(academicYearId : int) : array
+    + checkSyncStatus(student : Student) : array
+  }
+}
+
+' ============================================================================
+' SAW CALCULATION & RANKING
+' ============================================================================
+package "SAW Calculation & Ranking" {
+  class SawResult <<entity>> {
+    - id : bigint
+    - student_id : bigint
+    - academic_year_id : bigint
+    - specialization : enum
+    - final_score : decimal
+    - rank : integer
+    - detail_calculation : json
+    - calculated_at : timestamp
+    - calculated_by : bigint
+  }
+
+  class SawService <<service>> {
+    + calculateSawScores(academicYearId : int, specialization : string) : array
+    + getSawResults(academicYearId : int, specialization : string) : Collection
+    + recalculateSaw(academicYearId : int, specialization : string) : array
+  }
+
+  class RankingService <<service>> {
+    + calculateRankings(academicYearId : int) : array
+    + determineAcceptance(academicYearId : int) : array
+    + getDualPassSummary(academicYearId : int) : Collection
+    + getStudentRanking(student : Student) : array
+  }
+}
+
+' ============================================================================
+' SPECIALIZATION SELECTION
+' ============================================================================
+package "Specialization Selection" {
+  class SpecializationService <<service>> {
+    + getRecommendation(student : Student) : array
+    + getQuotaInformation(academicYearId : int) : array
+    + getSpecializationStatistics(academicYearId : int, specialization : string) : array
+    + storeSpecialization(student : Student, data : array) : array
+    + updateSpecialization(student : Student, data : array) : array
+    + getStudentRanking(student : Student) : array
+    + canChooseSpecialization(student : Student) : array
+    + canEditSpecialization(student : Student) : array
+  }
+}
+
+' ============================================================================
+' RESULT PUBLICATION & NOTIFICATION
+' ============================================================================
+package "Result Publication & Notification" {
+  class PublishResultNotificationJob <<job>> {
+    - academicYearId : int
+    - tries : int
+    - timeout : int
+    + handle() : void
+  }
+
+  class ResultPublishedNotification <<notification>> {
+    - student : Student
+    + via(notifiable : object) : array
+    + toMail(notifiable : object) : MailMessage
+    + toArray(notifiable : object) : array
+  }
+}
+
+' ============================================================================
+' WEBSITE CONTENT MANAGEMENT
+' ============================================================================
+package "Website Content Management" {
+  class Announcement <<entity>> {
+    - id : bigint
+    - title : string
+    - content : text
+    - image_path : string
+    - file_path : string
+    - is_active : boolean
+    - published_at : timestamp
+    - created_by : bigint
+    + createAnnouncement(data : array) : Announcement
+    + updateAnnouncement(data : array) : bool
+    + toggleStatus() : bool
+    + publish() : bool
+    + unpublish() : bool
+    + deleteImage() : bool
+    + deleteFile() : bool
+  }
+
+  class HeroSection <<entity>> {
+    - id : bigint
+    - badge_text : string
+    - title_main : string
+    - title_italic : string
+    - subtitle : string
+    - btn_primary_label : string
+    - btn_primary_url : string
+    - btn_outline_label : string
+    - btn_outline_url : string
+    - background_image : string
+    - is_active : boolean
+  }
+
+  class HeroStat <<entity>> {
+    - id : bigint
+    - hero_section_id : bigint
+    - number : string
+    - label : string
+    - urutan : integer
+  }
+
+  class PpdbSetting <<entity>> {
+    - id : bigint
+    - tahun_ajaran : string
+    - telepon : string
+    - jam_operasional : string
+    - tanggal_buka : date
+    - tanggal_tutup : date
+    - catatan_beasiswa : text
+    - link_pendaftaran : string
+    - is_active : boolean
+    + isPendaftaranBuka() : bool
+  }
+
+  class GaleriItem <<entity>> {
+    - id : bigint
+    - judul : string
+    - caption : text
+    - tipe : enum
+    - gambar_path : string
+    - video_url : string
+    - alt_text : string
+    - urutan : integer
+    - is_active : boolean
+  }
+
+  class JadwalPpdb <<entity>> {
+    - id : bigint
+    - tahun_ajaran : string
+    - nomor_urut : integer
+    - tanggal_label : string
+    - tanggal_mulai : date
+    - tanggal_selesai : date
+    - judul : string
+    - deskripsi : text
+    - status : enum
+    - is_active : boolean
+    + syncStatus() : JadwalPpdb
+  }
+
+  class PpdbBiaya <<entity>> {
+    - id : bigint
+    - tahun_ajaran : string
+    - nama_biaya : string
+    - nominal : integer
+    - keterangan : text
+    - urutan : integer
+    - is_active : boolean
+  }
+
+  class PpdbPersyaratan <<entity>> {
+    - id : bigint
+    - tahun_ajaran : string
+    - dokumen : string
+    - urutan : integer
+    - is_active : boolean
+  }
+}
+
+' ============================================================================
+' CONTROLLERS
+' ============================================================================
+package "Controllers" {
+  class ValidationController <<controller>> {
+    - validationService : ValidationService
+    + index(request : Request) : View
+    + show(student : Student) : View
+    + approve(request : ValidateStudentRequest, student : Student) : RedirectResponse
+    + reject(request : RejectStudentRequest, student : Student) : RedirectResponse
+    + validateDocument(request : Request, document : Document) : RedirectResponse
+    + batchApprove(request : Request) : RedirectResponse
+    + checkCompleteness(student : Student) : JsonResponse
+  }
+
+  class AhpMatrixController <<controller>> {
+    - ahpService : AhpService
+    + index(request : Request) : View
+    + store(request : StoreAhpMatrixRequest) : RedirectResponse
+    + calculateWeights(request : Request) : RedirectResponse
+    + reset(request : Request) : RedirectResponse
+    + show(request : Request) : JsonResponse
+  }
+
+  class SawResultController <<controller>> {
+    - rankingService : RankingService
+    + index(request : Request) : View
+    + show(student : Student) : View
+  }
+
+  class PublishResultController <<controller>> {
+    + preview() : View
+    + setReviewing(request : Request) : RedirectResponse
+    + publish(request : Request) : RedirectResponse
+    + unpublish(request : Request) : RedirectResponse
+  }
+}
+
+' ============================================================================
+' FORM REQUESTS
+' ============================================================================
+package "Form Requests" {
+  class StoreAhpMatrixRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+
+  class StoreCriteriaRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+
+  class StoreDocumentRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+
+  class StoreReportGradeRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+
+  class StudentRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+
+  class RejectStudentRequest <<request>> {
+    + authorize() : bool
+    + rules() : array
+  }
+}
+
+' ============================================================================
+' RELATIONSHIPS - USER & AUTHENTICATION
+' ============================================================================
+User "1" *-- "0..1" Student : has
+User "1" *-- "many" Announcement : creates
+User "1" *-- "many" ValidationLog : performs
+User "1" *-- "many" TestScore : inputs
+User "1" *-- "many" CriterionWeight : calculates
+User "1" *-- "many" SawResult : calculates
+User "1" *-- "many" AcademicYear : publishes
+
+' ============================================================================
+' RELATIONSHIPS - STUDENT & PROFILE
+' ============================================================================
+Student "1" *-- "0..1" ReportGrade : has
+Student "1" *-- "many" Document : uploads
+Student "1" *-- "0..1" TestScore : has
+Student "1" *-- "many" ValidationLog : has
+Student "many" --> "1" AcademicYear : belongs to
+Student "1" *-- "many" StudentCriterionValue : has
+Student "1" *-- "many" SawResult : has
+Student "many" --> "0..1" User : validated by
+
+' ============================================================================
+' RELATIONSHIPS - ACADEMIC YEAR & QUOTA
+' ============================================================================
+AcademicYear "1" *-- "0..1" SpecializationQuota : has
+AcademicYear "1" *-- "many" AhpMatrix : has
+AcademicYear "1" *-- "many" CriterionWeight : has
+AcademicYear "1" *-- "many" SawResult : has
+
+' ============================================================================
+' RELATIONSHIPS - CRITERIA & AHP
+' ============================================================================
+Criteria "1" *-- "many" AhpMatrix : row
+Criteria "1" *-- "many" AhpMatrix : column
+Criteria "1" *-- "many" CriterionWeight : has
+Criteria "1" *-- "many" StudentCriterionValue : has
+AhpMatrix "many" --> "1" AcademicYear : belongs to
+CriterionWeight "many" --> "1" AcademicYear : belongs to
+CriterionWeight "many" --> "1" Criteria : belongs to
+StudentCriterionValue "many" --> "1" Student : belongs to
+StudentCriterionValue "many" --> "1" Criteria : belongs to
+
+' ============================================================================
+' RELATIONSHIPS - SAW & RANKING
+' ============================================================================
+SawResult "many" --> "1" Student : belongs to
+SawResult "many" --> "1" AcademicYear : belongs to
+SawResult "many" --> "0..1" User : calculated by
+
+' ============================================================================
+' RELATIONSHIPS - WEBSITE CONTENT
+' ============================================================================
+HeroSection "1" *-- "many" HeroStat : has
+Announcement "many" --> "1" User : created by
+
+' ============================================================================
+' RELATIONSHIPS - SERVICES & MODELS
+' ============================================================================
+DocumentService ..> Student : uses
+DocumentService ..> Document : uses
+ValidationService ..> Student : uses
+ValidationService ..> Document : uses
+ValidationService ..> ValidationLog : uses
+AhpService ..> AhpMatrix : uses
+AhpService ..> Criteria : uses
+AhpService ..> CriterionWeight : uses
+SawService ..> SawResult : uses
+SawService ..> Student : uses
+SawService ..> StudentCriterionValue : uses
+SawService ..> CriterionWeight : uses
+RankingService ..> SawResult : uses
+RankingService ..> Student : uses
+RankingService ..> SpecializationQuota : uses
+SpecializationService ..> Student : uses
+SpecializationService ..> ReportGrade : uses
+SpecializationService ..> SawResult : uses
+SpecializationService ..> SpecializationQuota : uses
+CriteriaValueSyncService ..> Student : uses
+CriteriaValueSyncService ..> Criteria : uses
+CriteriaValueSyncService ..> StudentCriterionValue : uses
+CriteriaValueSyncService ..> ReportGrade : uses
+
+' ============================================================================
+' RELATIONSHIPS - CONTROLLERS & SERVICES
+' ============================================================================
+ValidationController ..> ValidationService : uses
+ValidationController ..> Student : uses
+ValidationController ..> Document : uses
+AhpMatrixController ..> AhpService : uses
+AhpMatrixController ..> AhpMatrix : uses
+SawResultController ..> RankingService : uses
+SawResultController ..> Student : uses
+SawResultController ..> SawResult : uses
+PublishResultController ..> Student : uses
+PublishResultController ..> AcademicYear : uses
+PublishResultController ..> PublishResultNotificationJob : dispatches
+
+' ============================================================================
+' RELATIONSHIPS - JOBS & NOTIFICATIONS
+' ============================================================================
+PublishResultNotificationJob ..> Student : uses
+PublishResultNotificationJob ..> ResultPublishedNotification : sends
+ResultPublishedNotification ..> Student : uses
+
+' ============================================================================
+' RELATIONSHIPS - CONTROLLERS & REQUESTS
+' ============================================================================
+ValidationController ..> RejectStudentRequest : validates
+AhpMatrixController ..> StoreAhpMatrixRequest : validates
+
+@enduml

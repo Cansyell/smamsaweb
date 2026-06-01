@@ -29,11 +29,10 @@ class CriterionValueController extends Controller
      * nilainya akan diambil otomatis dari ReportGrade dan tidak bisa diedit.
      */
     protected array $reportGradeMapping = [
-        // keyword dalam nama criteria => kolom di tabel report_grades
-        'agama'    => 'islamic_studies',
-        'pai'      => 'islamic_studies',
-        'inggris'  => 'english_language',
-        'english'  => 'english_language',
+        'agama'   => 'islamic_studies',
+        'pai'     => 'islamic_studies',
+        'inggris' => 'english_language',
+        'english' => 'english_language',
     ];
 
     public function __construct(
@@ -41,14 +40,14 @@ class CriterionValueController extends Controller
         RankingService $rankingService,
         CriteriaValueSyncService $syncService
     ) {
-        $this->sawService = $sawService;
+        $this->sawService    = $sawService;
         $this->rankingService = $rankingService;
-        $this->syncService = $syncService;
+        $this->syncService   = $syncService;
     }
 
-    // ---------------------------------------------------------------------------
-    // HELPER: tentukan apakah sebuah criteria nilainya diambil dari ReportGrade
-    // ---------------------------------------------------------------------------
+    // =========================================================================
+    // HELPERS
+    // =========================================================================
 
     /**
      * Kembalikan nama kolom ReportGrade yang sesuai dengan criteria,
@@ -81,20 +80,53 @@ class CriterionValueController extends Controller
         return $map;
     }
 
-    // ---------------------------------------------------------------------------
-    // INDEX
-    // ---------------------------------------------------------------------------
+    /**
+     * Format exception menjadi string lengkap untuk ditampilkan ke user (debug mode).
+     */
+    protected function formatException(\Throwable $e): string
+    {
+        return sprintf(
+            "[%s]\n%s\n\nFile : %s\nLine : %d\n\n--- Stack Trace ---\n%s",
+            get_class($e),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            $e->getTraceAsString()
+        );
+    }
 
     /**
-     * Display list of students for criterion value input
+     * Kembalikan redirect back dengan error lengkap.
+     * Di production (APP_DEBUG=false), detail trace disembunyikan dari session
+     * tapi tetap masuk ke Log.
      */
+    protected function redirectWithException(\Throwable $e, string $context = '')
+    {
+        $detail = $this->formatException($e);
+
+        Log::error(($context ? "[$context] " : '') . $e->getMessage(), [
+            'exception' => get_class($e),
+            'file'      => $e->getFile(),
+            'line'      => $e->getLine(),
+            'trace'     => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()
+            ->with('error', ($context ? "[$context] " : '') . $e->getMessage())
+            ->with('error_detail', config('app.debug') ? $detail : null);
+    }
+
+    // =========================================================================
+    // INDEX
+    // =========================================================================
+
     public function index(Request $request)
     {
         $activeYear = AcademicYear::getActiveYear();
 
         if (!$activeYear) {
             return redirect()->route('committee.dashboard')
-                ->with('error', 'Tidak ada tahun ajaran aktif');
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
         $specialization = $request->input('specialization', 'tahfiz');
@@ -115,12 +147,13 @@ class CriterionValueController extends Controller
             ->ordered()
             ->get();
 
+        $allCriteriaIds    = $allCriterias->pluck('id');
         $totalStudents     = $students->total();
         $completedStudents = 0;
 
         foreach ($students as $student) {
             $valueCount = $student->criterionValues()
-                ->whereIn('criteria_id', $allCriterias->pluck('id'))
+                ->whereIn('criteria_id', $allCriteriaIds)
                 ->count();
 
             if ($valueCount === $allCriterias->count()) {
@@ -150,19 +183,15 @@ class CriterionValueController extends Controller
         ));
     }
 
-    // ---------------------------------------------------------------------------
+    // =========================================================================
     // CREATE (FORM)
-    // ---------------------------------------------------------------------------
+    // =========================================================================
 
-    /**
-     * Show form for inputting criterion values for a student.
-     * Nilai agama & bahasa inggris diambil otomatis dari ReportGrade.
-     */
     public function create(Student $student)
     {
         if ($student->validation_status !== 'valid') {
             return redirect()->route('committee.criterion-values.index')
-                ->with('error', 'Siswa belum tervalidasi');
+                ->with('error', 'Siswa belum tervalidasi.');
         }
 
         if ($student->specialization === 'regular') {
@@ -170,35 +199,26 @@ class CriterionValueController extends Controller
                 ->with('warning', 'Siswa yang memilih Regular tidak perlu dinilai dengan SAW. Mereka akan otomatis masuk ranking FCFS.');
         }
 
-        // Ambil semua criteria aktif untuk tahfiz & language
         $criterias = Criteria::active()
             ->whereIn('specialization', ['tahfiz', 'language'])
             ->ordered()
             ->get();
 
-        // Existing values yang sudah tersimpan
         $existingValues = StudentCriterionValue::where('student_id', $student->id)
             ->get()
             ->keyBy('criteria_id');
 
-        // Map: criteria yang nilainya dari ReportGrade
         $reportGradeCriteriaMap = $this->buildReportGradeCriteriaMap($criterias);
+        $reportGrade            = $student->reportGrade;
 
-        // ReportGrade siswa (jika ada)
-        $reportGrade = $student->reportGrade;
-
-        // Sinkronkan nilai dari ReportGrade ke $existingValues (hanya untuk tampilan,
-        // belum disimpan ke DB — penyimpanan terjadi di store())
+        // Tampilkan nilai ReportGrade pada form (belum disimpan, hanya untuk preview)
         foreach ($reportGradeCriteriaMap as $criteriaId => $column) {
-            if ($reportGrade && isset($reportGrade->{$column})) {
-                // Jika belum ada di DB, tampilkan nilai dari ReportGrade
-                if (!$existingValues->has($criteriaId)) {
-                    $existingValues->put($criteriaId, (object)[
-                        'raw_value' => $reportGrade->{$column},
-                        'notes'     => null,
-                        'from_report_grade' => true, // flag untuk view
-                    ]);
-                }
+            if ($reportGrade && isset($reportGrade->{$column}) && !$existingValues->has($criteriaId)) {
+                $existingValues->put($criteriaId, (object) [
+                    'raw_value'         => $reportGrade->{$column},
+                    'notes'             => null,
+                    'from_report_grade' => true,
+                ]);
             }
         }
 
@@ -218,28 +238,22 @@ class CriterionValueController extends Controller
             'existingValues',
             'progress',
             'syncStatus',
-            'reportGradeCriteriaMap', // dikirim ke view agar tahu field mana yg readonly
+            'reportGradeCriteriaMap',
             'reportGrade'
         ));
     }
 
-    // ---------------------------------------------------------------------------
+    // =========================================================================
     // STORE
-    // ---------------------------------------------------------------------------
+    // =========================================================================
 
-    /**
-     * Store criterion values for a student.
-     * Nilai agama & bahasa inggris diambil langsung dari ReportGrade,
-     * bukan dari request (field-nya tidak ada di form / readonly).
-     */
     public function store(Request $request, Student $student)
     {
         if ($student->specialization === 'regular') {
             return redirect()->route('committee.criterion-values.index')
-                ->with('error', 'Siswa yang memilih Regular tidak perlu dinilai dengan SAW');
+                ->with('error', 'Siswa yang memilih Regular tidak perlu dinilai dengan SAW.');
         }
 
-        // Ambil semua criteria untuk menentukan field mana yg dari ReportGrade
         $criterias = Criteria::active()
             ->whereIn('specialization', ['tahfiz', 'language'])
             ->ordered()
@@ -248,37 +262,27 @@ class CriterionValueController extends Controller
         $reportGradeCriteriaMap = $this->buildReportGradeCriteriaMap($criterias);
         $reportGrade            = $student->reportGrade;
 
-        // ID criteria yang TIDAK dari ReportGrade → harus divalidasi dari input
-        $editableCriteriaIds = $criterias->pluck('id')
-            ->diff(array_keys($reportGradeCriteriaMap))
-            ->values()
-            ->all();
-
-        // Validasi hanya untuk field yang bisa diedit
         $validated = $request->validate([
             'values'   => 'required|array',
             'values.*' => 'required|numeric|min:0|max:100',
             'notes'    => 'nullable|array',
             'notes.*'  => 'nullable|string|max:500',
         ], [
-            'values.required'   => 'Minimal satu nilai kriteria harus diisi',
-            'values.*.required' => 'Nilai kriteria harus diisi',
-            'values.*.numeric'  => 'Nilai kriteria harus berupa angka',
-            'values.*.min'      => 'Nilai kriteria minimal 0',
-            'values.*.max'      => 'Nilai kriteria maksimal 100',
-            'notes.*.max'       => 'Catatan maksimal 500 karakter',
+            'values.required'   => 'Minimal satu nilai kriteria harus diisi.',
+            'values.*.required' => 'Nilai kriteria harus diisi.',
+            'values.*.numeric'  => 'Nilai kriteria harus berupa angka.',
+            'values.*.min'      => 'Nilai kriteria minimal 0.',
+            'values.*.max'      => 'Nilai kriteria maksimal 100.',
+            'notes.*.max'       => 'Catatan maksimal 500 karakter.',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // ----------------------------------------------------------------
             // 1. Simpan nilai dari form (criteria yang bisa diedit)
-            // ----------------------------------------------------------------
             foreach ($validated['values'] as $criteriaId => $value) {
-                // Hanya proses criteria yang BUKAN dari ReportGrade
                 if (array_key_exists($criteriaId, $reportGradeCriteriaMap)) {
-                    continue;
+                    continue; // Nilai ini diambil dari ReportGrade, skip
                 }
 
                 $criteria = Criteria::where('id', $criteriaId)
@@ -299,19 +303,16 @@ class CriterionValueController extends Controller
                 );
             }
 
-            // ----------------------------------------------------------------
-            // 2. Simpan / perbarui nilai dari ReportGrade secara otomatis
-            // ----------------------------------------------------------------
+            // 2. Simpan nilai dari ReportGrade secara otomatis
             foreach ($reportGradeCriteriaMap as $criteriaId => $column) {
                 if (!$reportGrade) {
-                    // Jika tidak ada ReportGrade, lewati (jangan hapus nilai lama)
                     continue;
                 }
 
-                $reportValue = $reportGrade->{$column};
+                $reportValue = $reportGrade->{$column} ?? null;
 
                 if ($reportValue === null) {
-                    continue; // Kolom kosong di ReportGrade, lewati
+                    continue;
                 }
 
                 StudentCriterionValue::updateOrCreate(
@@ -325,16 +326,13 @@ class CriterionValueController extends Controller
 
             DB::commit();
 
-            // Cek apakah semua criteria sudah terisi
             $criteriaCount = Criteria::active()
                 ->whereIn('specialization', ['tahfiz', 'language'])
                 ->count();
 
             $valueCount = StudentCriterionValue::where('student_id', $student->id)
-                ->whereHas('criteria', function ($query) {
-                    $query->where('is_active', true)
-                        ->whereIn('specialization', ['tahfiz', 'language']);
-                })
+                ->whereHas('criteria', fn ($q) => $q->where('is_active', true)
+                    ->whereIn('specialization', ['tahfiz', 'language']))
                 ->count();
 
             if ($valueCount === $criteriaCount) {
@@ -343,92 +341,88 @@ class CriterionValueController extends Controller
             }
 
             return redirect()->route('committee.criterion-values.create', $student)
-                ->with('success', 'Nilai kriteria berhasil disimpan');
+                ->with('success', 'Nilai kriteria berhasil disimpan.');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Error storing criterion values: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Gagal menyimpan nilai kriteria: ' . $e->getMessage());
+            return $this->redirectWithException($e, 'Store Criterion Values');
         }
     }
 
-    // ---------------------------------------------------------------------------
+    // =========================================================================
     // SYNC & BATCH
-    // ---------------------------------------------------------------------------
+    // =========================================================================
 
-    /**
-     * Sync nilai dari Report Grade ke Criterion Values
-     */
     public function syncFromReportGrade(Student $student)
     {
-        $result = $this->syncService->syncReportGradeToValues($student);
+        try {
+            $result = $this->syncService->syncReportGradeToValues($student);
 
-        if ($result['success']) {
-            return redirect()->route('committee.criterion-values.create', $student)
-                ->with('success', $result['message']);
+            if ($result['success']) {
+                return redirect()->route('committee.criterion-values.create', $student)
+                    ->with('success', $result['message']);
+            }
+
+            return redirect()->back()
+                ->with('error', $result['message']);
+
+        } catch (\Throwable $e) {
+            return $this->redirectWithException($e, 'Sync From Report Grade');
         }
-
-        return redirect()->back()
-            ->with('error', $result['message']);
     }
 
-    /**
-     * Batch sync untuk semua siswa
-     */
     public function batchSyncReportGrades(Request $request)
     {
         $activeYear = AcademicYear::getActiveYear();
 
         if (!$activeYear) {
             return redirect()->back()
-                ->with('error', 'Tidak ada tahun ajaran aktif');
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
-        $result = $this->syncService->batchSyncReportGrades($activeYear->id);
+        try {
+            $result = $this->syncService->batchSyncReportGrades($activeYear->id);
 
-        if ($result['success']) {
-            return redirect()->route('committee.criterion-values.index')
-                ->with('success', $result['message']);
+            if ($result['success']) {
+                return redirect()->route('committee.criterion-values.index')
+                    ->with('success', $result['message']);
+            }
+
+            return redirect()->back()
+                ->with('error', $result['message']);
+
+        } catch (\Throwable $e) {
+            return $this->redirectWithException($e, 'Batch Sync Report Grades');
         }
-
-        return redirect()->back()
-            ->with('error', $result['message']);
     }
 
-    // ---------------------------------------------------------------------------
+    // =========================================================================
     // SAW & ACCEPTANCE
-    // ---------------------------------------------------------------------------
+    // =========================================================================
 
-    /**
-     * Calculate SAW untuk SEMUA siswa di SEMUA spesialisasi
-     */
     public function calculateSaw(Request $request)
     {
         $activeYear = AcademicYear::getActiveYear();
 
         if (!$activeYear) {
             return redirect()->back()
-                ->with('error', 'Tidak ada tahun ajaran aktif');
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
-        // Check if there are any pending students
         $pendingCount = Student::where('academic_year_id', $activeYear->id)
             ->where('validation_status', 'pending')
             ->count();
 
         if ($pendingCount > 0) {
             return redirect()->back()
-                ->with('error', "Tidak dapat menghitung nilai SAW. Masih ada {$pendingCount} siswa dengan status validasi 'pending'. Silakan validasi semua siswa terlebih dahulu.");
+                ->with('error', "Tidak dapat menghitung SAW. Masih ada {$pendingCount} siswa berstatus 'pending'. Validasi semua siswa terlebih dahulu.");
         }
 
         try {
-            Log::info('SAW Calculation Started for All Specializations', [
+            Log::info('SAW Calculation Started', [
                 'academic_year_id' => $activeYear->id,
                 'user_id'          => auth()->id(),
-                'timestamp'        => now(),
+                'timestamp'        => now()->toDateTimeString(),
             ]);
 
             $result = $this->sawService->calculateAllScores(
@@ -436,87 +430,81 @@ class CriterionValueController extends Controller
                 auth()->id()
             );
 
+            Log::info('SAW Service Result', ['result' => $result]);
+
             if (!$result['success']) {
+                Log::error('SAW Service returned failure', ['result' => $result]);
+
+                $detail = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
                 return redirect()->back()
-                    ->with('error', $result['message']);
+                    ->with('error', '[SAW Service] ' . $result['message'])
+                    ->with('error_detail', config('app.debug') ? $detail : null);
             }
 
             $totalTahfiz   = $result['data']['tahfiz']['total_students']   ?? 0;
             $totalLanguage = $result['data']['language']['total_students'] ?? 0;
 
             return redirect()->route('committee.saw-results.index')
-                ->with('success', "✅ Perhitungan SAW berhasil! Tahfiz: {$totalTahfiz} siswa, Language: {$totalLanguage} siswa. Silakan lanjutkan ke penentuan status penerimaan.");
+                ->with('success', "Perhitungan SAW berhasil! Tahfiz: {$totalTahfiz} siswa, Language: {$totalLanguage} siswa.");
 
-        } catch (\Exception $e) {
-            Log::error('SAW Calculation Exception', [
-                'error' => $e->getMessage(),
-                'file'  => $e->getFile(),
-                'line'  => $e->getLine(),
-            ]);
-
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan saat menghitung SAW: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return $this->redirectWithException($e, 'Calculate SAW');
         }
     }
 
-    /**
-     * Tentukan status penerimaan dengan 3 jalur
-     */
     public function determineAcceptance(Request $request)
     {
         $activeYear = AcademicYear::getActiveYear();
 
         if (!$activeYear) {
             return redirect()->back()
-                ->with('error', 'Tidak ada tahun ajaran aktif');
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
+        }
+
+        $tahfizExists  = SawResult::where('academic_year_id', $activeYear->id)->where('specialization', 'tahfiz')->exists();
+        $languageExists = SawResult::where('academic_year_id', $activeYear->id)->where('specialization', 'language')->exists();
+
+        if (!$tahfizExists || !$languageExists) {
+            return redirect()->back()
+                ->with('error', 'Perhitungan SAW belum dilakukan. Silakan hitung SAW terlebih dahulu.');
         }
 
         try {
-            $tahfizResults = SawResult::where('academic_year_id', $activeYear->id)
-                ->where('specialization', 'tahfiz')
-                ->exists();
-
-            $languageResults = SawResult::where('academic_year_id', $activeYear->id)
-                ->where('specialization', 'language')
-                ->exists();
-
-            if (!$tahfizResults || !$languageResults) {
-                return redirect()->back()
-                    ->with('error', 'Perhitungan SAW belum dilakukan. Silakan hitung SAW terlebih dahulu.');
-            }
-
             $result = $this->rankingService->determineAcceptanceStatus($activeYear->id);
 
+            Log::info('Determine Acceptance Result', ['result' => $result]);
+
             if (!$result['success']) {
+                Log::error('Ranking Service returned failure', ['result' => $result]);
+
+                $detail = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
                 return redirect()->back()
-                    ->with('error', $result['message']);
+                    ->with('error', '[Ranking Service] ' . $result['message'])
+                    ->with('error_detail', config('app.debug') ? $detail : null);
             }
 
             $data    = $result['data'];
-            $message = "Status penerimaan berhasil ditentukan!\n";
-            $message .= "• Tahfiz: {$data['tahfiz']['accepted']}/{$data['tahfiz']['quota']}\n";
-            $message .= "• Language: {$data['language']['accepted']}/{$data['language']['quota']}\n";
-            $message .= "• Regular: {$data['regular']['accepted']}/{$data['regular']['quota']}\n";
-            $message .= "• Ditolak: {$data['rejected']['total']}";
+            $message = implode(' | ', [
+                "Tahfiz: {$data['tahfiz']['accepted']}/{$data['tahfiz']['quota']}",
+                "Language: {$data['language']['accepted']}/{$data['language']['quota']}",
+                "Regular: {$data['regular']['accepted']}/{$data['regular']['quota']}",
+                "Ditolak: {$data['rejected']['total']}",
+            ]);
 
             return redirect()->route('committee.saw-results.index')
-                    ->with('success', $message);
+                ->with('success', "Status penerimaan berhasil ditentukan! $message");
 
-        } catch (\Exception $e) {
-            Log::error('Determine Acceptance Exception', ['error' => $e->getMessage()]);
-
-            return redirect()->back()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return $this->redirectWithException($e, 'Determine Acceptance');
         }
     }
 
-    // ---------------------------------------------------------------------------
+    // =========================================================================
     // SHOW
-    // ---------------------------------------------------------------------------
+    // =========================================================================
 
-    /**
-     * Show detail of student's criterion values
-     */
     public function show(Student $student)
     {
         $criterias = Criteria::active()

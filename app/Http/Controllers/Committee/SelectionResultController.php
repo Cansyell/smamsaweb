@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Committee;
 
+use App\Export\SelectionResultPdfExport;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\Student;
@@ -72,5 +73,51 @@ class SelectionResultController extends Controller
             'regularStudents',
             'stats'
         ));
+    }
+
+    /**
+     * Export hasil seleksi ke PDF menggunakan DomPDF.
+     *
+     * Query param:
+     *   ?tab=all               → semua peserta
+     *   ?tab=tahfiz            → hanya Tahfiz
+     *   ?tab=language          → hanya Bahasa
+     *   ?tab=regular           → hanya Regular
+     *   ?tab=all_specializations → semua tab terpisah per halaman (default)
+     *   ?mode=stream           → preview di browser (opsional)
+     */
+    public function exportPdf(Request $request)
+    {
+        $activeYear = AcademicYear::getActiveYear();
+
+        if (! $activeYear) {
+            return redirect()
+                ->route('committee.dashboard')
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
+        }
+
+        $tab  = $request->input('tab', 'all_specializations');
+        // 'all_specializations' = semua section dalam 1 PDF (default kalau tab = 'all')
+        $mode = $request->input('mode', 'download'); // 'download' | 'stream'
+
+        $tabLabels = [
+            'all'                => 'Semua-Peserta',
+            'tahfiz'             => 'Tahfiz',
+            'language'           => 'Bahasa',
+            'regular'            => 'Regular',
+            'all_specializations'=> 'Semua-Spesialisasi',
+        ];
+
+        $filename = 'Hasil-Seleksi-PPDB-'
+          . ($tabLabels[$tab] ?? $tab)
+          . '-'
+          . now()->format('Ymd_His')
+          . '.pdf';
+
+        $export = new SelectionResultPdfExport($activeYear, ['tab' => $tab]);
+
+        return $mode === 'stream'
+            ? $export->stream($filename)
+            : $export->download($filename);
     }
 }

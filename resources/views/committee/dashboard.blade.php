@@ -190,7 +190,7 @@
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-800">Siswa Perlu Input Nilai Tes</h3>
-            <a href="#" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+            <a href="{{ route('committee.criterion-values.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
                 Lihat Semua
                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -228,7 +228,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{!! $student->status_badge !!}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="#" class="text-indigo-600 hover:text-indigo-900">Input Nilai</a>
+                                <a href="{{ route('committee.criterion-values.create', $student) }}" class="text-indigo-600 hover:text-indigo-900">Input Nilai</a>
                             </td>
                         </tr>
                         @endforeach
@@ -263,7 +263,7 @@
                     </div>
                 </div>
             </a>
-            <a href="#" 
+            <a href="{{ route('committee.criterion-values.index') }}" 
                class="border-2 border-green-300 bg-green-50 rounded-lg p-4 hover:shadow-md transition hover:bg-green-100">
                 <div class="flex items-center">
                     <div class="bg-green-100 p-3 rounded-full mr-4">
@@ -277,7 +277,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{ route('committee.validation.index', ['status' => 'all']) }}" 
+            <a href="{{ route('committee.students.index', ['status' => 'all']) }}" 
                class="border-2 border-blue-300 bg-blue-50 rounded-lg p-4 hover:shadow-md transition hover:bg-blue-100">
                 <div class="flex items-center">
                     <div class="bg-blue-100 p-3 rounded-full mr-4">

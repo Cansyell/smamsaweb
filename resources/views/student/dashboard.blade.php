@@ -404,7 +404,7 @@
     </div>
 
     <!-- Final Result -->
-    @if($validationStatus['status'] === 'valid')
+    {{-- @if($validationStatus['status'] === 'valid')
     <div class="bg-white rounded-lg shadow-md p-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">
             @if($student->specialization === 'regular') Status Penerimaan (FCFS)
@@ -588,6 +588,6 @@
             @endif
         @endif
     </div>
-    @endif
+    @endif --}}
 </div>
 @endsection

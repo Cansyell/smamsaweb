@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Committee;
 
 use App\Http\Controllers\Controller;
-use App\Models\Student;
 use App\Models\AcademicYear;
 use App\Models\Announcement;
-use Illuminate\Http\Request;
+use App\Models\Student;
 
 class CommitteeDashboardController extends Controller
 {
@@ -15,26 +14,30 @@ class CommitteeDashboardController extends Controller
         $activeYear = AcademicYear::getActiveYear();
 
         if (!$activeYear) {
-            return redirect()->back()->with('error', 'Tidak ada tahun ajaran aktif. Silakan aktifkan tahun ajaran terlebih dahulu.');
+            return redirect()->back()
+                ->with('error', 'Tidak ada tahun ajaran aktif. Silakan aktifkan tahun ajaran terlebih dahulu.');
         }
 
+        $base = fn() => Student::byAcademicYear($activeYear->id);
+
         $stats = [
-            'pending_validation' => Student::byAcademicYear($activeYear->id)->pending()->count(),
-            'need_test_scores'   => Student::byAcademicYear($activeYear->id)->valid()->whereDoesntHave('testScore')->count(),
-            'completed_tests'    => Student::byAcademicYear($activeYear->id)->whereHas('testScore')->count(),
-            'total_students'     => Student::byAcademicYear($activeYear->id)->count(),
+            'total_students'     => $base()->count(),
+            'pending_validation' => $base()->pending()->count(),
+            'need_test_scores'   => $base()->valid()->whereDoesntHave('criterionValues')->count(),
+            'completed_tests'    => $base()->valid()->whereHas('criterionValues')->count(),
         ];
 
-        $pendingStudents = Student::byAcademicYear($activeYear->id)
+        $pendingStudents = $base()
             ->pending()
             ->with(['user', 'academicYear'])
             ->latest()
             ->limit(5)
             ->get();
 
-        $needTestScores = Student::byAcademicYear($activeYear->id)
+        $needTestScores = $base()
             ->valid()
-            ->whereDoesntHave('testScore')
+            ->whereDoesntHave('criterionValues')
+            ->where('specialization','!=','regular')
             ->with(['user', 'academicYear'])
             ->latest()
             ->limit(5)
@@ -44,10 +47,10 @@ class CommitteeDashboardController extends Controller
 
         return view('committee.dashboard', [
             'page'            => 'dashboard',
+            'activeYear'      => $activeYear,
             'stats'           => $stats,
             'pendingStudents' => $pendingStudents,
             'needTestScores'  => $needTestScores,
-            'activeYear'      => $activeYear,
             'announcements'   => $announcements,
         ]);
     }

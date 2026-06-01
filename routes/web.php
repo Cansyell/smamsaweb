@@ -348,6 +348,9 @@ Route::middleware(['auth', 'role:committee'])
     // SELECTION-RESULT
     Route::get('selection-results', [SelectionResultController::class, 'index'])
     ->name('selection-results.index');
+
+    Route::get('selection-results/export-pdf', [SelectionResultController::class, 'exportPdf'])
+    ->name('selection-results.export-pdf');
 });
 
 
@@ -378,12 +381,11 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
      ===================================================== */
     Route::resource('documents', DocumentController::class);
     
-    Route::prefix('resubmission/{student}')->name('resubmission.')->group(function () {
-        Route::get('/',                  [ResubmissionController::class, 'show'])              ->name('show');
-        Route::put('/personal-data',     [ResubmissionController::class, 'updatePersonalData'])->name('update-personal');
-        Route::put('/report-grade',      [ResubmissionController::class, 'updateReportGrade']) ->name('update-grade');
-        Route::post('/replace-document', [ResubmissionController::class, 'replaceDocument'])  ->name('replace-document');
-        Route::post('/submit',           [ResubmissionController::class, 'submit'])            ->name('submit');
+    Route::prefix('resubmission/')->name('resubmission.')->group(function () {
+    Route::get('/',                  [ResubmissionController::class, 'show'])           ->name('show');
+    Route::put('/report-grade',      [ResubmissionController::class, 'updateReportGrade'])->name('update-grade');
+    Route::post('/upload-document', [ResubmissionController::class, 'uploadDocument'])->name('upload-document');
+    Route::post('/submit',           [ResubmissionController::class, 'submit'])         ->name('submit');
     });
 
     /* =====================================================
