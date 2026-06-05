@@ -22,9 +22,8 @@ class ReportGradeExport
         $this->filters = $filters;
     }
 
-    // ─────────────────────────────────────────────────────────
     // Ambil data siswa beserta nilai rapor sesuai filter
-    // ─────────────────────────────────────────────────────────
+
     public function collection()
     {
         $query = Student::with(['reportGrade', 'academicYear'])
@@ -62,9 +61,7 @@ class ReportGradeExport
         return $query->orderBy('full_name')->get();
     }
 
-    // ─────────────────────────────────────────────────────────
     // Heading kolom
-    // ─────────────────────────────────────────────────────────
     public function headings(): array
     {
         return [
@@ -87,9 +84,7 @@ class ReportGradeExport
         ];
     }
 
-    // ─────────────────────────────────────────────────────────
     // Build spreadsheet & stream download
-    // ─────────────────────────────────────────────────────────
     public function download(string $filename)
     {
         $spreadsheet = new Spreadsheet();
@@ -98,7 +93,7 @@ class ReportGradeExport
 
         $lastCol = self::LAST_COL;
 
-        // ── Baris 1: Nama sekolah ──────────────────────────
+        // Baris 1: Nama sekolah 
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->setCellValue('A1', 'SMA MUHAMMADIYAH 1 PURWOKERTO');
         $sheet->getStyle('A1')->applyFromArray([
@@ -107,7 +102,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(1)->setRowHeight(22);
 
-        // ── Baris 2: Alamat ────────────────────────────────
+        // Baris 2: Alamat
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->setCellValue('A2', 'Jl. Dr. Angka No.1, Karangjengkol, Sokanegara, Kec. Purwokerto Tim., Kabupaten Banyumas, Jawa Tengah 53115');
         $sheet->getStyle('A2')->applyFromArray([
@@ -116,7 +111,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(2)->setRowHeight(16);
 
-        // ── Baris 3: Telp ──────────────────────────────────
+        // Baris 3: Telp
         $sheet->mergeCells("A3:{$lastCol}3");
         $sheet->setCellValue('A3', 'Telp: (0281) 633373');
         $sheet->getStyle('A3')->applyFromArray([
@@ -125,7 +120,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(3)->setRowHeight(16);
 
-        // ── Baris 4: Garis pemisah ─────────────────────────
+        // Baris 4: Garis pemisah
         $sheet->mergeCells("A4:{$lastCol}4");
         $sheet->getStyle("A4:{$lastCol}4")->applyFromArray([
             'borders' => [
@@ -134,7 +129,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(4)->setRowHeight(4);
 
-        // ── Baris 5: Judul dokumen ─────────────────────────
+        // Baris 5: Judul dokumen 
         $sheet->mergeCells("A5:{$lastCol}5");
         $sheet->setCellValue('A5', 'REKAP NILAI RAPOR PESERTA PENERIMAAN MURID BARU');
         $sheet->getStyle('A5')->applyFromArray([
@@ -143,7 +138,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(5)->setRowHeight(20);
 
-        // ── Baris 6: Filter info + tanggal cetak ──────────
+        // Baris 6: Filter info + tanggal cetak 
         $filterInfo = $this->buildFilterInfo();
         $sheet->mergeCells("A6:{$lastCol}6");
         $sheet->setCellValue('A6', $filterInfo . '  |  Dicetak pada: ' . now()->format('d F Y, H:i') . ' WIB');
@@ -153,12 +148,12 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(6)->setRowHeight(14);
 
-        // ── Background kop ─────────────────────────────────
+        // Background kop 
         $sheet->getStyle("A1:{$lastCol}6")->applyFromArray([
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF8F7FF']],
         ]);
 
-        // ── Baris 7: Header kolom ──────────────────────────
+        // Baris 7: Header kolom 
         foreach ($this->headings() as $i => $heading) {
             $sheet->setCellValueByColumnAndRow($i + 1, 7, $heading);
         }
@@ -170,7 +165,7 @@ class ReportGradeExport
         ]);
         $sheet->getRowDimension(7)->setRowHeight(24);
 
-        // ── Baris 8+: Data siswa ───────────────────────────
+        // Baris 8+: Data siswa 
         $students    = $this->collection();
         $totalRows   = $students->count();
         $subjectCols = ['G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']; // kolom nilai mapel
@@ -232,7 +227,7 @@ class ReportGradeExport
 
         $lastDataRow = $totalRows + 7;
 
-        // ── Baris ringkasan (rata-rata keseluruhan) ────────
+        // Baris ringkasan (rata-rata keseluruhan)
         if ($totalRows > 0) {
             $summaryRow = $lastDataRow + 1;
             $sheet->mergeCells("A{$summaryRow}:F{$summaryRow}");
@@ -262,14 +257,14 @@ class ReportGradeExport
             $sheet->getRowDimension($summaryRow)->setRowHeight(20);
         }
 
-        // ── Border luar tabel data ─────────────────────────
+        // Border luar tabel data
         $sheet->getStyle("A7:{$lastCol}{$lastDataRow}")->applyFromArray([
             'borders' => [
                 'outline' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['argb' => 'FF4F46E5']],
             ],
         ]);
 
-        // ── Lebar kolom ────────────────────────────────────
+        // Lebar kolom
         $colWidths = [
             'A' => 5,   // No
             'B' => 14,  // ID Siswa
@@ -292,13 +287,13 @@ class ReportGradeExport
             $sheet->getColumnDimension($col)->setWidth($width);
         }
 
-        // ── Alignment tengah untuk kolom nilai ─────────────
+        // Alignment tengah untuk kolom nilai
         if ($totalRows > 0) {
             $sheet->getStyle("G8:P{$lastDataRow}")->getAlignment()
                   ->setHorizontal(Alignment::HORIZONTAL_CENTER);
         }
 
-        // ── Print setup ────────────────────────────────────
+        // Print setup
         $sheet->getPageSetup()
               ->setRowsToRepeatAtTopByStartAndEnd(0, 0)
               ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE)
@@ -314,9 +309,7 @@ class ReportGradeExport
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────
     // Helper: bangun keterangan filter untuk baris 6
-    // ─────────────────────────────────────────────────────────
     private function buildFilterInfo(): string
     {
         $parts = [];

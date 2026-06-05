@@ -6,7 +6,7 @@
     <title>Register</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-pink-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-br from-purple-50 to-white-100 min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <!-- Register Card -->
         <div class="bg-white rounded-lg shadow-xl p-8">

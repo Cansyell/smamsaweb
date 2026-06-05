@@ -16,6 +16,7 @@ class SawResult extends Model
         'specialization',
         'final_score',
         'rank',
+        'primary_rank',
         'detail_calculation',
         'calculated_at',
         'calculated_by',
@@ -24,6 +25,7 @@ class SawResult extends Model
     protected $casts = [
         'final_score' => 'decimal:8',
         'rank' => 'integer',
+        'primary_rank' => 'integer',
         'detail_calculation' => 'array',
         'calculated_at' => 'datetime',
     ];

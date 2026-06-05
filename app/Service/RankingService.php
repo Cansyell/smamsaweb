@@ -65,31 +65,30 @@ class RankingService
                 ->where('specialization', 'tahfiz')
                 ->whereHas('student', fn($q) => $q
                     ->where('validation_status', 'valid')
-                    ->where('specialization', 'tahfiz') // <-- HANYA yg memilih tahfiz
+                    ->where('specialization', 'tahfiz')
                 )
                 ->with('student')
-                ->orderBy('rank')
+                ->orderBy('primary_rank') // <-- GANTI dari orderBy('rank')
                 ->get();
 
-            $tahfizAccepted      = 0;
-            $tahfizSlotRemaining = $tahfizQuota;
+            $tahfizAccepted = 0;
 
             foreach ($tahfizStudents as $result) {
                 $student    = $result->student;
-                $isAccepted = $tahfizAccepted < $tahfizQuota;
+                $isAccepted = $result->primary_rank !== null 
+                        && $result->primary_rank <= $tahfizQuota; // <-- pakai primary_rank
 
                 if ($isAccepted) {
                     Student::where('id', $student->id)->update([
-                        'final_status'               => 'accepted',
-                        'dual_pass'                  => false,
+                        'final_status'            => 'accepted',
+                        'dual_pass'               => false,
                         'recommended_specialization' => null,
-                        'accepted_specialization'    => 'tahfiz',
-                        'cross_accepted'             => false,
+                        'accepted_specialization' => 'tahfiz',
+                        'cross_accepted'          => false,
                     ]);
                     $tahfizAccepted++;
                     $tahfizSlotRemaining--;
                 }
-                // else: tetap rejected (sudah di-reset di atas)
             }
 
             // --------------------------------------------------
@@ -100,18 +99,15 @@ class RankingService
                 ->where('specialization', 'language')
                 ->whereHas('student', fn($q) => $q
                     ->where('validation_status', 'valid')
-                    ->where('specialization', 'language') // <-- HANYA yg memilih bahasa
+                    ->where('specialization', 'language')
                 )
                 ->with('student')
-                ->orderBy('rank')
+                ->orderBy('primary_rank') // <-- GANTI
                 ->get();
 
-            $languageAccepted      = 0;
-            $languageSlotRemaining = $languageQuota;
-
             foreach ($languageStudents as $result) {
-                $student    = $result->student;
-                $isAccepted = $languageAccepted < $languageQuota;
+                $isAccepted = $result->primary_rank !== null 
+                        && $result->primary_rank <= $languageQuota;
 
                 if ($isAccepted) {
                     Student::where('id', $student->id)->update([

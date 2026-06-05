@@ -135,7 +135,7 @@ class CriterionValueController extends Controller
             ->where('academic_year_id', $activeYear->id)
             ->where('validation_status', 'valid')
             ->whereIn('specialization', ['tahfiz', 'language'])
-            ->paginate(20);
+            ->paginate(30);
 
         $criterias = Criteria::active()
             ->where('specialization', $specialization)

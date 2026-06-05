@@ -14,9 +14,8 @@ class JadwalPpdbController extends Controller
 {
     private const REDIRECT = 'admin.welcome.setting';
 
-    // ─────────────────────────────────────────
-    // JADWAL
-    // ─────────────────────────────────────────
+    
+    //JADWAL
 
     public function storeJadwal(Request $request): RedirectResponse
     {
@@ -80,9 +79,7 @@ class JadwalPpdbController extends Controller
         return back()->with('success', 'Status semua jadwal berhasil disinkronkan.');
     }
 
-    // ─────────────────────────────────────────
     // PPDB SETTINGS
-    // ─────────────────────────────────────────
 
     public function storeSetting(Request $request): RedirectResponse
     {
@@ -134,10 +131,7 @@ class JadwalPpdbController extends Controller
             ->with('success', 'Setting PPDB berhasil diperbarui.');
     }
 
-    // ─────────────────────────────────────────
     // BIAYA
-    // ─────────────────────────────────────────
-
     public function storeBiaya(Request $request): RedirectResponse
     {
         $request->validate([
@@ -186,9 +180,8 @@ class JadwalPpdbController extends Controller
             ->with('success', 'Biaya PPDB berhasil dihapus.');
     }
 
-    // ─────────────────────────────────────────
+
     // PERSYARATAN
-    // ─────────────────────────────────────────
 
     public function storePersyaratan(Request $request): RedirectResponse
     {

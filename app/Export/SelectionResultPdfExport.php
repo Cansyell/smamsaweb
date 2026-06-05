@@ -17,9 +17,7 @@ class SelectionResultPdfExport
         $this->filters    = $filters;
     }
 
-    // ─────────────────────────────────────────────────────────
     // Base query: peserta valid di tahun ajaran aktif
-    // ─────────────────────────────────────────────────────────
     private function baseQuery()
     {
         return Student::with('user')
@@ -27,9 +25,7 @@ class SelectionResultPdfExport
             ->where('validation_status', 'valid');
     }
 
-    // ─────────────────────────────────────────────────────────
     // Ambil data sesuai tab/filter
-    // ─────────────────────────────────────────────────────────
     private function getData(): array
     {
         $tab = $this->filters['tab'] ?? 'all';
@@ -78,9 +74,7 @@ class SelectionResultPdfExport
         );
     }
 
-    // ─────────────────────────────────────────────────────────
     // Stream download PDF
-    // ─────────────────────────────────────────────────────────
     public function download(string $filename)
     {
         $data = $this->getData();
@@ -99,9 +93,7 @@ class SelectionResultPdfExport
         return $pdf->download($filename);
     }
 
-    // ─────────────────────────────────────────────────────────
     // Stream inline (preview di browser)
-    // ─────────────────────────────────────────────────────────
     public function stream(string $filename)
     {
         $data = $this->getData();

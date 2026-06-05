@@ -22,7 +22,7 @@
     </div>
 
     <!-- Recommendation Alert -->
-    @if($recommendation && $recommendation['recommended'])
+    {{-- @if($recommendation && $recommendation['recommended'])
     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
         <div class="flex items-start">
             <div class="p-3 bg-blue-100 rounded-full mr-4">
@@ -41,7 +41,7 @@
             </div>
         </div>
     </div>
-    @endif
+    @endif --}}
 
     <!-- Main Form Card -->
     <div class="bg-white rounded-lg shadow-md p-6">
@@ -88,11 +88,11 @@
                                     <span class="text-xs text-gray-600">
                                         Kuota: {{ $quotaInfo['tahfiz']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['tahfiz']['accepted'] ?? 0 }}/{{ $quotaInfo['tahfiz']['quota'] ?? 0 }} diterima)
                                     </span>
-                                    @if(($recommendation['recommended'] ?? '') === 'tahfiz')
+                                    {{-- @if(($recommendation['recommended'] ?? '') === 'tahfiz')
                                         <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-medium">
                                             ⭐ Direkomendasikan
                                         </span>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                         </div>
@@ -123,11 +123,11 @@
                                     <span class="text-xs text-gray-600">
                                         Kuota: {{ $quotaInfo['language']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['language']['accepted'] ?? 0 }}/{{ $quotaInfo['language']['quota'] ?? 0 }} diterima)
                                     </span>
-                                    @if(($recommendation['recommended'] ?? '') === 'language')
+                                    {{-- @if(($recommendation['recommended'] ?? '') === 'language')
                                         <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-medium">
                                             ⭐ Direkomendasikan
                                         </span>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                         </div>
@@ -158,11 +158,11 @@
                                     <span class="text-xs text-gray-600">
                                         Kuota: {{ $quotaInfo['regular']['available'] ?? 0 }} tempat tersisa ({{ $quotaInfo['regular']['accepted'] ?? 0 }}/{{ $quotaInfo['regular']['quota'] ?? 0 }} diterima)
                                     </span>
-                                    @if(($recommendation['recommended'] ?? '') === 'regular')
+                                    {{-- @if(($recommendation['recommended'] ?? '') === 'regular')
                                         <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-medium">
                                             ⭐ Direkomendasikan
                                         </span>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                         </div>

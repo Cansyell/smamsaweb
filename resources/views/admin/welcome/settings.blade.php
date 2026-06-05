@@ -219,7 +219,6 @@
                             @endif
                         </div>
                         <div class="flex-1 min-w-40 text-sm text-gray-400 leading-relaxed pt-2">
-                            <p>Gambar latar belakang hero (dengan overlay gelap).</p>
                             <p class="mt-1">Rekomendasi: <strong class="text-gray-600">1920 × 1080 px</strong></p>
                             <p class="mt-1">Biarkan kosong untuk mempertahankan gambar saat ini.</p>
                         </div>

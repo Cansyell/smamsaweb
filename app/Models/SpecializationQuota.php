@@ -71,8 +71,8 @@ class SpecializationQuota extends Model
 
     public function activate(): bool
     {
-        // Nonaktifkan quota lain di tahun ajaran yang sama
-        self::where('academic_year_id', $this->academic_year_id)
+        //  Nonaktifkan SEMUA quota
+        self::where('is_active', true)
             ->where('id', '!=', $this->id)
             ->update(['is_active' => false]);
         

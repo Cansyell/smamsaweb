@@ -456,9 +456,29 @@ class SawService
             ->orderByDesc('final_score')
             ->get();
 
+        // --- Rank global (semua siswa di track ini, termasuk cross) ---
         $rank = 1;
         foreach ($results as $result) {
             $result->update(['rank' => $rank++]);
         }
+
+        // --- Primary rank (hanya siswa yang MEMILIH specialization ini) ---
+        // Ini yang dipakai untuk menentukan lulus/tidak di jalur primer
+        $primaryResults = SawResult::where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
+            ->whereHas('student', fn($q) => $q->where('specialization', $specialization))
+            ->orderByDesc('final_score')
+            ->get();
+
+        $primaryRank = 1;
+        foreach ($primaryResults as $result) {
+            $result->update(['primary_rank' => $primaryRank++]);
+        }
+
+        // Siswa cross (tidak memilih specialization ini) → primary_rank = null
+        SawResult::where('academic_year_id', $academicYearId)
+            ->where('specialization', $specialization)
+            ->whereHas('student', fn($q) => $q->where('specialization', '!=', $specialization))
+            ->update(['primary_rank' => null]);
     }
 }

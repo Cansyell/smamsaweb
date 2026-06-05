@@ -382,50 +382,33 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Status -->
-                            <div class="text-right ml-4">
-                                @if($student_item->final_status === 'accepted')
-                                    <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                                        Diterima
-                                    </span>
-                                @elseif($student_item->final_status === 'waiting_list')
-                                    <span class="px-3 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">
-                                        Daftar Tunggu
-                                    </span>
-                                @elseif($student_item->final_status === 'rejected')
-                                    <span class="px-3 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                                        Tidak Diterima
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">
-                                        Menunggu
-                                    </span>
-                                @endif
-                            </div>
                         </div>
                     </div>
                     @endforeach
                 @else
                     {{-- Tahfiz/Language: SAW Ranking --}}
                     @foreach($rankings as $ranking)
-                    <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition {{ $ranking->student_id == $student->id ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-200' : '' }}">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition
+                        {{ $ranking->student_id == $student->id ? 'bg-blue-50 border-blue-400 ring-2 ring-blue-200' : '' }}">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4 flex-1">
-                                <!-- Rank Badge -->
+                    
+                                {{-- Rank Badge — primary_rank = posisi di antara sesama pemilih peminatan --}}
                                 <div class="flex-shrink-0">
-                                    @if($ranking->rank <= 3)
-                                        <div class="flex items-center justify-center w-12 h-12 rounded-full {{ $ranking->rank == 1 ? 'bg-yellow-400' : ($ranking->rank == 2 ? 'bg-gray-300' : 'bg-orange-400') }} text-white font-bold text-lg">
-                                            {{ $ranking->rank }}
+                                    @if($ranking->primary_rank <= 3)
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-full
+                                            {{ $ranking->primary_rank == 1 ? 'bg-yellow-400' : ($ranking->primary_rank == 2 ? 'bg-gray-300' : 'bg-orange-400') }}
+                                            text-white font-bold text-lg">
+                                            {{ $ranking->primary_rank }}
                                         </div>
                                     @else
                                         <div class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-700 font-bold text-lg">
-                                            {{ $ranking->rank }}
+                                            {{ $ranking->primary_rank }}
                                         </div>
                                     @endif
                                 </div>
-
-                                <!-- Student Info -->
+                    
+                                {{-- Student Info --}}
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-1">
                                         <h3 class="text-base font-semibold text-gray-900">
@@ -437,9 +420,9 @@
                                             </span>
                                         @endif
                                     </div>
-                                    
+                    
                                     <div class="flex items-center gap-4 text-sm text-gray-600">
-                                       <span class="flex items-center">
+                                        <span class="flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
                                             </svg>
@@ -454,21 +437,12 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Score and Status -->
+                    
+                            {{-- Score & Status --}}
                             <div class="text-right ml-4">
                                 <div class="text-lg font-bold text-gray-900 mb-2">
                                     {{ number_format($ranking->final_score, 4) }}
                                 </div>
-                                @if($ranking->rank <= $quotaInfo[$filterSpecialization]['quota'])
-                                    <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                                        Diterima
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                                        Tidak Diterima
-                                    </span>
-                                @endif
                             </div>
                         </div>
                     </div>

@@ -268,7 +268,7 @@
             @endif
 
             <!-- Recommendation Info -->
-            @if($recommendation && $recommendation['recommended'])
+            {{-- @if($recommendation && $recommendation['recommended'])
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <div class="flex items-start">
                     <div class="p-3 bg-blue-100 rounded-full mr-4">
@@ -286,7 +286,7 @@
                     </div>
                 </div>
             </div>
-            @endif
+            @endif --}}
 
             <!-- Quota Info -->
             <div class="bg-white border border-gray-200 rounded-lg p-6">

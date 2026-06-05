@@ -179,9 +179,6 @@ class StudentExport
             ],
         ]);
 
-        // ── Freeze di baris 8 (header tetap, kop tidak ikut freeze) ──
-        // $sheet->freezePane('A8');
-
         // ── Auto width ────────────────────────────────────────────
         foreach (range('A', $lastCol) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);

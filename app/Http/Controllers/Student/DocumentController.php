@@ -229,6 +229,4 @@ class DocumentController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus dokumen: ' . $e->getMessage());
         }
     }
-
-    // HAPUS METHOD calculateProgress() KARENA SUDAH ADA DI MODEL
 }

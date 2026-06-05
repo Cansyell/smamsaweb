@@ -31,12 +31,10 @@ class ResultController extends Controller
                 ->with('warning', 'Anda harus memilih peminatan terlebih dahulu');
         }
 
-        // ── GUARD PUBLISH ────────────────────────────────────────────────
         $activeYear = AcademicYear::getActiveYear();
         if (!$activeYear || $activeYear->result_status !== 'published') {
             return view('student.result.not-published', compact('activeYear'));
         }
-        // ─────────────────────────────────────────────────────────────────
 
         $filterSpecialization = $this->resolveFilter($request, $student);
 
@@ -48,7 +46,6 @@ class ResultController extends Controller
         $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
         $progress  = $student->getRegistrationProgress();
 
-        // Data dual-pass (untuk banner saran)
         $dualPassInfo = $student->dual_pass ? [
             'recommended'            => $student->recommended_specialization,
             'chosen'                 => $student->specialization,
@@ -63,7 +60,7 @@ class ResultController extends Controller
     }
 
     // -----------------------------------------------------------------------
-    // SHOW (detail perhitungan SAW)
+    // SHOW
     // -----------------------------------------------------------------------
 
     public function show()
@@ -80,12 +77,10 @@ class ResultController extends Controller
                 ->with('warning', 'Anda belum memilih peminatan');
         }
 
-        // ── GUARD PUBLISH ────────────────────────────────────────────────
         $activeYear = AcademicYear::getActiveYear();
         if (!$activeYear || $activeYear->result_status !== 'published') {
             return view('student.result.not-published', compact('activeYear'));
         }
-        // ─────────────────────────────────────────────────────────────────
 
         if ($student->specialization === 'regular') {
             return redirect()->route('student.result.index')
@@ -107,7 +102,6 @@ class ResultController extends Controller
         $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
         $progress  = $student->getRegistrationProgress();
 
-        // Info dual-pass untuk ditampilkan di halaman detail
         $dualPassInfo = $student->dual_pass ? [
             'recommended'            => $student->recommended_specialization,
             'chosen'                 => $student->specialization,
@@ -120,12 +114,11 @@ class ResultController extends Controller
     }
 
     // -----------------------------------------------------------------------
-    // CARD  — kartu hasil seleksi (cetak)
+    // CARD
     // -----------------------------------------------------------------------
 
     public function card()
     {
-        // Eager-load sawResults agar tabel perbandingan dual-pass tidak N+1
         $student = Student::with('sawResults')
             ->where('user_id', auth()->id())
             ->first();
@@ -143,14 +136,12 @@ class ResultController extends Controller
         $myRanking = $this->resolveMyRanking($student, $activeYear);
         $quotaInfo = $this->specializationService->getQuotaInformation($student->academic_year_id);
 
-        // Dual-pass info — dibutuhkan blade card untuk notice saran pindah
         $dualPassInfo = $student->dual_pass ? [
             'recommended'            => $student->recommended_specialization,
             'chosen'                 => $student->specialization,
             'already_at_recommended' => $student->specialization === $student->recommended_specialization,
         ] : null;
 
-        // Label spesialisasi — dikirim sebagai variabel agar view tidak perlu memanggil service/static method
         $labels = [
             'tahfiz'   => "Tahfiz Al-Qur'an",
             'language' => 'Bahasa / Internasional',
@@ -207,20 +198,30 @@ class ResultController extends Controller
             return [$rankings, $myPosition, $statistics];
         }
 
-        // Tahfiz / Language — tampilkan semua siswa yang ikut SAW (termasuk cross)
+        // ── Tahfiz / Language ──────────────────────────────────────────────
+        // Hanya tampilkan siswa yang MEMILIH peminatan ini (primary_rank tidak null).
+        // Diurutkan primary_rank agar nomor urut berurutan (#1, #2, #3...).
         $rankings = SawResult::with(['student.user'])
             ->where('academic_year_id', $student->academic_year_id)
             ->where('specialization', $filter)
-            ->orderBy('rank')
+            ->whereNotNull('primary_rank')          // hanya pemilih peminatan ini
+            ->whereHas('student', fn($q) => $q
+                ->where('specialization', $filter)
+                ->where('validation_status', 'valid')
+            )
+            ->orderBy('primary_rank')               // urut primary_rank, bukan global rank
             ->paginate(20);
 
+        // Posisi siswa saat ini = primary_rank-nya di peminatan yang dipilih
         $myPosition = null;
         $myRankData = SawResult::where('student_id', $student->id)
             ->where('academic_year_id', $student->academic_year_id)
             ->where('specialization', $filter)
             ->first();
         if ($myRankData) {
-            $myPosition = $myRankData->rank;
+            // Gunakan primary_rank jika ada (siswa memilih peminatan ini),
+            // fallback ke rank global jika sedang melihat tab lain
+            $myPosition = $myRankData->primary_rank ?? $myRankData->rank;
         }
 
         $statistics = $this->specializationService->getSpecializationStatistics(
@@ -255,10 +256,12 @@ class ResultController extends Controller
                 'final_score'    => null,
                 'is_accepted'    => $student->final_status === 'accepted',
                 'specialization' => 'regular',
-                'calculated_at'  => now(), // FCFS tidak punya calculated_at, fallback ke now()
+                'calculated_at'  => now(),
             ];
         }
 
+        // Untuk tahfiz/language: getStudentRanking() sudah mengembalikan primary_rank
+        // dan is_accepted dari final_status DB
         return $this->specializationService->getStudentRanking($student);
     }
 }

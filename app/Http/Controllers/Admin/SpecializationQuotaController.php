@@ -123,9 +123,12 @@ class SpecializationQuotaController extends Controller
     public function toggleActive(SpecializationQuota $specializationQuota)
     {
         if ($specializationQuota->is_active) {
+            //  Sudah aktif → nonaktifkan
             $specializationQuota->deactivate();
             $message = 'Kuota spesialisasi dinonaktifkan';
         } else {
+            // activate() sudah otomatis nonaktifkan quota lain
+            //    di academic_year yang sama, lalu aktifkan yang ini
             $specializationQuota->activate();
             $message = 'Kuota spesialisasi diaktifkan';
         }

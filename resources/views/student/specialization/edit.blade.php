@@ -59,7 +59,7 @@
     </div>
 
     <!-- Recommendation Alert -->
-    @if($recommendation && $recommendation['recommended'])
+    {{-- @if($recommendation && $recommendation['recommended'])
     <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
         <div class="flex items-start">
             <div class="p-3 bg-blue-100 rounded-full mr-4">
@@ -78,7 +78,7 @@
             </div>
         </div>
     </div>
-    @endif
+    @endif --}}
 
     <!-- Main Form Card -->
     <div class="bg-white rounded-lg shadow-md p-6">

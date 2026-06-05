@@ -259,31 +259,32 @@ class SpecializationService
      */
     public function getStudentRanking(Student $student): ?array
     {
-        if (empty($student->specialization)) {
-            return null;
-        }
+        if (empty($student->specialization)) return null;
 
         $ranking = SawResult::where('student_id', $student->id)
             ->where('academic_year_id', $student->academic_year_id)
             ->where('specialization', $student->specialization)
             ->first();
 
-        if (!$ranking) {
-            return null;
-        }
+        if (!$ranking) return null;
 
-        // Get quota info to determine if accepted
         $quotaInfo = $this->getQuotaInformation($student->academic_year_id);
-        $quota = $quotaInfo[$student->specialization]['quota'] ?? 0;
+
+        // Hitung total siswa yang memilih specialization ini (untuk "X dari Y siswa")
+        $totalPrimaryStudents = Student::where('academic_year_id', $student->academic_year_id)
+            ->where('specialization', $student->specialization)
+            ->where('validation_status', 'valid')
+            ->count();
 
         return [
-            'rank' => $ranking->rank,
-            'final_score' => $ranking->final_score,
-            'total_students' => $quotaInfo[$student->specialization]['registered'] ?? 0,
-            'is_accepted' => $ranking->rank <= $quota,
-            'quota' => $quota,
+            'rank'               => $ranking->primary_rank ?? $ranking->rank, // primary dulu
+            'global_rank'        => $ranking->rank,   // untuk informasi cross
+            'final_score'        => $ranking->final_score,
+            'total_students'     => $totalPrimaryStudents, // dari peminatan pilihan, bukan global
+            'is_accepted'        => $student->final_status === 'accepted', // tetap dari DB
+            'quota'              => $quotaInfo[$student->specialization]['quota'] ?? 0,
             'detail_calculation' => $ranking->detail_calculation,
-            'calculated_at' => $ranking->calculated_at,
+            'calculated_at'      => $ranking->calculated_at,
         ];
     }
 

@@ -72,10 +72,14 @@ class SawResultController extends Controller
         ])->first();
 
         $totalTahfizStudents = SawResult::where('academic_year_id', $activeYear->id)
-            ->where('specialization', 'tahfiz')->count();
+            ->where('specialization', 'tahfiz')
+            ->whereNotNull('primary_rank')
+            ->count();
 
         $totalLanguageStudents = SawResult::where('academic_year_id', $activeYear->id)
-            ->where('specialization', 'language')->count();
+            ->where('specialization', 'language')
+            ->whereNotNull('primary_rank')
+            ->count();
 
         return view('committee.saw-results.show', compact(
             'student',
@@ -90,10 +94,6 @@ class SawResultController extends Controller
     // PRIVATE HELPERS
     // -----------------------------------------------------------------------
 
-    /**
-     * Data global — semua siswa dengan final_status aktual.
-     * Badge ★ Dual dan ↔ Cross HANYA ditampilkan di sini.
-     */
     private function getAllStudentsData(int $academicYearId): Collection
     {
         $students = Student::with('user')
@@ -124,14 +124,12 @@ class SawResultController extends Controller
                 'program_icon'        => $config['icon'],
                 'avatar_color'        => $config['avatar_color'],
 
-                // Rank & score hanya tampil jika siswa accepted
-                'tahfiz_rank'  => ($finalStatus === 'accepted' && $tahfizResult)  ? $tahfizResult->rank        : null,
-                'tahfiz_score' => ($finalStatus === 'accepted' && $tahfizResult)  ? $tahfizResult->final_score : null,
+                'tahfiz_rank'  => $tahfizResult?->rank,
+                'tahfiz_score' => $tahfizResult?->final_score,
 
-                'language_rank'  => ($finalStatus === 'accepted' && $languageResult) ? $languageResult->rank        : null,
-                'language_score' => ($finalStatus === 'accepted' && $languageResult) ? $languageResult->final_score : null,
+                'language_rank'  => $languageResult?->rank,
+                'language_score' => $languageResult?->final_score,
 
-                // Badge dual/cross ditampilkan di tab global
                 'dual_pass'                  => (bool) $student->dual_pass,
                 'cross_accepted'             => (bool) $student->cross_accepted,
                 'recommended_specialization' => $student->recommended_specialization,
@@ -142,25 +140,27 @@ class SawResultController extends Controller
 
     /**
      * Ranking Tahfiz — HANYA siswa yang memilih tahfiz.
-     * Tidak ada badge cross/dual di tab ini.
-     * Status lulus = final_status accepted (karena mereka bersaing di quota tahfiz sendiri).
+     * Diurutkan berdasarkan primary_rank (posisi di antara sesama pemilih tahfiz).
+     * rank global tetap tersedia sebagai informasi.
      */
     private function getTahfizRanking(int $academicYearId): Collection
     {
         return SawResult::with(['student', 'student.user'])
             ->where('academic_year_id', $academicYearId)
             ->where('specialization', 'tahfiz')
+            ->whereNotNull('primary_rank')           // hanya pemilih tahfiz
             ->whereHas('student', fn($q) => $q
                 ->where('validation_status', 'valid')
-                ->where('specialization', 'tahfiz') // hanya siswa yang memilih tahfiz
+                ->where('specialization', 'tahfiz')
             )
-            ->orderBy('rank')
+            ->orderBy('primary_rank')                // urut primary_rank, bukan rank global
             ->get()
             ->map(function (SawResult $result) {
                 $student = $result->student;
 
                 return [
-                    'rank'          => $result->rank,
+                    'rank'          => $result->rank,          // global (informasi sekunder)
+                    'primary_rank'  => $result->primary_rank,  // posisi di antara sesama pemilih
                     'student'       => $student,
                     'score'         => $result->final_score,
                     'calculated_at' => $result->calculated_at,
@@ -171,25 +171,26 @@ class SawResultController extends Controller
 
     /**
      * Ranking Bahasa — HANYA siswa yang memilih bahasa.
-     * Tidak ada badge cross/dual di tab ini.
-     * Status lulus = final_status accepted (karena mereka bersaing di quota bahasa sendiri).
+     * Diurutkan berdasarkan primary_rank.
      */
     private function getLanguageRanking(int $academicYearId): Collection
     {
         return SawResult::with(['student', 'student.user'])
             ->where('academic_year_id', $academicYearId)
             ->where('specialization', 'language')
+            ->whereNotNull('primary_rank')
             ->whereHas('student', fn($q) => $q
                 ->where('validation_status', 'valid')
-                ->where('specialization', 'language') // hanya siswa yang memilih bahasa
+                ->where('specialization', 'language')
             )
-            ->orderBy('rank')
+            ->orderBy('primary_rank')
             ->get()
             ->map(function (SawResult $result) {
                 $student = $result->student;
 
                 return [
                     'rank'          => $result->rank,
+                    'primary_rank'  => $result->primary_rank,
                     'student'       => $student,
                     'score'         => $result->final_score,
                     'calculated_at' => $result->calculated_at,

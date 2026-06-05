@@ -265,12 +265,24 @@
             </div>
         </div>
 
+        {{--
+            PATCH: committee/saw-results/index.blade.php
+            Ganti section TAB TAHFIZ dan TAB BAHASA dengan kode di bawah ini.
+            Perubahan utama:
+            - Rank badge menampilkan $data['primary_rank'] bukan $data['rank']
+            - Status badge membaca student->final_status bukan rank vs quota
+            - Tambah kolom "Rank Global" sebagai informasi sekunder
+        --}}
+
         {{-- ──────────────── TAB: TAHFIZ ──────────────── --}}
         <div id="content-tahfiz" class="tab-content hidden">
             <div class="px-6 py-4 border-b border-gray-100 bg-green-50 flex items-center justify-between flex-wrap gap-2">
                 <div>
                     <h3 class="font-semibold text-gray-800">Ranking Jalur Tahfiz</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Hanya siswa yang memilih jalur Tahfiz, diurutkan berdasarkan SAW score.</p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        Hanya siswa yang memilih jalur Tahfiz, diurutkan berdasarkan SAW score.
+                        <span class="font-medium text-green-700">Rank = posisi di antara {{ $tahfizRanking->count() }} pemilih Tahfiz.</span>
+                    </p>
                 </div>
                 <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">{{ $tahfizRanking->count() }} Siswa</span>
             </div>
@@ -282,6 +294,10 @@
                             <th class="px-4 py-3 text-left">NISN</th>
                             <th class="px-4 py-3 text-left">Nama Siswa</th>
                             <th class="px-4 py-3 text-center">SAW Score</th>
+                            <th class="px-4 py-3 text-center">
+                                Rank Global
+                                <div class="text-gray-400 font-normal normal-case tracking-normal">(semua track)</div>
+                            </th>
                             <th class="px-4 py-3 text-center">Status</th>
                             <th class="px-4 py-3 text-center">Aksi</th>
                         </tr>
@@ -290,7 +306,11 @@
                         @forelse($tahfizRanking as $data)
                         <tr class="hover:bg-green-50 transition-colors">
                             <td class="px-4 py-3 text-center">
-                                @include('committee.saw-results._rank-badge', ['rank'=>$data['rank'],'color'=>'green'])
+                                {{-- primary_rank: posisi di antara sesama pemilih tahfiz --}}
+                                @include('committee.saw-results._rank-badge', [
+                                    'rank'  => $data['primary_rank'],
+                                    'color' => 'green'
+                                ])
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-700">{{ $data['student']->nisn }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -309,6 +329,12 @@
                                 <div class="text-xs text-gray-400">Final Score</div>
                             </td>
                             <td class="px-4 py-3 text-center">
+                                {{-- rank = posisi global (semua siswa di track tahfiz termasuk cross) --}}
+                                <span class="text-sm font-semibold text-gray-500">#{{ $data['rank'] }}</span>
+                                <div class="text-xs text-gray-400">dari semua track</div>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                {{-- Baca dari final_status DB — bukan hitung ulang rank vs quota --}}
                                 @if($data['status_in_tab'] === 'accepted')
                                     <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-semibold">Lulus</span>
                                 @else
@@ -317,13 +343,13 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <a href="{{ route('committee.saw-results.show', $data['student']) }}"
-                                   class="inline-flex items-center px-3 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition text-xs font-medium">
+                                class="inline-flex items-center px-3 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition text-xs font-medium">
                                     Detail
                                 </a>
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400 text-sm">Belum ada siswa jalur Tahfiz</td></tr>
+                        <tr><td colspan="7" class="px-6 py-12 text-center text-gray-400 text-sm">Belum ada siswa jalur Tahfiz</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -335,7 +361,10 @@
             <div class="px-6 py-4 border-b border-gray-100 bg-blue-50 flex items-center justify-between flex-wrap gap-2">
                 <div>
                     <h3 class="font-semibold text-gray-800">Ranking Jalur Bahasa</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Hanya siswa yang memilih jalur Bahasa, diurutkan berdasarkan SAW score.</p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        Hanya siswa yang memilih jalur Bahasa, diurutkan berdasarkan SAW score.
+                        <span class="font-medium text-blue-700">Rank = posisi di antara {{ $languageRanking->count() }} pemilih Bahasa.</span>
+                    </p>
                 </div>
                 <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">{{ $languageRanking->count() }} Siswa</span>
             </div>
@@ -347,6 +376,10 @@
                             <th class="px-4 py-3 text-left">NISN</th>
                             <th class="px-4 py-3 text-left">Nama Siswa</th>
                             <th class="px-4 py-3 text-center">SAW Score</th>
+                            <th class="px-4 py-3 text-center">
+                                Rank Global
+                                <div class="text-gray-400 font-normal normal-case tracking-normal">(semua track)</div>
+                            </th>
                             <th class="px-4 py-3 text-center">Status</th>
                             <th class="px-4 py-3 text-center">Aksi</th>
                         </tr>
@@ -355,7 +388,10 @@
                         @forelse($languageRanking as $data)
                         <tr class="hover:bg-blue-50 transition-colors">
                             <td class="px-4 py-3 text-center">
-                                @include('committee.saw-results._rank-badge', ['rank'=>$data['rank'],'color'=>'blue'])
+                                @include('committee.saw-results._rank-badge', [
+                                    'rank'  => $data['primary_rank'],
+                                    'color' => 'blue'
+                                ])
                             </td>
                             <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-700">{{ $data['student']->nisn }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">
@@ -374,6 +410,10 @@
                                 <div class="text-xs text-gray-400">Final Score</div>
                             </td>
                             <td class="px-4 py-3 text-center">
+                                <span class="text-sm font-semibold text-gray-500">#{{ $data['rank'] }}</span>
+                                <div class="text-xs text-gray-400">dari semua track</div>
+                            </td>
+                            <td class="px-4 py-3 text-center">
                                 @if($data['status_in_tab'] === 'accepted')
                                     <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full font-semibold">Lulus</span>
                                 @else
@@ -382,13 +422,13 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <a href="{{ route('committee.saw-results.show', $data['student']) }}"
-                                   class="inline-flex items-center px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition text-xs font-medium">
+                                class="inline-flex items-center px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition text-xs font-medium">
                                     Detail
                                 </a>
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" class="px-6 py-12 text-center text-gray-400 text-sm">Belum ada siswa jalur Bahasa</td></tr>
+                        <tr><td colspan="7" class="px-6 py-12 text-center text-gray-400 text-sm">Belum ada siswa jalur Bahasa</td></tr>
                         @endforelse
                     </tbody>
                 </table>
