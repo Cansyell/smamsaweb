@@ -100,11 +100,15 @@
         <div class="space-y-6">
             <!-- Status Card -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
-                <div class="flex items-center justify-between">
-                    <div>
+
+                {{-- wrapper utama: row di desktop, column di mobile --}}
+                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+
+                    {{-- kolom kiri: peminatan + status tes --}}
+                    <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2">Kelas Peminatan Anda</h3>
-                        <div class="flex items-center gap-3">
-                            <span class="text-3xl font-bold text-indigo-600">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-2xl sm:text-3xl font-bold text-indigo-600">
                                 @if($student->specialization === 'tahfiz')
                                     🕌 Tahfiz
                                 @elseif($student->specialization === 'language')
@@ -124,29 +128,34 @@
                             @endif
                         </div>
                     </div>
+
+                    {{-- kolom kanan: ranking — hanya tampil kalau ada data --}}
                     @if($ranking)
-                        <div class="text-right">
-                            <p class="text-sm text-gray-600">Peringkat</p>
-                            <p class="text-4xl font-bold text-indigo-600">#{{ $ranking['rank'] }}</p>
+                        {{-- di mobile: row (peringkat kiri, badge kanan); di desktop: kolom rata kanan --}}
+                        <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start
+                                    gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-blue-200 flex-shrink-0">
+
+                            <div class="sm:text-right">
+                                <p class="text-sm text-gray-600">Peringkat</p>
+                                <p class="text-3xl sm:text-4xl font-bold text-indigo-600">#{{ $ranking['rank'] }}</p>
+                                <p class="text-sm text-gray-500">dari {{ $ranking['total_students'] }} siswa</p>
+                            </div>
+
+                            @if($ranking['is_accepted'])
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full whitespace-nowrap">
+                                    ✓ Diterima
+                                </span>
+                            @else
+                                <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full whitespace-nowrap">
+                                    ✗ Belum Diterima
+                                </span>
+                            @endif
+
                         </div>
-
-                        <p class="text-sm text-gray-500 mt-1">
-                            dari {{ $ranking['total_students'] }} siswa
-                        </p>
-
-                        @if($ranking['is_accepted'])
-                            <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                                ✓ Diterima
-                            </span>
-                        @else
-                            <span class="inline-block mt-2 px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                                ✗ Belum Diterima
-                            </span>
-                        @endif
                     @endif
+
                 </div>
             </div>
-
             <!-- Ranking Card (if available) -->
             @if($ranking)
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
