@@ -84,6 +84,7 @@
     <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Dokumen Saya</h2>
+            @if($canEdit['can_edit'])
             <a href="{{ route('student.documents.create') }}" 
                class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition">
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,6 +92,7 @@
                 </svg>
                 Upload Dokumen
             </a>
+            @endif
         </div>
 
         <!-- Statistics Cards -->

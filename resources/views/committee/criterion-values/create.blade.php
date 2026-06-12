@@ -126,7 +126,7 @@
                 <div class="text-sm text-blue-800">
                     <p class="font-semibold mb-1">Informasi Penting:</p>
                     <ul class="list-disc list-inside space-y-1">
-                        <li>Rentang nilai: 0 – 100</li>
+                        <li>Rentang nilai: 25 – 100</li>
                         <li>
                             Nilai <strong>Agama (PAI)</strong> dan <strong>Bahasa Inggris</strong>
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold">

@@ -179,8 +179,33 @@
         }
         .btn-logout:hover { border-color: var(--red); color: var(--red); }
 
-        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-        .hamburger span { display: block; width: 22px; height: 2px; background: var(--ink); transition: .25s; }
+        .hamburger {
+            display: none;
+            width: 42px; height: 42px;
+            border: 1px solid var(--rule);
+            border-radius: 10px;
+            background: var(--canvas);
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 5px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: border-color .15s, background .15s;
+        }
+        .hamburger:hover { border-color: var(--blue); background: var(--blue-light); }
+        .hamburger span {
+            display: block;
+            width: 20px; height: 2px;
+            border-radius: 999px;
+            background: var(--ink);
+            transform-origin: center;
+            transition: transform .25s, opacity .2s;
+        }
+        .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-menu { display: none; }
+
 
         /* ── MODALS ──────────────────────── */
         .moverlay {
@@ -813,6 +838,32 @@
 }
 
         @media (max-width: 640px) {
+            nav {
+                height: 64px;
+                padding: 0 16px;
+                gap: 12px;
+            }
+            .nav-brand {
+                min-width: 0;
+                gap: 8px;
+            }
+            .nav-logo {
+                width: 36px;
+                height: 36px;
+            }
+            .nav-brand-text {
+                min-width: 0;
+            }
+            .nav-brand-name {
+                max-width: 210px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: .82rem;
+            }
+            .nav-brand-sub {
+                font-size: .58rem;
+            }
             .nav-links { display: none; }
             .nav-auth { display: none; }
             .nav-user { display: none !important; }
@@ -844,28 +895,140 @@
             .fgrow { grid-template-columns: 1fr; }
             .dhead, .dbody { padding: 20px; }
             .dpanel { margin: 8px; }
-        }
+
+            /* ── MOBILE MENU ─────────────────── */
+            .mobile-menu {
+                display: block;
+                position: fixed;
+                top: 64px; left: 0; right: 0;
+                z-index: 850;
+                background: rgba(255,255,255,.98);
+                backdrop-filter: blur(16px);
+                border-bottom: 1px solid var(--rule);
+                box-shadow: 0 8px 24px rgba(26,58,107,.1);
+                padding: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height .35s cubic-bezier(.4,0,.2,1), padding .35s;
+            }
+            .mobile-menu.open {
+                max-height: calc(100vh - 64px);
+                padding: 12px 0 18px;
+                overflow-y: auto;
+            }
+            .mobile-menu-links {
+                list-style: none;
+                display: flex; flex-direction: column;
+                padding: 0 16px;
+                gap: 4px;
+            }
+            .mobile-menu-links a {
+                display: block;
+                padding: 12px 14px;
+                border-radius: 8px;
+                font-size: .9rem; font-weight: 600;
+                color: var(--ink-2); text-decoration: none;
+                transition: background .15s, color .15s;
+            }
+            .mobile-menu-links a:hover,
+            .mobile-menu-links a:active {
+                background: var(--blue-light);
+                color: var(--blue);
+            }
+            .mobile-menu-divider {
+                height: 1px;
+                background: var(--rule);
+                margin: 10px 16px;
+            }
+            .mobile-menu-auth {
+                display: flex; gap: 10px;
+                padding: 0 16px;
+            }
+            .mobile-menu-auth a {
+                flex: 1; text-align: center;
+                padding: 11px 10px;
+                border-radius: 8px;
+                font-size: .88rem; font-weight: 700;
+                text-decoration: none;
+                transition: background .15s;
+            }
+            .mobile-menu-auth .m-login {
+                border: 1.5px solid var(--rule);
+                color: var(--ink-2);
+                background: transparent;
+            }
+            .mobile-menu-auth .m-login:hover { background: var(--surface); }
+            .mobile-menu-auth .m-daftar {
+                background: var(--blue); color: #fff;
+                border: 1.5px solid var(--blue);
+            }
+            .mobile-menu-auth .m-daftar:hover { background: var(--blue-mid); }
+
+            /* user state di mobile menu */
+            .mobile-menu-user {
+                display: none;
+                flex-direction: column; gap: 8px;
+                padding: 0 16px;
+            }
+            .mobile-menu-user.show { display: flex; }
+            .mobile-user-info {
+                display: flex; align-items: center; gap: 10px;
+                padding: 10px 14px;
+                background: var(--blue-light);
+                border-radius: 8px;
+            }
+            .mobile-user-avatar {
+                width: 34px; height: 34px; border-radius: 50%;
+                background: var(--blue); color: #fff;
+                display: flex; align-items: center; justify-content: center;
+                font-size: .72rem; font-weight: 700;
+                flex-shrink: 0;
+            }
+            .mobile-user-name {
+                font-size: .88rem; font-weight: 600;
+                color: var(--blue);
+            }
+            .mobile-menu-user-btns {
+                display: flex; gap: 8px;
+            }
+            .mobile-menu-user-btns button {
+                flex: 1; padding: 10px;
+                border-radius: 8px;
+                font-size: .84rem; font-weight: 700;
+                font-family: inherit; cursor: pointer;
+                transition: background .15s;
+            }
+            .mbtn-dash {
+                background: var(--blue); color: #fff;
+                border: 1.5px solid var(--blue);
+            }
+            .mbtn-dash:hover { background: var(--blue-mid); }
+            .mbtn-logout {
+                background: transparent; color: var(--ink-3);
+                border: 1.5px solid var(--rule);
+            }
+            .mbtn-logout:hover { border-color: var(--red); color: var(--red); }
+
+            }
     </style>
 </head>
 <body>
 
-{{-- ═══════════════════════════════════ --}}
 {{-- NAVBAR                             --}}
-{{-- ═══════════════════════════════════ --}}
 <nav>
     <a class="nav-brand" href="/">
         {{-- Logo only — no wrapper circle/border --}}
         <img class="nav-logo" src="{{ asset('images/logo-smamsa1.jpeg') }}" alt="Logo SMAMSA">
         <div class="nav-brand-text">
             <span class="nav-brand-name">SMA Muhammadiyah 1 Purwokerto</span>
-            <span class="nav-brand-sub">SMAMSA — Est. 1965</span>
+            <span class="nav-brand-sub">SMAMSA — Est. 1956</span>
         </div>
     </a>
 
     <ul class="nav-links">
         <li><a href="#visi-misi">Visi &amp; Misi</a></li>
         <li><a href="#fasilitas">Fasilitas</a></li>
-        <li><a href="#ppdb">PPDB</a></li>
+        <li><a href="#ppdb">SPMB</a></li>
         <li><a href="#galeri">Galeri</a></li>
         <li><a href="#lokasi">Lokasi</a></li>
     </ul>
@@ -882,15 +1045,42 @@
         <button class="btn-logout" onclick="doLogout()">Keluar</button>
     </div>
 
-    <div class="hamburger">
+    <button class="hamburger" type="button" aria-label="Buka menu navigasi" aria-controls="mobile-menu" aria-expanded="false">
         <span></span><span></span><span></span>
-    </div>
+    </button>
 </nav>
 
+{{-- MOBILE MENU                        --}}
+<div class="mobile-menu" id="mobile-menu">
+    <ul class="mobile-menu-links">
+        <li><a href="#visi-misi" onclick="closeMobileMenu()">Visi &amp; Misi</a></li>
+        <li><a href="#fasilitas" onclick="closeMobileMenu()">Fasilitas</a></li>
+        <li><a href="#ppdb" onclick="closeMobileMenu()">SPMB</a></li>
+        <li><a href="#galeri" onclick="closeMobileMenu()">Galeri</a></li>
+        <li><a href="#lokasi" onclick="closeMobileMenu()">Lokasi</a></li>
+    </ul>
+    <div class="mobile-menu-divider"></div>
 
-{{-- ═══════════════════════════════════ --}}
+    {{-- state: belum login --}}
+    <div class="mobile-menu-auth" id="mobile-auth-buttons">
+        <a href="/login" class="m-login">Masuk</a>
+        <a href="/register" class="m-daftar">Daftar</a>
+    </div>
+
+    {{-- state: sudah login --}}
+    <div class="mobile-menu-user" id="mobile-user-info">
+        <div class="mobile-user-info">
+            <div class="mobile-user-avatar" id="mobile-avatar">–</div>
+            <span class="mobile-user-name" id="mobile-username">–</span>
+        </div>
+        <div class="mobile-menu-user-btns">
+            <button class="mbtn-dash" onclick="closeMobileMenu(); openDashboard()">Dashboard</button>
+            <button class="mbtn-logout" onclick="closeMobileMenu(); doLogout()">Keluar</button>
+        </div>
+    </div>
+</div>
+
 {{-- LOGIN MODAL                        --}}
-{{-- ═══════════════════════════════════ --}}
 <div class="moverlay" id="modal-login">
     <div class="mbox">
         <button class="mclose" onclick="closeModal('login')">✕</button>
@@ -914,10 +1104,7 @@
     </div>
 </div>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- REGISTER MODAL                     --}}
-{{-- ═══════════════════════════════════ --}}
 <div class="moverlay" id="modal-register">
     <div class="mbox">
         <button class="mclose" onclick="closeModal('register')">✕</button>
@@ -961,10 +1148,7 @@
     </div>
 </div>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- DASHBOARD                          --}}
-{{-- ═══════════════════════════════════ --}}
 <div class="doverlay" id="dashboard-overlay">
     <div class="dpanel">
         <div class="dhead">
@@ -982,7 +1166,7 @@
                 <div class="dstatus-icon">📋</div>
                 <div>
                     <div class="dstatus-lbl">Status Pendaftaran</div>
-                    <div class="dstatus-val">PPDB SMA Muhammadiyah 1 Purwokerto – T.A. 2025/2026</div>
+                    <div class="dstatus-val">SPMB SMA Muhammadiyah 1 Purwokerto – T.A. 2025/2026</div>
                 </div>
                 <span class="badge-pending">Belum Lengkap</span>
             </div>
@@ -999,7 +1183,7 @@
                 </div>
             </div>
             <div class="dtl">
-                <div class="dtl-head">Progress Tahapan PPDB</div>
+                <div class="dtl-head">Progress Tahapan SPMB</div>
                 <div class="trow"><div class="tdot done"></div><div class="ttext">Pembuatan akun</div><div class="tdate">✔ Selesai</div></div>
                 <div class="trow"><div class="tdot now"></div><div class="ttext now">Pengisian formulir & upload berkas</div><div class="tdate">Aktif</div></div>
                 <div class="trow"><div class="tdot later"></div><div class="ttext">Tes seleksi & wawancara</div><div class="tdate">1–10 Jul</div></div>
@@ -1015,14 +1199,11 @@
     </div>
 </div>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- HERO                               --}}
-{{-- ═══════════════════════════════════ --}}
 @if ($hero)
 <section id="hero">
     <div class="hero-left">
-        <div class="hero-badge">PPDB {{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}</div>
+        <div class="hero-badge">SPMB {{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}</div>
         <h1 class="hero-title">
             <strong>{{ $hero->title_main }}</strong><br>
             <em>{{ $hero->title_italic }}</em>
@@ -1066,10 +1247,7 @@
 </section>
 @endif
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- VISI MISI                          --}}
-{{-- ═══════════════════════════════════ --}}
 <section id="visi-misi">
     <div class="vm visi reveal">
         <div class="eyebrow light">Visi Sekolah</div>
@@ -1122,10 +1300,7 @@
     </div>
 </section>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- FASILITAS                          --}}
-{{-- ═══════════════════════════════════ --}}
 <section id="fasilitas">
     <div class="fas-head reveal">
         <div class="eyebrow">Fasilitas Kami</div>
@@ -1135,56 +1310,48 @@
     <div class="fas-grid">
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">🔬</span></div>
-            <div class="fas-title">Lab Sains Terintegrasi</div>
-            <p class="fas-desc">Laboratorium Fisika, Kimia, dan Biologi berteknologi mutakhir dengan peralatan sesuai standar internasional.</p>
+            <div class="fas-title">Lab Sains</div>
+            <p class="fas-desc">Laboratorium Fisika, Kimia, dan Biologi dengan peralatan sesuai standar.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">💻</span></div>
-            <div class="fas-title">Lab Komputer &amp; AI</div>
-            <p class="fas-desc">200+ unit komputer terbaru dengan koneksi internet fiber optik 1 Gbps dan perangkat lunak berlisensi penuh.</p>
+            <div class="fas-title">Lab Komputer</div>
+            <p class="fas-desc">Puluhan unit komputer untuk mendukung belajar siswa.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">📚</span></div>
-            <div class="fas-title">Perpustakaan Digital</div>
-            <p class="fas-desc">Koleksi lebih dari 15.000 judul buku fisik dan akses ke ribuan jurnal internasional secara daring.</p>
+            <div class="fas-title">Perpustakaan</div>
+            <p class="fas-desc">Koleksi lebih dari 1.000 judul buku.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">🏟️</span></div>
-            <div class="fas-title">Lapangan &amp; Stadion</div>
-            <p class="fas-desc">Lapangan futsal, basket, voli, dan lintasan atletik berstandar nasional di lingkungan sekolah.</p>
+            <div class="fas-title">Lapangan</div>
+            <p class="fas-desc">Lapangan olahraga di lingkungan sekolah.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">🎭</span></div>
-            <div class="fas-title">Aula &amp; Teater</div>
-            <p class="fas-desc">Ruang pertunjukan berkapasitas 500 orang dengan sistem tata suara dan pencahayaan profesional.</p>
+            <div class="fas-title">Aula</div>
+            <p class="fas-desc">Ruang pertunjukan berkapasitas 500 orang.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">🍽️</span></div>
             <div class="fas-title">Kantin Sehat</div>
-            <p class="fas-desc">Kantin higienis dengan menu bergizi dan terjangkau, dikelola secara profesional oleh mitra bersertifikat.</p>
+            <p class="fas-desc">Kantin higienis dengan menu bergizi dan terjangkau.</p>
         </div>
         <div class="fas-card reveal">
             <div class="fas-icon-bg"><span class="fas-emoji">🏥</span></div>
             <div class="fas-title">Klinik Sekolah</div>
-            <p class="fas-desc">Unit kesehatan sekolah dengan tenaga medis berpengalaman, siap melayani kebutuhan siswa setiap hari.</p>
-        </div>
-        <div class="fas-card reveal">
-            <div class="fas-icon-bg"><span class="fas-emoji">🚌</span></div>
-            <div class="fas-title">Layanan Antar-Jemput</div>
-            <p class="fas-desc">Armada bus sekolah ber-AC yang melayani berbagai rute di dalam kota dengan sistem GPS real-time.</p>
+            <p class="fas-desc">Unit kesehatan sekolah untuk kebutuhan siswa setiap hari.</p>
         </div>
     </div>
 </section>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- PPDB                               --}}
-{{-- ═══════════════════════════════════ --}}
 <section id="ppdb">
     <div class="ppdb-inner">
         <div class="reveal">
             <div class="eyebrow light">Penerimaan Murid Baru</div>
-            <h2 class="section-title light">Informasi PPDB<br>{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}</h2>
+            <h2 class="section-title light">Informasi SPMB<br>{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}</h2>
             <p class="section-lead light">Ikuti alur pendaftaran berikut untuk bergabung bersama keluarga besar SMA Muhammadiyah 1 Purwokerto. Proses seleksi transparan dan berkeadilan.</p>
         </div>
 
@@ -1255,10 +1422,7 @@
     </div>
 </section>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- GALERI                             --}}
-{{-- ═══════════════════════════════════ --}}
 <section id="galeri">
     <div class="galeri-head reveal">
         <div class="eyebrow">Galeri Sekolah</div>
@@ -1281,10 +1445,7 @@
     @endif
 </section>
 
-
-{{-- ═══════════════════════════════════ --}}
 {{-- LOKASI                             --}}
-{{-- ═══════════════════════════════════ --}}
 <section id="lokasi">
     <div class="reveal">
         <div class="eyebrow">Lokasi</div>
@@ -1304,7 +1465,7 @@
                 <div class="lcard-lbl">Telepon</div>
                 <div class="lcard-val">(0281) 633373</div>
             </div>
-            <a href="https://maps.google.com" target="_blank" class="btn-maps">Buka di Google Maps →</a>
+            <a href="https://www.google.com/maps?q=SMA+Muhammadiyah+1+Purwokerto"target="_blank"class="btn-maps">Buka di Google Maps →</a>
         </div>
         <div class="map-frame reveal">
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3956.443536014362!2d109.2288820747998!3d-7.416064673040172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e655e572a33a7bf%3A0x60396314bb780a46!2sSMA%20Muhammadiyah%201%20Purwokerto%20(SMAMSA%20Purwokerto)!5e0!3m2!1sid!2sid!4v1772252049348!5m2!1sid!2sid" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
@@ -1312,10 +1473,7 @@
     </div>
 </section>
 
-
-{{-- ═══════════════════════════════════ --}}
-{{-- FOOTER                             --}}
-{{-- ═══════════════════════════════════ --}}
+{{-- footer --}}
 <footer>
     <div class="footer-top">
         <div>
@@ -1330,13 +1488,13 @@
             <ul>
                 <li><a href="#visi-misi">Visi &amp; Misi</a></li>
                 <li><a href="#fasilitas">Fasilitas</a></li>
-                <li><a href="#ppdb">Info PPDB</a></li>
+                <li><a href="#ppdb">Info SPMB</a></li>
                 <li><a href="#galeri">Galeri</a></li>
                 <li><a href="#lokasi">Lokasi</a></li>
             </ul>
         </div>
         <div class="footer-col">
-            <h4>PPDB</h4>
+            <h4>SPMB</h4>
             <ul>
                 <li><a href="/register">Pendaftaran Online</a></li>
                 <li><a href="#">Persyaratan</a></li>
@@ -1347,11 +1505,7 @@
         <div class="footer-col">
             <h4>Sosial Media</h4>
             <ul>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">Facebook</a></li>
-                <li><a href="#">YouTube</a></li>
-                <li><a href="#">Twitter / X</a></li>
-                <li><a href="#">TikTok</a></li>
+                <li><a href="https://www.instagram.com/smamsapurwokerto/" target="_blank">Instagram</a></li>
             </ul>
         </div>
     </div>
@@ -1363,19 +1517,67 @@
 
 
 <script>
-/* ── STATE ─────────────────────── */
+// STATE 
 let currentUser = null;
 const users = [{ email:'demo@ppdb.id', password:'demo123', name:'Demo Siswa' }];
+const hamburger = document.querySelector('.hamburger');
+const mobileMenu = document.getElementById('mobile-menu');
 
-/* ── MODAL ─────────────────────── */
-function openModal(t){ clearForms(); document.getElementById('modal-'+t).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeModal(t){ document.getElementById('modal-'+t).classList.remove('open'); document.body.style.overflow=''; }
+// MOBILE NAV 
+function setBodyLock() {
+    const hasOverlay = document.querySelector('.moverlay.open,.doverlay.open');
+    const hasMobileMenu = mobileMenu && mobileMenu.classList.contains('open');
+    document.body.style.overflow = hasOverlay || hasMobileMenu ? 'hidden' : '';
+}
+
+function closeMobileMenu() {
+    if (!mobileMenu || !hamburger) return;
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Buka menu navigasi');
+    setBodyLock();
+}
+
+function toggleMobileMenu() {
+    if (!mobileMenu || !hamburger) return;
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    hamburger.setAttribute('aria-label', isOpen ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+    setBodyLock();
+}
+
+if (hamburger && mobileMenu) {
+    hamburger.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleMobileMenu();
+    });
+
+    document.addEventListener('click', e => {
+        if (
+            mobileMenu.classList.contains('open') &&
+            !mobileMenu.contains(e.target) &&
+            !hamburger.contains(e.target)
+        ) {
+            closeMobileMenu();
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 640) closeMobileMenu();
+    });
+}
+
+// MODAL 
+function openModal(t){ clearForms(); closeMobileMenu(); document.getElementById('modal-'+t).classList.add('open'); setBodyLock(); }
+function closeModal(t){ document.getElementById('modal-'+t).classList.remove('open'); setBodyLock(); }
 function switchModal(a,b){ closeModal(a); setTimeout(()=>openModal(b),200); }
 document.querySelectorAll('.moverlay').forEach(o=>{
-    o.addEventListener('click',e=>{ if(e.target===o){ o.classList.remove('open'); document.body.style.overflow=''; }});
+    o.addEventListener('click',e=>{ if(e.target===o){ o.classList.remove('open'); setBodyLock(); }});
 });
 
-/* ── LOGIN ─────────────────────── */
+// LOGIN 
 function doLogin(){
     const email=document.getElementById('login-email').value.trim();
     const pass=document.getElementById('login-password').value;
@@ -1391,7 +1593,7 @@ function doLogin(){
 }
 function demoLogin(){ setLoggedIn({name:'Demo Siswa',email:'demo@ppdb.id'}); closeModal('login'); }
 
-/* ── REGISTER ──────────────────── */
+// REGISTER 
 function doRegister(){
     const fname=document.getElementById('reg-firstname').value.trim();
     const lname=document.getElementById('reg-lastname').value.trim();
@@ -1414,40 +1616,57 @@ function doRegister(){
     setTimeout(()=>{ switchModal('register','login'); document.getElementById('login-email').value=email; },1200);
 }
 
-/* ── AUTH ──────────────────────── */
-function setLoggedIn(user){
-    currentUser=user;
-    const ini=user.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    document.getElementById('nav-auth-buttons').style.display='none';
-    const ui=document.getElementById('nav-user-info'); ui.style.display='flex';
-    const bd=document.getElementById('btn-dashboard-nav'); bd.style.display='flex';
-    document.getElementById('nav-avatar').textContent=ini;
-    document.getElementById('nav-username').textContent=user.name.split(' ')[0];
-    document.getElementById('dash-avatar').textContent=ini;
-    document.getElementById('dash-fullname').textContent=user.name;
-}
-function doLogout(){
-    currentUser=null;
-    document.getElementById('nav-auth-buttons').style.display='flex';
-    document.getElementById('nav-user-info').style.display='none';
-    document.getElementById('btn-dashboard-nav').style.display='none';
+// AUTH 
+function setLoggedIn(user) {
+    currentUser = user;
+    const ini = user.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+
+    // navbar desktop
+    document.getElementById('nav-auth-buttons').style.display = 'none';
+    const ui = document.getElementById('nav-user-info'); ui.style.display = 'flex';
+    const bd = document.getElementById('btn-dashboard-nav'); bd.style.display = 'flex';
+    document.getElementById('nav-avatar').textContent = ini;
+    document.getElementById('nav-username').textContent = user.name.split(' ')[0];
+
+    // dashboard
+    document.getElementById('dash-avatar').textContent = ini;
+    document.getElementById('dash-fullname').textContent = user.name;
+
+    // mobile menu
+    document.getElementById('mobile-auth-buttons').style.display = 'none';
+    const mu = document.getElementById('mobile-user-info'); mu.classList.add('show');
+    document.getElementById('mobile-avatar').textContent = ini;
+    document.getElementById('mobile-username').textContent = user.name.split(' ')[0];
 }
 
-/* ── DASHBOARD ─────────────────── */
+function doLogout() {
+    currentUser = null;
+    // desktop
+    document.getElementById('nav-auth-buttons').style.display = 'flex';
+    document.getElementById('nav-user-info').style.display = 'none';
+    document.getElementById('btn-dashboard-nav').style.display = 'none';
+    // mobile
+    document.getElementById('mobile-auth-buttons').style.display = 'flex';
+    document.getElementById('mobile-user-info').classList.remove('show');
+    closeMobileMenu();
+}
+
+// DASHBOARD 
 function openDashboard(){
     if(!currentUser){ openModal('login'); return; }
+    closeMobileMenu();
     document.getElementById('dashboard-overlay').classList.add('open');
-    document.body.style.overflow='hidden';
+    setBodyLock();
     const d=Math.floor((new Date('2025-07-30')-new Date())/86400000);
     document.getElementById('dash-countdown').textContent=d>0?d+' hari':'Ditutup';
 }
 function closeDashboard(){
     document.getElementById('dashboard-overlay').classList.remove('open');
-    document.body.style.overflow='';
+    setBodyLock();
 }
 document.getElementById('dashboard-overlay').addEventListener('click',e=>{ if(e.target===document.getElementById('dashboard-overlay'))closeDashboard(); });
 
-/* ── HELPERS ───────────────────── */
+// HELPERS  
 function showErr(id,show){
     const el=document.getElementById(id); if(!el)return;
     el.classList.toggle('show',show);
@@ -1460,17 +1679,18 @@ function clearForms(){
     document.querySelectorAll('.malert').forEach(e=>e.classList.remove('show'));
 }
 
-/* ── SCROLL REVEAL ─────────────── */
+//  SCROLL REVEAL 
 const io=new IntersectionObserver(entries=>{
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }});
 },{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-/* ── ESC ───────────────────────── */
+// ESC  
 document.addEventListener('keydown',e=>{
     if(e.key==='Escape'){
         document.querySelectorAll('.moverlay.open,.doverlay.open').forEach(m=>m.classList.remove('open'));
-        document.body.style.overflow='';
+        closeMobileMenu();
+        setBodyLock();
     }
 });
 </script>

@@ -260,24 +260,19 @@ class AhpMatrix extends Model
         }
 
         // ── Step 5: Eigen per baris ───────────────────────────────────────────
-        // Sesuai Excel: eigen[i] = Σ_j ( matrix[i][j] × prioritas[j] )
-        // Ini adalah weighted sum vector; λmax = SUM semua eigen (bukan rata-rata)
-        //
-        // Verifikasi: SUM(J44:J48) = 5.198023725 = λmax  ✓
+        // eigen[i] = colSum[i] × prioritas[i]
         $eigen = array_fill(0, $n, 0.0);
         for ($i = 0; $i < $n; $i++) {
-            for ($j = 0; $j < $n; $j++) {
-                $eigen[$i] += $matrix[$i][$j] * $prioritas[$j];
-            }
+            $eigen[$i] = $colSum[$i] * $prioritas[$i];
         }
 
-        // ── Step 6: λmax = SUM semua eigen ───────────────────────────────────
+        // ── Step 6: λmax = SUM semua eigen 
         $lambdaMax = array_sum($eigen);
 
-        // ── Step 7: CI = (λmax - n) / (n - 1) ───────────────────────────────
+        // ── Step 7: CI = (λmax - n) / (n - 1) 
         $ci = ($n > 1) ? ($lambdaMax - $n) / ($n - 1) : 0.0;
 
-        // ── Step 8: CR = CI / RI ─────────────────────────────────────────────
+        // ── Step 8: CR = CI / RI 
         $cr = ($ri > 0) ? $ci / $ri : 0.0;
 
         // ── Susun weights keyed by criteria_id (backward-compat) ─────────────

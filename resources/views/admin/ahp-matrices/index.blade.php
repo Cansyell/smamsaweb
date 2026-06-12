@@ -383,7 +383,7 @@
                 <p class="text-xs text-gray-400 mt-0.5">
                     Normalisasi = nilai ÷ jumlah kolom &nbsp;·&nbsp;
                     Prioritas = rata-rata tiap baris &nbsp;·&nbsp;
-                    Eigen = Σ(nilai baris × prioritas kolom)
+                    λmax = Σ(nilai baris × prioritas kolom)
                 </p>
             </div>
         </div>
@@ -402,7 +402,7 @@
                         <th class="px-3 py-3 text-center font-bold text-green-700 border border-gray-200 bg-green-50"
                             style="min-width:100px">Prioritas</th>
                         <th class="px-3 py-3 text-center font-bold text-purple-700 border border-gray-200 bg-purple-50"
-                            style="min-width:100px">Eigen</th>
+                            style="min-width:100px">Kontribusi(λmax)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -454,7 +454,7 @@
         <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
-                    <p class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">λ Max (Σ Eigen)</p>
+                    <p class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">λmax</p>
                     <p class="text-sm font-bold text-gray-800 font-mono">{{ number_format($metrics['lambdaMax'], 9) }}</p>
                 </div>
                 <div>

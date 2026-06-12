@@ -711,6 +711,13 @@ class Student extends Model
      */
     public function canEditData(): array
     {
+        if ($this->validation_status === 'valid') {
+            return [
+                'can_edit' => false,
+                'reason' => 'Data tidak dapat diubah karena pendaftaran Anda sudah divalidasi oleh panitia.',
+            ];
+        }
+
         if ($this->hasSawCalculation()) {
             return [
                 'can_edit' => false,

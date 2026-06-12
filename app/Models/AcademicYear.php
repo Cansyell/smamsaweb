@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\SpecializationQuota; 
 
 class AcademicYear extends Model
 {
@@ -98,14 +99,26 @@ class AcademicYear extends Model
 
     public function activate(): bool
     {
-        // Nonaktifkan tahun ajaran lain sebelum mengaktifkan yang baru
-        self::where('is_active', true)->update(['is_active' => false]);
-        
+        // Nonaktifkan semua tahun ajaran lain
+        self::where('is_active', true)
+            ->where('id', '!=', $this->id)
+            ->update(['is_active' => false]);
+
+        // Nonaktifkan semua quota yang bukan milik tahun ini
+        SpecializationQuota::where('is_active', true)
+            ->where('academic_year_id', '!=', $this->id)
+            ->update(['is_active' => false]);
+
         return $this->update(['is_active' => true]);
     }
 
     public function deactivate(): bool
     {
+        // Nonaktifkan quota milik tahun ajaran ini
+        $this->specializationQuotas()
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
+
         return $this->update(['is_active' => false]);
     }
 

@@ -18,16 +18,15 @@ class CommitteeStudentController extends Controller
     public function index(Request $request)
     {
         $academicYears = AcademicYear::orderBy('year', 'desc')->get();
-        $activeYear    = AcademicYear::where('is_active', true)->first();  
-        $query = Student::with('user');
-        // Filter by academic year
-            $selectedYearId = $request->filled('academic_year_id')
-                ? (int) $request->academic_year_id
-                : $activeYear?->id;
 
-            if ($selectedYearId) {
-                $query->byAcademicYear($selectedYearId);
-            }
+        $query = Student::with('user'); 
+
+        $selectedYearId = $request->input('academic_year_id');
+
+        if (!empty($selectedYearId)) {
+            $query->byAcademicYear($selectedYearId);
+        }
+
 
         // Filter by validation status
         if ($request->filled('status')) {

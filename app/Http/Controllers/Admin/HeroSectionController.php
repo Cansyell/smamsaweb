@@ -14,7 +14,7 @@ class HeroSectionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $request->validate([
             'badge_text'        => 'required|string|max:150',
             'title_main'        => 'required|string|max:150',
             'title_italic'      => 'required|string|max:150',
@@ -30,6 +30,8 @@ class HeroSectionController extends Controller
             'stats.*.label'     => 'required_with:stats|string|max:80',
             'stats.*.urutan'    => 'required_with:stats|integer|min:0',
         ]);
+
+        $data = $request->all();
 
         if ($request->boolean('is_active')) {
             HeroSection::where('is_active', true)->update(['is_active' => false]);
@@ -54,24 +56,26 @@ class HeroSectionController extends Controller
 
     public function update(Request $request, HeroSection $hero): RedirectResponse
     {
-        $data = $request->validate([
-            'badge_text'        => 'required|string|max:150',
-            'title_main'        => 'required|string|max:150',
-            'title_italic'      => 'required|string|max:150',
-            'subtitle'          => 'required|string',
-            'btn_primary_label' => 'required|string|max:80',
-            'btn_primary_url'   => 'required|string|max:200',
-            'btn_outline_label' => 'required|string|max:80',
-            'btn_outline_url'   => 'required|string|max:200',
-            'background_image'  => 'nullable|image|mimes:jpeg,jpg,png,webp|max:4096',
+        $request->validate([
+            'badge_text'              => 'required|string|max:150',
+            'title_main'              => 'required|string|max:150',
+            'title_italic'            => 'required|string|max:150',
+            'subtitle'                => 'required|string',
+            'btn_primary_label'       => 'required|string|max:80',
+            'btn_primary_url'         => 'required|string|max:200',
+            'btn_outline_label'       => 'required|string|max:80',
+            'btn_outline_url'         => 'required|string|max:200',
+            'background_image'        => 'nullable|image|mimes:jpeg,jpg,png,webp|max:4096',
             'remove_background_image' => 'nullable|boolean',
-            'is_active'         => 'boolean',
-            'stats'             => 'nullable|array',
-            'stats.*.id'        => 'nullable|integer|exists:hero_stats,id',
-            'stats.*.number'    => 'required_with:stats|string|max:20',
-            'stats.*.label'     => 'required_with:stats|string|max:80',
-            'stats.*.urutan'    => 'required_with:stats|integer|min:0',
+            'is_active'               => 'boolean',
+            'stats'                   => 'nullable|array',
+            'stats.*.id'              => 'nullable|integer|exists:hero_stats,id',
+            'stats.*.number'          => 'required_with:stats|string|max:20',
+            'stats.*.label'           => 'required_with:stats|string|max:80',
+            'stats.*.urutan'          => 'required_with:stats|integer|min:0',
         ]);
+
+        $data = $request->all();
 
         if ($request->boolean('is_active')) {
             HeroSection::where('id', '!=', $hero->id)
@@ -79,13 +83,11 @@ class HeroSectionController extends Controller
                 ->update(['is_active' => false]);
         }
 
-        // Hapus gambar jika diminta
         if ($request->boolean('remove_background_image') && $hero->background_image) {
             Storage::disk('public')->delete($hero->background_image);
             $data['background_image'] = null;
         }
 
-        // Ganti gambar jika ada upload baru
         if ($request->hasFile('background_image')) {
             if ($hero->background_image) {
                 Storage::disk('public')->delete($hero->background_image);
@@ -96,7 +98,6 @@ class HeroSectionController extends Controller
 
         $hero->update($data);
 
-        // Sync stats: hapus lama, re-insert
         $hero->stats()->delete();
         if (! empty($data['stats'])) {
             foreach ($data['stats'] as $stat) {

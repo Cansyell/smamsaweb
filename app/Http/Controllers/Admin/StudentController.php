@@ -16,55 +16,53 @@ class StudentController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
-        $activeYear    = AcademicYear::where('is_active', true)->first();  
-        $query = Student::with('user');
-        // Filter by academic year
-            $selectedYearId = $request->filled('academic_year_id')
-                ? (int) $request->academic_year_id
-                : $activeYear?->id;
+{
+    $academicYears = AcademicYear::orderBy('year', 'desc')->get();
 
-            if ($selectedYearId) {
-                $query->byAcademicYear($selectedYearId);
-            }
+    $query = Student::with('user'); 
 
-        // Filter by validation status
-        if ($request->filled('status')) {
-            $query->where('validation_status', $request->status);
-        }
+    $selectedYearId = $request->input('academic_year_id');
 
-        // Filter by gender
-        if ($request->filled('gender')) {
-            $query->byGender($request->gender);
-        }
-
-        // Filter by specialization
-        if ($request->filled('specialization')) {
-            $query->bySpecialization($request->specialization);
-        }
-
-        // Filter by graduation year
-        if ($request->filled('graduation_year')) {
-            $query->graduatedInYear($request->graduation_year);
-        }
-
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('full_name', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%")
-                  ->orWhere('student_id', 'like', "%{$search}%")
-                  ->orWhere('father_name', 'like', "%{$search}%")
-                  ->orWhere('mother_name', 'like', "%{$search}%");
-            });
-        }
-
-        $students = $query->latest()->paginate(10)->withQueryString();
-
-        return view('admin.students.index', compact('students', 'academicYears', 'selectedYearId'));
+    if (!empty($selectedYearId)) {
+        $query->byAcademicYear($selectedYearId);
     }
+
+    // filter lain 
+    if ($request->filled('status')) {
+        $query->where('validation_status', $request->status);
+    }
+
+    if ($request->filled('gender')) {
+        $query->byGender($request->gender);
+    }
+
+    if ($request->filled('specialization')) {
+        $query->bySpecialization($request->specialization);
+    }
+
+    if ($request->filled('graduation_year')) {
+        $query->graduatedInYear($request->graduation_year);
+    }
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('full_name', 'like', "%{$search}%")
+              ->orWhere('nisn', 'like', "%{$search}%")
+              ->orWhere('student_id', 'like', "%{$search}%")
+              ->orWhere('father_name', 'like', "%{$search}%")
+              ->orWhere('mother_name', 'like', "%{$search}%");
+        });
+    }
+
+    $students = $query->latest()->paginate(10)->withQueryString();
+
+    return view('admin.students.index', compact(
+        'students',
+        'academicYears',
+        'selectedYearId'
+    ));
+}
 
     /**
      * Show the form for creating a new resource.

@@ -19,7 +19,6 @@ class SpecializationQuotaController extends Controller
         $query = SpecializationQuota::with('academicYear')
             ->orderBy('created_at', 'desc');
 
-        // Filter by academic year if provided
         if ($request->has('academic_year_id')) {
             $query->byAcademicYear($request->academic_year_id);
         }
@@ -36,7 +35,7 @@ class SpecializationQuotaController extends Controller
     public function create()
     {
         $academicYears = AcademicYear::orderBy('year', 'desc')->get();
-        
+
         return view('admin.specialization-quotas.create', compact('academicYears'));
     }
 
@@ -47,9 +46,20 @@ class SpecializationQuotaController extends Controller
     {
         $validated = $request->validated();
 
+        // Jika ingin diaktifkan, pastikan academic year yang dipilih adalah yang sedang aktif
+        if ($validated['is_active']) {
+            $activeYear = AcademicYear::getActiveYear();
+
+            if (!$activeYear || $activeYear->id != $validated['academic_year_id']) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Kuota hanya dapat diaktifkan pada tahun ajaran yang sedang aktif.');
+            }
+        }
+
         $quota = SpecializationQuota::createQuota($validated);
 
-        // Jika diset aktif, nonaktifkan yang lain
         if ($validated['is_active']) {
             $quota->activate();
         }
@@ -65,7 +75,7 @@ class SpecializationQuotaController extends Controller
     public function show(SpecializationQuota $specializationQuota)
     {
         $specializationQuota->load('academicYear');
-        
+
         return view('admin.specialization-quotas.show', compact('specializationQuota'));
     }
 
@@ -75,7 +85,7 @@ class SpecializationQuotaController extends Controller
     public function edit(SpecializationQuota $specializationQuota)
     {
         $academicYears = AcademicYear::orderBy('year', 'desc')->get();
-        
+
         return view('admin.specialization-quotas.edit', compact('specializationQuota', 'academicYears'));
     }
 
@@ -86,9 +96,20 @@ class SpecializationQuotaController extends Controller
     {
         $validated = $request->validated();
 
+        // Jika ingin diaktifkan, pastikan academic year yang dipilih adalah yang sedang aktif
+        if ($validated['is_active']) {
+            $activeYear = AcademicYear::getActiveYear();
+
+            if (!$activeYear || $activeYear->id != $validated['academic_year_id']) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('error', 'Kuota hanya dapat diaktifkan pada tahun ajaran yang sedang aktif.');
+            }
+        }
+
         $specializationQuota->updateQuota($validated);
 
-        // Jika diset aktif, nonaktifkan yang lain
         if ($validated['is_active']) {
             $specializationQuota->activate();
         }
@@ -103,7 +124,6 @@ class SpecializationQuotaController extends Controller
      */
     public function destroy(SpecializationQuota $specializationQuota)
     {
-        // Cek apakah quota sedang aktif
         if ($specializationQuota->is_active) {
             return redirect()
                 ->route('admin.specialization-quotas.index')
@@ -123,18 +143,29 @@ class SpecializationQuotaController extends Controller
     public function toggleActive(SpecializationQuota $specializationQuota)
     {
         if ($specializationQuota->is_active) {
-            //  Sudah aktif → nonaktifkan
+            // Sudah aktif → nonaktifkan, tidak perlu cek tahun ajaran
             $specializationQuota->deactivate();
-            $message = 'Kuota spesialisasi dinonaktifkan';
-        } else {
-            // activate() sudah otomatis nonaktifkan quota lain
-            //    di academic_year yang sama, lalu aktifkan yang ini
-            $specializationQuota->activate();
-            $message = 'Kuota spesialisasi diaktifkan';
+
+            return redirect()
+                ->route('admin.specialization-quotas.index')
+                ->with('success', 'Kuota spesialisasi dinonaktifkan');
         }
+
+        // Ingin diaktifkan → pastikan academic year-nya adalah yang sedang aktif
+        $activeYear = AcademicYear::getActiveYear();
+
+        if (!$activeYear || $activeYear->id !== $specializationQuota->academic_year_id) {
+            return redirect()
+                ->route('admin.specialization-quotas.index')
+                ->with('error', 'Kuota hanya dapat diaktifkan pada tahun ajaran yang sedang aktif.');
+        }
+
+        // activate() sudah otomatis nonaktifkan quota lain di semua tahun,
+        // lalu aktifkan yang ini
+        $specializationQuota->activate();
 
         return redirect()
             ->route('admin.specialization-quotas.index')
-            ->with('success', $message);
+            ->with('success', 'Kuota spesialisasi diaktifkan');
     }
 }

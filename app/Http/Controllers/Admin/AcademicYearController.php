@@ -37,7 +37,14 @@ class AcademicYearController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'is_active' => 'boolean',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string',],
+        [
+            'year.required' => 'Tahun ajaran wajib diisi.',
+            'year.unique'   => 'Tahun ajaran sudah terdaftar.',
+            'year.max'      => 'Tahun ajaran maksimal 9 karakter.',
+            'start_date.required' => 'Tanggal mulai wajib diisi.',
+            'end_date.required'   => 'Tanggal selesai wajib diisi.',
+            'end_date.after'      => 'Tanggal selesai harus setelah tanggal mulai.',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
@@ -84,7 +91,13 @@ class AcademicYearController extends Controller
             'end_date' => 'required|date|after:start_date',
             'is_active' => 'boolean',
             'description' => 'nullable|string',
-        ]);
+        ],['year.required' => 'Tahun ajaran wajib diisi.',
+            'year.unique'   => 'Tahun ajaran sudah terdaftar.',
+            'year.max'      => 'Tahun ajaran maksimal 9 karakter.',
+            'start_date.required' => 'Tanggal mulai wajib diisi.',
+            'end_date.required'   => 'Tanggal selesai wajib diisi.',
+            'end_date.after'      => 'Tanggal selesai harus setelah tanggal mulai.',
+        ]);;
 
         $validated['is_active'] = $request->has('is_active');
 
@@ -143,7 +156,7 @@ class AcademicYearController extends Controller
             $message = 'Tahun ajaran berhasil dinonaktifkan';
         } else {
             $academicYear->activate();
-            $message = 'Tahun ajaran berhasil diaktifkan';
+            $message = 'Tahun ajaran berhasil diaktifkan, Silakan aktifkan kuota spesialisasi untuk tahun ajaran ini';
         }
 
         return redirect()

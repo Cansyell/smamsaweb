@@ -24,6 +24,78 @@
 </div>
 @endif
 
+{{-- ── ERROR BAG DISPLAY (Patch #1) ── --}}
+
+@if($errors->galeri_store->any() || $errors->galeri_update->any())
+<div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium mb-5 bg-red-50 text-red-700 border border-red-200">
+    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+    <div class="flex-1">
+        <p class="font-semibold mb-1">Gagal menyimpan item galeri:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach(($errors->galeri_store->any() ? $errors->galeri_store : $errors->galeri_update)->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
+@if($errors->jadwal_store->any() || $errors->jadwal_update->any())
+<div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium mb-5 bg-red-50 text-red-700 border border-red-200">
+    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+    <div class="flex-1">
+        <p class="font-semibold mb-1">Gagal menyimpan jadwal PPDB:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach(($errors->jadwal_store->any() ? $errors->jadwal_store : $errors->jadwal_update)->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
+@if($errors->biaya_store->any() || $errors->biaya_update->any())
+<div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium mb-5 bg-red-50 text-red-700 border border-red-200">
+    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+    <div class="flex-1">
+        <p class="font-semibold mb-1">Gagal menyimpan biaya PPDB:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach(($errors->biaya_store->any() ? $errors->biaya_store : $errors->biaya_update)->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
+@if($errors->persyaratan_store->any() || $errors->persyaratan_update->any())
+<div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium mb-5 bg-red-50 text-red-700 border border-red-200">
+    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+    <div class="flex-1">
+        <p class="font-semibold mb-1">Gagal menyimpan persyaratan:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach(($errors->persyaratan_store->any() ? $errors->persyaratan_store : $errors->persyaratan_update)->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
+@if($errors->setting_store->any() || $errors->setting_update->any())
+<div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium mb-5 bg-red-50 text-red-700 border border-red-200">
+    <svg class="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+    <div class="flex-1">
+        <p class="font-semibold mb-1">Gagal menyimpan setting PPDB:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach(($errors->setting_store->any() ? $errors->setting_store : $errors->setting_update)->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
 {{-- Page Header --}}
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
@@ -39,9 +111,7 @@
 
 {{-- ── TAB NAVIGATION (Horizontal, Scrollable, Mobile-Friendly) ── --}}
 <div class="bg-white rounded-lg shadow-md mb-6">
-    {{-- Scrollable tab bar --}}
     <div class="relative">
-        {{-- Fade gradient kanan (hint scroll) --}}
         <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent rounded-tr-lg rounded-br-lg z-10 hidden" id="tab-fade-right"></div>
 
         <nav id="tab-nav"
@@ -285,7 +355,7 @@
                 </table>
             </div>
             <div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
-                <button type="reset" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Reset</button>
+                {{-- <button type="reset" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Reset</button> --}}
                 <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     Simpan Hero Section
@@ -749,7 +819,7 @@
                                value="{{ old('link_pendaftaran', $ppdbSetting?->link_pendaftaran ?? '/register') }}"
                                placeholder="/register"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            @error('link_pendaftaran') <p class="text-red-500 text-sm">{{ $message }}</p>@enderror
+                        @error('link_pendaftaran') <p class="text-red-500 text-sm">{{ $message }}</p>@enderror
                     </div>
                     <div class="md:col-span-2 lg:col-span-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Beasiswa</label>
@@ -765,9 +835,9 @@
                     <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium">
                         Simpan Pengaturan
                     </button>
-                    <button type="reset" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                    {{-- <button type="reset" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
                         Reset
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         </div>
@@ -790,46 +860,57 @@
         </div>
         <form method="POST" action="{{ route('admin.galeri.store') }}" enctype="multipart/form-data">
             @csrf
+            {{-- Patch #2: Error summary di dalam modal Tambah Galeri --}}
+            @if($errors->galeri_store->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->galeri_store->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Judul <span class="text-red-500">*</span></label>
-                    <input type="text" name="judul" placeholder="Judul item galeri" required
+                    <input type="text" name="judul" value="{{ old('judul') }}" placeholder="Judul item galeri" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Caption</label>
-                    <input type="text" name="caption" placeholder="Caption saat hover"
+                    <input type="text" name="caption" value="{{ old('caption') }}" placeholder="Caption saat hover"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipe <span class="text-red-500">*</span></label>
                     <select name="tipe" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            onchange="toggleGaleriTipe(this.value, '')">
-                        <option value="foto">📷 Foto</option>
-                        <option value="video">▶ Video (YouTube)</option>
+                            onchange="toggleGaleriTipe(this.value, '-add')">
+                        <option value="foto" {{ old('tipe', 'foto') === 'foto' ? 'selected' : '' }}>📷 Foto</option>
+                        <option value="video" {{ old('tipe') === 'video' ? 'selected' : '' }}>▶ Video (YouTube)</option>
                     </select>
                 </div>
-                <div id="field-gambar-add">
+                <div id="field-gambar-add" class="{{ old('tipe') === 'video' ? 'hidden' : '' }}">
                     <label class="block text-sm font-medium text-gray-700 mb-1">File Gambar <span class="text-red-500">*</span></label>
                     <input type="file" name="gambar" accept="image/*"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-xs text-gray-400 mt-1">JPG, PNG, WebP – maks 5MB</p>
                 </div>
-                <div id="field-video-add" class="hidden">
+                <div id="field-video-add" class="{{ old('tipe') === 'video' ? '' : 'hidden' }}">
                     <label class="block text-sm font-medium text-gray-700 mb-1">URL YouTube <span class="text-red-500">*</span></label>
-                    <input type="url" name="video_url" placeholder="https://www.youtube.com/watch?v=..."
+                    <input type="url" name="video_url" value="{{ old('video_url') }}" placeholder="https://www.youtube.com/watch?v=..."
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-xs text-gray-400 mt-1">URL biasa atau embed — akan otomatis dikonversi.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Alt Text</label>
-                        <input type="text" name="alt_text" placeholder="Teks aksesibilitas"
+                        <input type="text" name="alt_text" value="{{ old('alt_text') }}" placeholder="Teks aksesibilitas"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Urutan</label>
-                        <input type="number" name="urutan" min="0" value="{{ ($galeri->max('urutan') ?? 0) + 1 }}"
+                        <input type="number" name="urutan" min="0" value="{{ old('urutan', ($galeri->max('urutan') ?? 0) + 1) }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
@@ -838,7 +919,7 @@
                         <p class="text-sm font-medium text-gray-700">Aktifkan Item</p>
                         <p class="text-xs text-gray-400">Tampilkan di galeri publik</p>
                     </div>
-                    <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
+                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
                 </label>
             </div>
             <div class="flex justify-end gap-2 px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-lg">
@@ -862,6 +943,17 @@
         </div>
         <form method="POST" id="form-galeri-edit" enctype="multipart/form-data">
             @csrf @method('PUT')
+            {{-- Patch #2: Error summary di dalam modal Edit Galeri --}}
+            @if($errors->galeri_update->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->galeri_update->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Judul <span class="text-red-500">*</span></label>
@@ -932,54 +1024,65 @@
         <form method="POST" action="{{ route('admin.ppdb.jadwal.store') }}">
             @csrf
             <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{-- Patch #2: Error summary di dalam modal Tambah Jadwal --}}
+                @if($errors->jadwal_store->any())
+                <div class="col-span-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                    <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach($errors->jadwal_store->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran <span class="text-red-500">*</span></label>
-                    <input type="text" name="tahun_ajaran" value="{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}" required
+                    <input type="text" name="tahun_ajaran" value="{{ old('tahun_ajaran', $ppdbSetting?->tahun_ajaran ?? '2025/2026') }}" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Urut <span class="text-red-500">*</span></label>
-                    <input type="number" name="nomor_urut" min="1" value="{{ ($jadwals->max('nomor_urut') ?? 0) + 1 }}" required
+                    <input type="number" name="nomor_urut" min="1" value="{{ old('nomor_urut', ($jadwals->max('nomor_urut') ?? 0) + 1) }}" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Judul Tahapan <span class="text-red-500">*</span></label>
-                    <input type="text" name="judul" placeholder="Pendaftaran Online" required
+                    <input type="text" name="judul" value="{{ old('judul') }}" placeholder="Pendaftaran Online" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Label <span class="text-red-500">*</span></label>
-                    <input type="text" name="tanggal_label" placeholder="1 Jan – 28 Feb 2025" required
+                    <input type="text" name="tanggal_label" value="{{ old('tanggal_label') }}" placeholder="1 Jan – 28 Feb 2025" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Status <span class="text-red-500">*</span></label>
                     <select name="status" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="upcoming">○ Upcoming</option>
-                        <option value="active">● Aktif</option>
-                        <option value="done">✔ Selesai</option>
+                        <option value="upcoming" {{ old('status', 'upcoming') === 'upcoming' ? 'selected' : '' }}>○ Upcoming</option>
+                        <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>● Aktif</option>
+                        <option value="done" {{ old('status') === 'done' ? 'selected' : '' }}>✔ Selesai</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai <span class="text-red-500">*</span></label>
-                    <input type="date" name="tanggal_mulai" required
+                    <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai') }}" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai <span class="text-red-500">*</span></label>
-                    <input type="date" name="tanggal_selesai" required
+                    <input type="date" name="tanggal_selesai" value="{{ old('tanggal_selesai') }}" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                     <textarea name="deskripsi" rows="2" placeholder="Deskripsi singkat tahapan…"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ old('deskripsi') }}</textarea>
                 </div>
                 <div class="md:col-span-2">
                     <label class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
                         <span class="text-sm font-medium text-gray-700">Tampilkan di halaman publik</span>
-                        <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
+                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', '1') ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
                     </label>
                 </div>
             </div>
@@ -1005,6 +1108,17 @@
         <form method="POST" id="form-jadwal-edit">
             @csrf @method('PUT')
             <div class="px-6 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{-- Patch #2: Error summary di dalam modal Edit Jadwal --}}
+                @if($errors->jadwal_update->any())
+                <div class="col-span-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                    <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach($errors->jadwal_update->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran <span class="text-red-500">*</span></label>
                     <input type="text" name="tahun_ajaran" id="ej-tahun"
@@ -1078,21 +1192,32 @@
         <form method="POST" action="{{ route('admin.ppdb.persyaratan.store') }}">
             @csrf
             <input type="hidden" name="is_active" value="1">
+            {{-- Patch #2: Error summary di dalam modal Tambah Persyaratan --}}
+            @if($errors->persyaratan_store->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->persyaratan_store->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dokumen <span class="text-red-500">*</span></label>
-                    <input type="text" name="dokumen" required placeholder="Fotokopi Ijazah"
+                    <input type="text" name="dokumen" value="{{ old('dokumen') }}" required placeholder="Fotokopi Ijazah"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran</label>
-                        <input type="text" name="tahun_ajaran" value="{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}"
+                        <input type="text" name="tahun_ajaran" value="{{ old('tahun_ajaran', $ppdbSetting?->tahun_ajaran ?? '2025/2026') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Urutan</label>
-                        <input type="number" name="urutan" min="0" value="{{ ($persyaratan->max('urutan') ?? 0) + 1 }}"
+                        <input type="number" name="urutan" min="0" value="{{ old('urutan', ($persyaratan->max('urutan') ?? 0) + 1) }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
@@ -1118,6 +1243,17 @@
         </div>
         <form method="POST" id="form-persyaratan-edit">
             @csrf @method('PUT')
+            {{-- Patch #2: Error summary di dalam modal Edit Persyaratan --}}
+            @if($errors->persyaratan_update->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->persyaratan_update->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Dokumen <span class="text-red-500">*</span></label>
@@ -1164,27 +1300,38 @@
             @csrf
             <input type="hidden" name="is_active" value="1">
             <input type="hidden" name="tahun_ajaran" value="{{ $ppdbSetting?->tahun_ajaran ?? '2025/2026' }}">
+            {{-- Patch #2: Error summary di dalam modal Tambah Biaya --}}
+            @if($errors->biaya_store->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->biaya_store->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Biaya <span class="text-red-500">*</span></label>
-                    <input type="text" name="nama_biaya" required placeholder="SPP per Bulan"
+                    <input type="text" name="nama_biaya" value="{{ old('nama_biaya') }}" required placeholder="SPP per Bulan"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp) <span class="text-red-500">*</span></label>
-                        <input type="number" name="nominal" min="0" required placeholder="750000"
+                        <input type="number" name="nominal" value="{{ old('nominal') }}" min="0" required placeholder="750000"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Urutan</label>
-                        <input type="number" name="urutan" min="0" value="{{ ($biaya->max('urutan') ?? 0) + 1 }}"
+                        <input type="number" name="urutan" min="0" value="{{ old('urutan', ($biaya->max('urutan') ?? 0) + 1) }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
-                    <input type="text" name="keterangan" placeholder="Opsional"
+                    <input type="text" name="keterangan" value="{{ old('keterangan') }}" placeholder="Opsional"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
             </div>
@@ -1209,6 +1356,17 @@
         </div>
         <form method="POST" id="form-biaya-edit">
             @csrf @method('PUT')
+            {{-- Patch #2: Error summary di dalam modal Edit Biaya --}}
+            @if($errors->biaya_update->any())
+            <div class="mx-6 mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                <p class="font-semibold mb-1">Perhatikan kesalahan berikut:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach($errors->biaya_update->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             <div class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Biaya <span class="text-red-500">*</span></label>
@@ -1249,6 +1407,7 @@
 </div>
 
 
+{{-- ── SCRIPT (Patch #3: Restored tab dari PHP session + auto-open modal) ── --}}
 <script>
 (() => {
     const $ = s => document.querySelector(s);
@@ -1256,39 +1415,38 @@
 
     /* ── TAB SWITCHING ─────────────────────────────────────────── */
     window.switchTab = (key, button) => {
-        // Hide all panels
         $$('.tab-panel').forEach(p => p.classList.add('hidden'));
-
-        // Reset all tab buttons
         $$('.tab-btn').forEach(b => {
             b.classList.remove('border-indigo-600', 'text-indigo-600', 'bg-indigo-50/60');
             b.classList.add('border-transparent', 'text-gray-500');
         });
 
-        // Show target panel
         document.getElementById('panel-' + key)?.classList.remove('hidden');
 
-        // Activate clicked button
         if (button) {
             button.classList.remove('border-transparent', 'text-gray-500');
             button.classList.add('border-indigo-600', 'text-indigo-600', 'bg-indigo-50/60');
-
-            // Scroll tab into view on mobile
             button.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
 
         sessionStorage.setItem('ws_tab', key);
     };
 
-    // Restore last active tab
-    const savedTab = sessionStorage.getItem('ws_tab');
-    if (savedTab) {
-        const btn = $(`[data-tab="${savedTab}"]`);
-        if (btn) switchTab(savedTab, btn);
+    // ── Restore tab: prioritaskan session dari PHP, lalu sessionStorage ──
+    const phpTab    = @json(session('open_tab'));
+    const phpModal  = @json(session('open_modal'));
+
+    const activeTab = phpTab || sessionStorage.getItem('ws_tab') || 'hero';
+    const activeBtn = $(`[data-tab="${activeTab}"]`);
+    if (activeBtn) switchTab(activeTab, activeBtn);
+
+    // ── Auto-open modal jika ada error dari controller ──
+    if (phpModal) {
+        openModal(phpModal);
     }
 
-    // Show/hide right-fade hint based on scroll position
-    const tabNav = $('#tab-nav');
+    // Show/hide right-fade hint
+    const tabNav   = $('#tab-nav');
     const fadeRight = $('#tab-fade-right');
     if (tabNav && fadeRight) {
         const checkScroll = () => {
@@ -1311,14 +1469,12 @@
         document.body.style.overflow = '';
     };
 
-    // Close on backdrop click
     $$('[id^="modal-"]').forEach(modal => {
         modal.addEventListener('click', e => {
             if (e.target === modal) closeModal(modal.id);
         });
     });
 
-    // Close on Escape
     document.addEventListener('keydown', e => {
         if (e.key !== 'Escape') return;
         $$('[id^="modal-"]:not(.hidden)').forEach(m => closeModal(m.id));

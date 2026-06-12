@@ -14,14 +14,14 @@ class RankingService
     /**
      * Tentukan status penerimaan untuk SEMUA siswa.
      *
-     * Logika yang benar:
+     * Logika:
      *  - Tahfiz  → siswa yg MEMILIH tahfiz bersaing di quota tahfiz berdasarkan SAW rank tahfiz
      *  - Bahasa  → siswa yg MEMILIH bahasa bersaing di quota bahasa berdasarkan SAW rank bahasa
      *  - Regular → FCFS (urutan validated_at) vs quota regular
      *
      *  CROSS-ACCEPTED:
      *  Jika quota tahfiz belum penuh setelah siswa tahfiz selesai, sisa slot bisa diisi
-     *  oleh siswa bahasa dengan rank tahfiz terbaik (dan sebaliknya). Ini opsional.
+     *  oleh siswa bahasa dengan rank tahfiz terbaik (dan sebaliknya).
      *
      *  DUAL PASS:
      *  Siswa yang lulus di KEDUA spesialisasi (karena cross-accepted) mendapat saran
@@ -42,6 +42,13 @@ class RankingService
             $languageQuota = $quota->language_quota ?? 0;
             $regularQuota  = $quota->regular_quota  ?? 0;
 
+            // Inisialisasi semua counter & slot
+            $tahfizAccepted        = 0;
+            $languageAccepted      = 0;
+            $tahfizSlotRemaining   = $tahfizQuota;
+            $languageSlotRemaining = $languageQuota;
+            $dualPassCount         = 0;
+
             DB::beginTransaction();
 
             // --------------------------------------------------
@@ -59,7 +66,7 @@ class RankingService
 
             // --------------------------------------------------
             // A. TAHFIZ — hanya siswa yang MEMILIH tahfiz
-            //    Ranking berdasarkan SAW tahfiz mereka
+            //    Ranking berdasarkan SAW tahfiz (primary_rank)
             // --------------------------------------------------
             $tahfizStudents = SawResult::where('academic_year_id', $academicYearId)
                 ->where('specialization', 'tahfiz')
@@ -68,23 +75,21 @@ class RankingService
                     ->where('specialization', 'tahfiz')
                 )
                 ->with('student')
-                ->orderBy('primary_rank') // <-- GANTI dari orderBy('rank')
+                ->orderBy('primary_rank')
                 ->get();
-
-            $tahfizAccepted = 0;
 
             foreach ($tahfizStudents as $result) {
                 $student    = $result->student;
-                $isAccepted = $result->primary_rank !== null 
-                        && $result->primary_rank <= $tahfizQuota; // <-- pakai primary_rank
+                $isAccepted = $result->primary_rank !== null
+                           && $result->primary_rank <= $tahfizQuota;
 
                 if ($isAccepted) {
                     Student::where('id', $student->id)->update([
-                        'final_status'            => 'accepted',
-                        'dual_pass'               => false,
+                        'final_status'               => 'accepted',
+                        'dual_pass'                  => false,
                         'recommended_specialization' => null,
-                        'accepted_specialization' => 'tahfiz',
-                        'cross_accepted'          => false,
+                        'accepted_specialization'    => 'tahfiz',
+                        'cross_accepted'             => false,
                     ]);
                     $tahfizAccepted++;
                     $tahfizSlotRemaining--;
@@ -93,7 +98,7 @@ class RankingService
 
             // --------------------------------------------------
             // B. BAHASA — hanya siswa yang MEMILIH bahasa
-            //    Ranking berdasarkan SAW bahasa mereka
+            //    Ranking berdasarkan SAW bahasa (primary_rank)
             // --------------------------------------------------
             $languageStudents = SawResult::where('academic_year_id', $academicYearId)
                 ->where('specialization', 'language')
@@ -102,12 +107,13 @@ class RankingService
                     ->where('specialization', 'language')
                 )
                 ->with('student')
-                ->orderBy('primary_rank') // <-- GANTI
+                ->orderBy('primary_rank')
                 ->get();
 
             foreach ($languageStudents as $result) {
-                $isAccepted = $result->primary_rank !== null 
-                        && $result->primary_rank <= $languageQuota;
+                $student    = $result->student; 
+                $isAccepted = $result->primary_rank !== null
+                           && $result->primary_rank <= $languageQuota;
 
                 if ($isAccepted) {
                     Student::where('id', $student->id)->update([
@@ -124,17 +130,7 @@ class RankingService
 
             // --------------------------------------------------
             // C. CROSS-ACCEPTED (opsional — isi sisa slot)
-            //    Jika quota tahfiz belum penuh, isi dgn siswa bahasa
-            //    yg punya rank tahfiz terbaik (sudah lulus bahasa maupun belum).
-            //    Begitu pula sebaliknya untuk quota bahasa.
-            //
-            //    FIX: filter `final_status = 'rejected'` DIHAPUS dari query
-            //    agar siswa yang sudah lulus di spesialisasi utamanya tetap
-            //    terdeteksi dan ditandai sebagai Dual Pass.
-            //    Pengecekan `$alreadyPassed*` di dalam loop yang menentukan
-            //    apakah slot berkurang atau hanya ditandai dual_pass.
             // --------------------------------------------------
-            $dualPassCount = 0;
 
             // C1. Sisa slot tahfiz → cari siswa BAHASA yang lolos rank tahfiz
             if ($tahfizSlotRemaining > 0) {
@@ -142,22 +138,18 @@ class RankingService
                     ->where('specialization', 'tahfiz')
                     ->whereHas('student', fn($q) => $q
                         ->where('validation_status', 'valid')
-                        ->where('specialization', 'language') // siswa bahasa di ranking tahfiz
-                        // TIDAK filter final_status — biarkan loop yang cek
+                        ->where('specialization', 'language')
                     )
                     ->with('student')
                     ->orderBy('rank')
-                    ->get(); // ambil semua, slot dikelola manual di loop
+                    ->get();
 
                 foreach ($crossForTahfiz as $result) {
-                    // Hentikan jika slot sudah habis
                     if ($tahfizSlotRemaining <= 0) {
                         break;
                     }
 
-                    // Refresh agar data final_status terbaru dari DB
                     $student = $result->student->fresh();
-
                     $alreadyPassedLanguage = $student->final_status === 'accepted';
 
                     if ($alreadyPassedLanguage) {
@@ -174,11 +166,11 @@ class RankingService
                             'final_status'               => 'accepted',
                             'dual_pass'                  => true,
                             'recommended_specialization' => $recommended,
-                            'accepted_specialization'    => 'language', // pilihan utamanya bahasa
+                            'accepted_specialization'    => 'language',
                             'cross_accepted'             => true,
                         ]);
                         $dualPassCount++;
-                        // Slot TIDAK berkurang — siswa ini sudah terhitung di quota bahasa
+                        // Slot TIDAK berkurang — sudah terhitung di quota bahasa
                     } else {
                         // Belum lulus di mana pun → cross-accepted ke tahfiz
                         Student::where('id', $student->id)->update([
@@ -200,22 +192,18 @@ class RankingService
                     ->where('specialization', 'language')
                     ->whereHas('student', fn($q) => $q
                         ->where('validation_status', 'valid')
-                        ->where('specialization', 'tahfiz') // siswa tahfiz di ranking bahasa
-                        // TIDAK filter final_status — biarkan loop yang cek
+                        ->where('specialization', 'tahfiz')
                     )
                     ->with('student')
                     ->orderBy('rank')
-                    ->get(); // ambil semua, slot dikelola manual di loop
+                    ->get();
 
                 foreach ($crossForLanguage as $result) {
-                    // Hentikan jika slot sudah habis
                     if ($languageSlotRemaining <= 0) {
                         break;
                     }
 
-                    // Refresh agar data final_status terbaru dari DB
                     $student = $result->student->fresh();
-
                     $alreadyPassedTahfiz = $student->final_status === 'accepted';
 
                     if ($alreadyPassedTahfiz) {
@@ -232,11 +220,11 @@ class RankingService
                             'final_status'               => 'accepted',
                             'dual_pass'                  => true,
                             'recommended_specialization' => $recommended,
-                            'accepted_specialization'    => 'tahfiz', // pilihan utamanya tahfiz
+                            'accepted_specialization'    => 'tahfiz',
                             'cross_accepted'             => true,
                         ]);
                         $dualPassCount++;
-                        // Slot TIDAK berkurang — siswa ini sudah terhitung di quota tahfiz
+                        // Slot TIDAK berkurang — sudah terhitung di quota tahfiz
                     } else {
                         // Belum lulus di mana pun → cross-accepted ke bahasa
                         Student::where('id', $student->id)->update([
