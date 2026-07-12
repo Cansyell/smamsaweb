@@ -164,9 +164,8 @@ class PublishResultController extends Controller
             ->with('warning', 'Publikasi hasil telah ditarik. Siswa tidak lagi dapat melihat hasil seleksi.');
     }
 
-    // -----------------------------------------------------------------------
+   
     // PRIVATE
-    // -----------------------------------------------------------------------
 
     private function buildPublishSummary(int $academicYearId): array
     {

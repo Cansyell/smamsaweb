@@ -45,9 +45,7 @@ class CriterionValueController extends Controller
         $this->syncService   = $syncService;
     }
 
-    // =========================================================================
     // HELPERS
-    // =========================================================================
 
     /**
      * Kembalikan nama kolom ReportGrade yang sesuai dengan criteria,
@@ -116,9 +114,7 @@ class CriterionValueController extends Controller
             ->with('error_detail', config('app.debug') ? $detail : null);
     }
 
-    // =========================================================================
     // INDEX
-    // =========================================================================
 
     public function index(Request $request)
     {
@@ -183,9 +179,7 @@ class CriterionValueController extends Controller
         ));
     }
 
-    // =========================================================================
     // CREATE (FORM)
-    // =========================================================================
 
     public function create(Student $student)
     {
@@ -243,9 +237,7 @@ class CriterionValueController extends Controller
         ));
     }
 
-    // =========================================================================
     // STORE
-    // =========================================================================
 
     public function store(Request $request, Student $student)
     {
@@ -349,9 +341,7 @@ class CriterionValueController extends Controller
         }
     }
 
-    // =========================================================================
     // SYNC & BATCH
-    // =========================================================================
 
     public function syncFromReportGrade(Student $student)
     {
@@ -396,9 +386,7 @@ class CriterionValueController extends Controller
         }
     }
 
-    // =========================================================================
     // SAW & ACCEPTANCE
-    // =========================================================================
 
     public function calculateSaw(Request $request)
     {
@@ -501,9 +489,7 @@ class CriterionValueController extends Controller
         }
     }
 
-    // =========================================================================
     // SHOW
-    // =========================================================================
 
     public function show(Student $student)
     {

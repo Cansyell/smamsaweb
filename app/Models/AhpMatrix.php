@@ -225,7 +225,7 @@ class AhpMatrix extends Model
                     $matrix[$i][$j] = (float) $rawMatrix[$rid][$cid];
                 } elseif (isset($rawMatrix[$cid][$rid]) && $rawMatrix[$cid][$rid] !== null) {
                     $val = (float) $rawMatrix[$cid][$rid];
-                    $matrix[$i][$j] = ($val != 0) ? 1.0 / $val : 0.0;
+                    $matrix[$i][$j] = ($val != 0) ? 1.0 / $val : 0.0; //kebalikan
                 } else {
                     return null; // belum lengkap
                 }

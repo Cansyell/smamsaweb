@@ -66,22 +66,15 @@
                     @endif
                 </div>
 
-                <!-- Remember Me & Forgot Password -->
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center">
-                        <input 
-                            type="checkbox" 
-                            id="remember_me" 
-                            name="remember"
-                            class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                        >
-                        <label for="remember_me" class="ml-2 text-sm text-gray-700">Remember me</label>
-                    </div>
-                    @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="text-sm text-indigo-600 hover:text-indigo-800 transition">
-                            Lupa password?
-                        </a>
-                    @endif
+                <!-- Remember Me -->
+                <div class="flex items-center mb-6">
+                    <input 
+                        type="checkbox" 
+                        id="remember_me" 
+                        name="remember"
+                        class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                    >
+                    <label for="remember_me" class="ml-2 text-sm text-gray-700">Remember me</label>
                 </div>
 
                 <!-- Login Button -->

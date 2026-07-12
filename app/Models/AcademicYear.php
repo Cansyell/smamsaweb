@@ -41,7 +41,7 @@ class AcademicYear extends Model
     {
         return $this->hasMany(Student::class);
     }
-    // Tambahkan di bagian RELATIONSHIP
+    
     public function specializationQuotas()
     {
         return $this->hasMany(SpecializationQuota::class);

@@ -14,9 +14,7 @@ class SawResultController extends Controller
 {
     public function __construct(protected RankingService $rankingService) {}
 
-    // -----------------------------------------------------------------------
     // INDEX
-    // -----------------------------------------------------------------------
 
     public function index(Request $request)
     {
@@ -46,9 +44,7 @@ class SawResultController extends Controller
         ));
     }
 
-    // -----------------------------------------------------------------------
     // SHOW
-    // -----------------------------------------------------------------------
 
     public function show(Student $student)
     {
@@ -90,10 +86,7 @@ class SawResultController extends Controller
         ));
     }
 
-    // -----------------------------------------------------------------------
     // PRIVATE HELPERS
-    // -----------------------------------------------------------------------
-
     private function getAllStudentsData(int $academicYearId): Collection
     {
         $students = Student::with('user')

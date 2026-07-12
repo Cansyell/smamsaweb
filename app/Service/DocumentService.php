@@ -89,7 +89,7 @@ class DocumentService
             
             // Create document record
             $document = Document::createDocument([
-                'student_id' => $studentId, // PERBAIKAN: Gunakan student_id yang benar
+                'student_id' => $studentId, 
                 'document_type' => $data['document_type'],
                 'file_name' => $file->getClientOriginalName(),
                 'file_path' => $filePath,
